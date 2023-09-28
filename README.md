@@ -36,7 +36,7 @@ In the desired example directory perform the following steps
 - The code should now execute on the Nucleo
 
 Notes
-- Use the generated .hex file with a SWD style programmers
+- Use the generated .hex file with a JTAG/SWD style programmers
 - The compiled assembler is available in the .asm file
 
 ## Help
