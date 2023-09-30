@@ -35,7 +35,9 @@ namespace bpl
             //
             const std::pmr::string readln() const;
 
-            //note, for the usual C++ reasons, the templated version of readln() has to be declared here in the .hpp file
+            // notes 1, for the usual C++ reasons, the templated version of readln() has to be declared here in the .hpp file
+            //       2, if the buffer is filled before CR is pressed the input will be truncated
+            //       3, the output will always be 0x00 terminated and the returned length does not include the 0x00 byte
             //
             template<size_t n>
             const uint32_t readln(char(&text)[n]) const
@@ -46,22 +48,20 @@ namespace bpl
                 {
                     if (read(byte))
                     {
-                        if (byte == bpl::Ascii::CR)
-                        {
-                            // notes 1, make the end of the c_str
-                            //       2, don't include the 0x00 in the returned length, i.e. no i++
-                            //
-                            text[i] = 0x00;
-                            break;
-                        }
+                        if (byte == bpl::Ascii::CR) break;
 
                         text[i++] = byte;
+                        if (i == n) break;
                     }
                     else
                     {
                         asm volatile ("wfi");
                     }
                 }
+
+                // terminate and generate the equivalent of a c_str()
+                //
+                text[i] = 0x00;
 
                 return i;
             }
