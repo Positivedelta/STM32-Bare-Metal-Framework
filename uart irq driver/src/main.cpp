@@ -58,6 +58,11 @@ int main()
     //
     const auto writer = bpl::PrintWriter(outputStream);
     writer.println();
+
+    //
+    // test the std::pmr::string APIs of the bpl::PrintWriter and bpl::TextReader classes
+    //
+
     for (auto line : lines) writer.println(line);
     writer.println();
     writer.print("Please enter your name: ");
@@ -85,6 +90,41 @@ int main()
     writer.println();
     writer.println("Typed characters will now be echoed back to the terminal");
     while (true) input.readln();
+
+/*  //
+    // test the char* APIs of the bpl::PrintWriter and bpl::TextReader classes
+    //
+
+    for (auto line : lines) writer.println(line.c_str());
+    writer.println();
+    writer.print("Please enter your name: ");
+
+    // indicate uart activity by alternating the led2 state as characters
+    // note, this is purely and example to demonstrate a possible use for a ByteListener
+    //
+    int32_t count = 0;
+    const bpl::ByteListener listener = [&](const uint8_t rxedByte) {
+        if (++count % 3) Stm32::gpioA(Gpio::ODR) = Stm32::gpioA(Gpio::ODR) ^ (1 << Gpio::Pin5);
+    };
+
+    inputStream.setByteListener(listener);
+
+    // notes 1, readline() blocks, internally it uses WFI in order to sip power...
+    //       2, the TextReader class can optionally take an OutputStream, this is to allow local echo
+    //       3, using the templated TextReader::readln<N>(char(&textBuffer)[n]) method to avoid allocating a std::pmr::string
+    //
+    const auto input = bpl::TextReader(inputStream, outputStream);
+
+    const auto BUFFER_SIZE = 1024;
+    char buffer[BUFFER_SIZE];
+    input.readln<BUFFER_SIZE>(buffer);
+    writer.print("Hello ");
+    writer.print(buffer);
+    writer.println("!");
+
+    writer.println();
+    writer.println("Typed characters will now be echoed back to the terminal");
+    while (true) input.readln<BUFFER_SIZE>(buffer); */
 
     return 0;
 }
