@@ -28,7 +28,7 @@ class LedFlasher
         }
 };
 
-int main(void)
+int main()
 {
     Stm32::rcc(Rcc::AHB1ENR) = Stm32::rcc(Rcc::AHB1ENR) | 1;                // enable the AHB1 clock, needed by gpioA
     asm("nop");

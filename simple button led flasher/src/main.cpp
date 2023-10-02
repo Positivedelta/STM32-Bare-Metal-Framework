@@ -13,7 +13,7 @@ void delay(uint64_t count)
     for (uint64_t i = 0; i < count; i++) asm("nop");
 }
 
-int main(void)
+int main()
 {
     Stm32::rcc(Rcc::AHB1ENR) = Stm32::rcc(Rcc::AHB1ENR) | (Rcc::AHB1ENR_GPIOA + Rcc::AHB1ENR_GPIOC);
     asm("nop");
