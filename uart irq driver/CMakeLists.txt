@@ -24,9 +24,9 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 file(GLOB STM32_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/stm32/*.cpp)
 file(GLOB IO_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/io/*.cpp)
-file(GLOB NUCLEO_LED_FLASHER_SRC ${PROJECT_SOURCE_DIR}/src/*.cpp)
-list(APPEND NUCLEO_LED_FLASHER_SRC ${STM32_SRC} ${IO_SRC})
-add_executable(${CMAKE_PROJECT_NAME} ${NUCLEO_LED_FLASHER_SRC})
+file(GLOB NUCLEO_UART_IRQ_DRIVER_SRC ${PROJECT_SOURCE_DIR}/src/*.cpp)
+list(APPEND NUCLEO_UART_IRQ_DRIVER_SRC ${STM32_SRC} ${IO_SRC})
+add_executable(${CMAKE_PROJECT_NAME} ${NUCLEO_UART_IRQ_DRIVER_SRC})
 
 # notes 1, the --no-warn-rwx-segments can be removed once the compiler is upgraded to v13, see the GCC v12 #1029 issue
 #       2, added extra quotes to cater for spaces in paths
@@ -41,3 +41,7 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "${CMAKE_PROJ
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_OBJCOPY} ARGS -O binary ${CMAKE_PROJECT_NAME}.elf ${CMAKE_PROJECT_NAME}.bin)
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_OBJCOPY} ARGS -O ihex ${CMAKE_PROJECT_NAME}.elf ${CMAKE_PROJECT_NAME}.hex)
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_OBJDUMP} ARGS -D ${CMAKE_PROJECT_NAME}.elf > ${CMAKE_PROJECT_NAME}.asm)
+
+# the .hex file is automatically added to the 'clean' target, but not the above .bin, .hex and .asm files
+#
+set_property(TARGET ${CMAKE_PROJECT_NAME} APPEND PROPERTY ADDITIONAL_CLEAN_FILES ${CMAKE_PROJECT_NAME}.bin ${CMAKE_PROJECT_NAME}.hex ${CMAKE_PROJECT_NAME}.asm)
