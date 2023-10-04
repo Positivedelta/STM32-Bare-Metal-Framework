@@ -60,8 +60,9 @@ Usart2IRQ& Usart2IRQ::getInstance(const bpl::BaudRate& baudRate)
 
 Usart2IRQ::Usart2IRQ(const bpl::BaudRate& baudRate): baudRate(baudRate), inputStream(Usart2IRQ::In()), outputStream(Usart2IRQ::Out())
 {
-    // enable the usart2 clock
+    // enable the gpioA and usart2 clocks
     //
+    Stm32::rcc(Rcc::AHB1ENR) = Stm32::rcc(Rcc::AHB1ENR) | Rcc::AHB1ENR_GPIOA;
     Stm32::rcc(Rcc::APB1ENR) = Stm32::rcc(Rcc::APB1ENR) | Rcc::APB1ENR_USART2EN;
 
     // setup the appropriate pins on gpioA, PA2:PA3 --> tx:rx
