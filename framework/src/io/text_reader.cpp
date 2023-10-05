@@ -15,26 +15,61 @@ bpl::TextReader::TextReader(const bpl::InputStream& inputStream, const bpl::Outp
 
 const bool bpl::TextReader::read(uint8_t& byte) const
 {
-    const bool hasByte = inputStream.read(byte);
-    if (hasByte && echo)
-    {
-        outputStream.write(byte);
-        if (byte == bpl::Ascii::CR) outputStream.write(bpl::Ascii::LF);
-    }
-
-    return hasByte;
+    return inputStream.read(byte);
 }
 
+// note, implements CR, BS and DEL handling
+//
 const std::pmr::string bpl::TextReader::readln() const
 {
     uint8_t byte;
     auto line = std::pmr::string();
-    while (true)
+    auto keepReading = true;
+    while (keepReading)
     {
         if (read(byte))
         {
-            if (byte == bpl::Ascii::CR) break;
-            line.push_back(byte);
+            if (echo && (byte != bpl::Ascii::BS) && (byte != bpl::Ascii::DEL))
+            {
+                outputStream.write(byte);
+                if (byte == bpl::Ascii::CR) outputStream.write(bpl::Ascii::LF);
+            }
+
+            switch (byte)
+            {
+                case bpl::Ascii::CR:
+                    keepReading = false;
+                    break;
+
+                case bpl::Ascii::BS:
+                {
+                    if (line.size() > 0)
+                    {
+                        line.pop_back();
+                        if (echo)
+                        {
+                            const uint8_t action[] = {bpl::Ascii::BS, bpl::Ascii::SPACE, bpl::Ascii::BS};
+                            outputStream.write(action, sizeof(action));
+                        }
+                    }
+
+                    break;
+                }
+
+                case bpl::Ascii::DEL:
+                {
+                    if (line.size() > 0)
+                    {
+                        line.pop_back();
+                        if (echo) outputStream.write(bpl::Ascii::DEL);
+                    }
+
+                    break;
+                }
+
+                default:
+                    line.push_back(byte);
+            }
         }
         else
         {

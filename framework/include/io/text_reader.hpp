@@ -38,20 +38,61 @@ namespace bpl
             // notes 1, for the usual C++ reasons, the templated version of readln() has to be declared here in the .hpp file
             //       2, if the buffer is filled before CR is pressed the input will be truncated
             //       3, the output will always be 0x00 terminated and the returned length does not include the 0x00 byte
+            //       4, implements CR, BS and DEL handling
             //
             template<size_t n>
             const uint32_t readln(char(&text)[n]) const
             {
                 uint8_t byte;
                 uint32_t i = 0;
-                while (true)
+                auto keepReading = true;
+                while (keepReading)
                 {
                     if (read(byte))
                     {
-                        if (byte == bpl::Ascii::CR) break;
+                        if (echo && (byte != bpl::Ascii::BS) && (byte != bpl::Ascii::DEL))
+                        {
+                            outputStream.write(byte);
+                            if (byte == bpl::Ascii::CR) outputStream.write(bpl::Ascii::LF);
+                        }
 
-                        text[i++] = byte;
-                        if (i == n) break;
+                        switch (byte)
+                        {
+                            case bpl::Ascii::CR:
+                                keepReading = false;
+                                break;
+
+                            case bpl::Ascii::BS:
+                            {
+                                if (i > 0)
+                                {
+                                    --i;
+                                    if (echo)
+                                    {
+                                        const uint8_t action[] = {bpl::Ascii::BS, bpl::Ascii::SPACE, bpl::Ascii::BS};
+                                        outputStream.write(action, sizeof(action));
+                                    }
+                                }
+
+                                break;
+                            }
+
+                            case bpl::Ascii::DEL:
+                            {
+                                if (i > 0)
+                                {
+                                    --i;
+                                    if (echo) outputStream.write(bpl::Ascii::DEL);
+                                }
+
+                                break;
+                            }
+
+                            // don't allow the buffer to overflow, just truncate the input
+                            //
+                            default:
+                                (i < n) ? text[i++] = byte : --i;
+                        }
                     }
                     else
                     {
