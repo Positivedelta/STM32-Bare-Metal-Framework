@@ -1,5 +1,5 @@
 //
-// (c) Bit Parallel Ltd, September 2023
+// (c) Bit Parallel Ltd, October 2023
 //
 
 #ifndef BPL_ASCII_H
