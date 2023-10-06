@@ -21,6 +21,25 @@ class Nvic
         //
         inline static constexpr uint32_t PRE4_SUB0 = 0b011;
 
+        // IRQ priority constants, PRI0..PRI15 ==> high..low
+        //
+        inline static constexpr uint8_t Priority0 = 0x00;
+        inline static constexpr uint8_t Priority1 = 0x01;
+        inline static constexpr uint8_t Priority2 = 0x02;
+        inline static constexpr uint8_t Priority3 = 0x03;
+        inline static constexpr uint8_t Priority4 = 0x04;
+        inline static constexpr uint8_t Priority5 = 0x05;
+        inline static constexpr uint8_t Priority6 = 0x06;
+        inline static constexpr uint8_t Priority7 = 0x07;
+        inline static constexpr uint8_t Priority8 = 0x08;
+        inline static constexpr uint8_t Priority9 = 0x09;
+        inline static constexpr uint8_t Priority10 = 0x0a;
+        inline static constexpr uint8_t Priority11 = 0x0b;
+        inline static constexpr uint8_t Priority12 = 0x0c;
+        inline static constexpr uint8_t Priority13 = 0x0d;
+        inline static constexpr uint8_t Priority14 = 0x0e;
+        inline static constexpr uint8_t Priority15 = 0x0f;
+
         //
         // utility methods
         //

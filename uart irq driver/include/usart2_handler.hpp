@@ -50,7 +50,7 @@ class Usart2IRQ
                 const bool bufferFull() const;
         };
 
-        static Usart2IRQ& getInstance(const bpl::BaudRate& baudRate);
+        static Usart2IRQ& getInstance(const bpl::BaudRate& baudRate, const uint8_t priority);
         static void handler();
 
         const bpl::BaudRate& baudRate;
@@ -58,14 +58,14 @@ class Usart2IRQ
         const bpl::OutputStream& getOutputStream();
 
     private:
-        Usart2IRQ(const bpl::BaudRate& baudRate);
+        Usart2IRQ(const bpl::BaudRate& baudRate, const uint8_t priority);
         const In inputStream;
         const Out outputStream;
 
     public:
-//      Usart2IRQ(const Usart2IRQ&) = delete;           // FIXME! not 100% sure why is this a problem?
+        Usart2IRQ(const Usart2IRQ(const bpl::BaudRate& baudRate, const uint8_t priority)&) = delete;
         Usart2IRQ& operator=(const Usart2IRQ&) = delete;
-//      void operator=(const Usart2IRQ&) = delete;
+        void operator=(const Usart2IRQ(const bpl::BaudRate& baudRate, const uint8_t priority)&) = delete;
 };
 
 #endif

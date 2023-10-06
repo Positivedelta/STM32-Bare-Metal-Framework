@@ -52,13 +52,13 @@ void Usart2IRQ::handler()
     }
 }
 
-Usart2IRQ& Usart2IRQ::getInstance(const bpl::BaudRate& baudRate)
+Usart2IRQ& Usart2IRQ::getInstance(const bpl::BaudRate& baudRate, const uint8_t priority)
 {
-    static Usart2IRQ instance = Usart2IRQ(baudRate);
+    static Usart2IRQ instance = Usart2IRQ(baudRate, priority);
     return instance;
 }
 
-Usart2IRQ::Usart2IRQ(const bpl::BaudRate& baudRate): baudRate(baudRate), inputStream(Usart2IRQ::In()), outputStream(Usart2IRQ::Out())
+Usart2IRQ::Usart2IRQ(const bpl::BaudRate& baudRate, const uint8_t priority): baudRate(baudRate), inputStream(Usart2IRQ::In()), outputStream(Usart2IRQ::Out())
 {
     // enable the gpioA and usart2 clocks
     //
@@ -143,7 +143,7 @@ Usart2IRQ::Usart2IRQ(const bpl::BaudRate& baudRate): baudRate(baudRate), inputSt
 
     // set the IRQ priority, hi --> low encoded as 0 --> 15 and enable the IRQ
     //
-    Nvic::setPriority(Stm32F446IRQn::Usart2, 1);
+    Nvic::setPriority(Stm32F446IRQn::Usart2, priority);
     Nvic::enableIRQ(Stm32F446IRQn::Usart2);
 }
 

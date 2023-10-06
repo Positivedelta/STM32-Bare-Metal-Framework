@@ -45,7 +45,7 @@ int main()
     Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
     Stm32::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
 
-    auto uart2 = Usart2IRQ::getInstance(bpl::BaudRate::BPS_115200);
+    auto uart2 = Usart2IRQ::getInstance(bpl::BaudRate::BPS_115200, Nvic::Priority1);
     const auto& inputStream = uart2.getInputStream();
     const auto& outputStream = uart2.getOutputStream();
 
