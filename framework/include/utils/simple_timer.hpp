@@ -6,7 +6,6 @@
 #define BPL_SIMPLE_TIMER_H
 
 #include <cstdint>
-#include <functional>
 
 #include "irq_consumer.hpp"
 #include "simple_callback.hpp"
@@ -16,13 +15,13 @@ namespace bpl
     class SimpleTimer : public IrqConsumer
     {
         private:
-            const int32_t period;
+            const uint32_t period;
             SimpleCallBack& callBack;
-            int32_t counter;
 
         public:
-            SimpleTimer(const int32_t period, SimpleCallBack& callBack);
+            SimpleTimer(const uint32_t period, SimpleCallBack& callBack);
             void irq() override;
+            uint32_t getIrqRate() const override;
     };
 }
 

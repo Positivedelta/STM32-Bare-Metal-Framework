@@ -4,14 +4,16 @@
 
 #include "simple_timer.hpp"
 
-bpl::SimpleTimer::SimpleTimer(const int32_t period, bpl::SimpleCallBack& callBack):
-    period(period), callBack(callBack), counter(period) {
+bpl::SimpleTimer::SimpleTimer(const uint32_t period, bpl::SimpleCallBack& callBack):
+    period(period), callBack(callBack) {
 }
 
 void bpl::SimpleTimer::irq()
 {
-    if (--counter > 0) return;
-
     callBack();
-    counter = period;
+}
+
+uint32_t bpl::SimpleTimer::getIrqRate() const
+{
+    return period;
 }

@@ -25,11 +25,12 @@ int main()
     auto pool = std::pmr::monotonic_buffer_resource {pmrBuffer.data(), pmrBuffer.size(), upstreamResource};
     std::pmr::set_default_resource(&pool);
 
-    // setup and initialise the Nucleo's user led2
+    // enable the AHB1 clock, needed by gpioA
     //
-    Stm32::rcc(Rcc::AHB1ENR) = Stm32::rcc(Rcc::AHB1ENR) | 1;                // enable the AHB1 clock, needed by gpioA
+    Stm32::rcc(Rcc::AHB1ENR) = Stm32::rcc(Rcc::AHB1ENR) | 1;
     asm("nop");
 
+    // setup and initialise the Nucleo's user led2
     // make PA5 an output, it's connected to led2
     // set led2 off as it's default state
     //
@@ -63,7 +64,7 @@ int main()
     //       3, the ledOnToggle callback toggles the led2 on state, i.e. causes led2 for flash more quickly when on
     //
 
-    auto ledOn = false;
+    volatile auto ledOn = false;
     bpl::SimpleCallBack ledSlowFlash = [&ledOn] {
         ledOn = !ledOn;
         Stm32::gpioA(Gpio::BSR) = (ledOn) ? (1 << Gpio::Pin5) : (1 << (Gpio::Pin5 + 16));
@@ -71,7 +72,7 @@ int main()
 
     // whilst on, toggle led2 3 times
     //
-    bpl::SimpleCallBack ledOnToggle = [&ledOn, toggleCount = 0, toggle = true] mutable {
+    bpl::SimpleCallBack ledOnToggle = [toggleCount = 0, toggle = true, &ledOn] mutable {
         if (ledOn)
         {
             if (toggleCount++ < 6)
@@ -91,11 +92,12 @@ int main()
         }
     };
 
-    auto&& slowFlasher = bpl::SimpleTimer(1000, ledSlowFlash);
-    auto&& onToggler = bpl::SimpleTimer(100, ledOnToggle);
+    constexpr uint32_t TIME_BASE_US = 500;
+    auto&& slowFlasher = bpl::SimpleTimer(2000 * TIME_BASE_US, ledSlowFlash);   // trigger every 1s
+    auto&& onToggler = bpl::SimpleTimer(200 * TIME_BASE_US, ledOnToggle);       // trigget every 0.1s
 
-//  auto sysTick = SysTick(slowFlasher);
-    auto sysTick = SysTick({slowFlasher, onToggler});
+//  auto sysTick = SysTick::getInstance(TIME_BASE_US, slowFlasher);
+    auto sysTick = SysTick::getInstance(TIME_BASE_US, {slowFlasher, onToggler});
     sysTick.enable();
 
     return 0;

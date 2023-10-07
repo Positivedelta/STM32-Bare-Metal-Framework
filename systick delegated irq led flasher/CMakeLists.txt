@@ -22,7 +22,11 @@ include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include/irq)
 include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include/utils)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-file(GLOB NUCLEO_LED_FLASHER_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/stm32/*.cpp ${BIT_PARALLEL_STM32_ROOT}/framework/src/utils/*.cpp ${PROJECT_SOURCE_DIR}/src/*.cpp)
+file(GLOB STM32_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/stm32/*.cpp)
+file(GLOB IRQ_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/irq/*.cpp)
+file(GLOB UTILS_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/utils/*.cpp)
+file(GLOB NUCLEO_LED_FLASHER_SRC ${PROJECT_SOURCE_DIR}/src/*.cpp)
+list(APPEND NUCLEO_LED_FLASHER_SRC ${STM32_SRC} ${IRQ_SRC} ${UTILS_SRC})
 add_executable(${CMAKE_PROJECT_NAME} ${NUCLEO_LED_FLASHER_SRC})
 
 # notes 1, the --no-warn-rwx-segments can be removed once the compiler is upgraded to v13, see the GCC v12 #1029 issue
