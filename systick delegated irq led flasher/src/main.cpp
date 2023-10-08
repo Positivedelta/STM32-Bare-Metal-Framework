@@ -72,7 +72,7 @@ int main()
 
     // whilst on, toggle led2 3 times
     //
-    bpl::SimpleCallBack ledOnToggle = [toggleCount = 0, toggle = true, &ledOn] mutable {
+    bpl::SimpleCallBack ledOnToggle = [&ledOn, toggleCount = 0, toggle = true] mutable {
         if (ledOn)
         {
             if (toggleCount++ < 6)
@@ -99,6 +99,10 @@ int main()
 //  auto sysTick = SysTick::getInstance(TIME_BASE_US, slowFlasher);
     auto sysTick = SysTick::getInstance(TIME_BASE_US, {slowFlasher, onToggler});
     sysTick.enable();
+
+    // let the IRQs work their magic...
+    //
+    while (true) asm volatile ("nop");
 
     return 0;
 }
