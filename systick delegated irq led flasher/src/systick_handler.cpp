@@ -5,17 +5,20 @@
 #include <utility>
 
 #include "stm32.hpp"
+#include "stm32_f446xx_irq_n.hpp"
+#include "stm32_nvic.hpp"
+#include "stm32_systick.hpp"
 #include "stm32_systick.hpp"
 
 #include "systick_handler.hpp"
 
-SysTick& SysTick::getInstance(const uint32_t timeBase, bpl::IrqListeners&& irqListeners)
+SysTick& SysTick::getInstance(const uint32_t timeBase, bpl::IrqListeners&& irqListeners, const uint8_t priority)
 {
-    static SysTick instance = SysTick(timeBase, std::move(irqListeners));
+    static SysTick instance = SysTick(timeBase, std::move(irqListeners), priority);
     return instance;
 }
 
-SysTick::SysTick(const uint32_t timeBase, bpl::IrqListeners&& irqListeners)
+SysTick::SysTick(const uint32_t timeBase, bpl::IrqListeners&& irqListeners, const uint8_t priority)
 {
     timeIncrement = timeBase;
     listeners = std::move(irqListeners);
@@ -24,6 +27,10 @@ SysTick::SysTick(const uint32_t timeBase, bpl::IrqListeners&& irqListeners)
     Stm32::sysTick(Stk::CTRL) = Stm32::sysTick(Stk::CTRL) | (1 << 1);   // enable the IRQ
     Stm32::sysTick(Stk::LOAD) = 180 * timeBase;                         // timeBase is specified in us
     Stm32::sysTick(Stk::VAL) = 0;
+
+    // set the IRQ priority, hi --> low encoded as 0 --> 15 and enable the IRQ
+    //
+    Nvic::setPriority(Stm32F446IRQn::SysTick, priority);
 }
 
 void SysTick::handler()
@@ -33,7 +40,7 @@ void SysTick::handler()
 
 void SysTick::enable()
 {
-    Stm32::sysTick(Stk::CTRL) = Stm32::sysTick(Stk::CTRL) | (1 << 0);       // enable SysTick
+    Stm32::sysTick(Stk::CTRL) = Stm32::sysTick(Stk::CTRL) | (1 << 0);   // enable SysTick
 }
 
 void SysTick::disable()

@@ -86,14 +86,19 @@ class Stm32
             return peripheral(APB1_BASE + PWR + reg);
         }
 
-        volatile constexpr static uint32_t& scb(const uint32_t reg)
+        //
+        // note, the scb & nvic registers can be accessed on 8 and 32 bit boundaries
+        //
+
+        volatile constexpr static uint32_t& scb32(const uint32_t reg)
         {
             return peripheral(SCS_BASE + SCB + reg);
         }
 
-        //
-        // note, the nvic registers are accessed on 8 and 32 bit boundaries
-        //
+        volatile constexpr static uint8_t& scb8(const uint32_t reg)
+        {
+            return *reinterpret_cast<uint8_t*>(SCS_BASE + SCB + reg);
+        }
 
         volatile constexpr static uint32_t& nvic32(const uint32_t reg)
         {

@@ -7,8 +7,9 @@
 #include <vector>
 
 #include "stm32.hpp"
-#include "stm32_rcc.hpp"
 #include "stm32_gpio.hpp"
+#include "stm32_nvic.hpp"
+#include "stm32_rcc.hpp"
 
 #include "simple_callback.hpp"
 #include "simple_timer.hpp"
@@ -24,6 +25,11 @@ int main()
     auto upstreamResource = std::pmr::null_memory_resource();
     auto pool = std::pmr::monotonic_buffer_resource {pmrBuffer.data(), pmrBuffer.size(), upstreamResource};
     std::pmr::set_default_resource(&pool);
+
+    // set the NVIC to use group4, i.e. 4 bits for preemption, 0 bits for sub priority
+    // note, this application only uses a small number of IRQ priority levels, i.e. no need for sub-levels
+    //
+    Nvic::setPriorityGrouping(Nvic::PRE4_SUB0);
 
     // enable the AHB1 clock, needed by gpioA
     //
@@ -96,8 +102,8 @@ int main()
     auto&& slowFlasher = bpl::SimpleTimer(2000 * TIME_BASE_US, ledSlowFlash);   // trigger every 1s
     auto&& onToggler = bpl::SimpleTimer(200 * TIME_BASE_US, ledOnToggle);       // trigget every 0.1s
 
-//  auto sysTick = SysTick::getInstance(TIME_BASE_US, slowFlasher);
-    auto sysTick = SysTick::getInstance(TIME_BASE_US, {slowFlasher, onToggler});
+//  auto sysTick = SysTick::getInstance(TIME_BASE_US, slowFlasher, Nvic::Priority2);
+    auto sysTick = SysTick::getInstance(TIME_BASE_US, {slowFlasher, onToggler}, Nvic::Priority2);
     sysTick.enable();
 
     // let the IRQs work their magic...

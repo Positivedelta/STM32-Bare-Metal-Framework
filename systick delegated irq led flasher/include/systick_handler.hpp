@@ -16,18 +16,18 @@ class SysTick
         static inline bpl::IrqListeners listeners;
 
     public:
-        SysTick(const SysTick(const uint32_t timeBase, bpl::IrqListeners&& irqListeners)&) = delete;
+        SysTick(const SysTick(const uint32_t timeBase, bpl::IrqListeners&& irqListeners, const uint8_t priority)&) = delete;
         SysTick& operator=(const SysTick&) = delete;
-        void operator=(const SysTick(const uint32_t timeBase, bpl::IrqListeners&& irqListeners)&) = delete;
+        void operator=(const SysTick(const uint32_t timeBase, bpl::IrqListeners&& irqListeners, const uint8_t priority)&) = delete;
 
-        static SysTick& getInstance(const uint32_t timeBase, bpl::IrqListeners&& irqListeners);
+        static SysTick& getInstance(const uint32_t timeBase, bpl::IrqListeners&& irqListeners, const uint8_t priority);
         static void handler();
 
         void enable();
         void disable();
 
     private:
-        SysTick(const uint32_t timeBase, bpl::IrqListeners&& irqListeners);
+        SysTick(const uint32_t timeBase, bpl::IrqListeners&& irqListeners, const uint8_t priority);
 };
 
 #endif

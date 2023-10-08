@@ -1,5 +1,5 @@
 //
-// (c) Bit Parallel Ltd, 2021
+// (c) Bit Parallel Ltd, October 2023
 //
 
 #ifndef BPL_STM32_F446XX_IRQ_H
@@ -94,6 +94,19 @@ class Stm32F446IRQn
         inline static constexpr uint32_t SpdifRx         = 94;
         inline static constexpr uint32_t FmpI2C1Ev       = 95;
         inline static constexpr uint32_t FmpI2C1Er       = 96;
+
+        // exception type IRQ numbers
+        // notes 1, Nmi and HardFault are NOT supported by the Nvic::setPriority() method
+        //       2, they get ignored if used
+        //
+        inline static constexpr uint32_t Nmi             = uint32_t(-14);
+        inline static constexpr uint32_t HardFault       = uint32_t(-13);
+        inline static constexpr uint32_t MemManFault     = uint32_t(-12);
+        inline static constexpr uint32_t BusFault        = uint32_t(-11);
+        inline static constexpr uint32_t UsageFault      = uint32_t(-10);
+        inline static constexpr uint32_t SVCall          = uint32_t(-5);
+        inline static constexpr uint32_t PendSV          = uint32_t(-2);
+        inline static constexpr uint32_t SysTick         = uint32_t(-1);
 };
 
 #endif
