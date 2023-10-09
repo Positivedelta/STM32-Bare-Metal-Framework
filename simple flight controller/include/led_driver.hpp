@@ -8,23 +8,37 @@
 #include <cstdint>
 
 #include "irq_consumer.hpp"
+#include "cli_provider.hpp"
 
-class LedDriver : public bpl::IrqConsumer
+class LedDriver : public bpl::IrqConsumer, public CliProvider
 {
     private:
         const uint32_t timeBase;
-        int32_t ledPeriod, ledPeriodCount;
-        bool ledOn, ledFlashing, ledToggle;
+        volatile int32_t ledPeriod, ledPeriodCount;
+        volatile bool isActive, ledOn, ledFlashing, ledToggle;
+        int32_t currentLedPeriod, currentLedPeriodCount;
+        bool currentLedOn, currentLedFlashing, currentLedToggle;
 
     public:
         LedDriver(const uint32_t timeBase);
 
         void on();
         void off();
-        void flash(uint32_t period);
+        void flash(const uint32_t period);
 
         void irq() override;
         uint32_t getIrqRate() const override;
+
+    protected:
+        bool doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
+
+    private:
+        void doLedOn();
+        void doLedOff();
+        void doLedFlash(const uint32_t period);
+
+        void ifActiveSaveStateAndReportCliControl(const bpl::PrintWriter& consoleWriter);
+        void restoreActiveState();
 };
 
 #endif

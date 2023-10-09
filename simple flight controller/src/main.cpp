@@ -61,7 +61,7 @@ int main()
     //
     auto uart = Usart2IRQ::getInstance(bpl::BaudRate::BPS_115200, Nvic::Priority1);
     const auto console = bpl::TextIO(uart.getInputStream(), uart.getOutputStream());
-    auto cli = CliHandler(console, {gyros, sbus, servos, controller});
+    auto cli = CliHandler(console, {led, gyros, sbus, servos, controller});
     while (true) cli.run();
 
     return 0;
