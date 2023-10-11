@@ -7,10 +7,10 @@
 
 #include <cstdint>
 
-#include "irq_consumer.hpp"
+#include "timer_irq_consumer.hpp"
 #include "cli_provider.hpp"
 
-class LedDriver : public bpl::IrqConsumer, public CliProvider
+class LedDriver : public bpl::TimerIrqConsumer, public CliProvider
 {
     private:
         const uint32_t timeBase;

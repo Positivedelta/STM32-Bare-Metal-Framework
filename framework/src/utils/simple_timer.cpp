@@ -1,5 +1,5 @@
 //
-// (c) Bit Parallel Ltd, September 2023
+// (c) Bit Parallel Ltd, October 2023
 //
 
 #include "simple_timer.hpp"

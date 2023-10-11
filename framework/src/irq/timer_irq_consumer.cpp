@@ -2,13 +2,13 @@
 // (c) Bit Parallel Ltd, October 2023
 //
 
-#include "irq_consumer.hpp"
+#include "timer_irq_consumer.hpp"
 
-bpl::IrqConsumer::IrqConsumer():
+bpl::TimerIrqConsumer::TimerIrqConsumer():
     count(0) {
 }
 
-void bpl::IrqConsumer::tryFire(const uint32_t timeIncrement)
+void bpl::TimerIrqConsumer::tryFire(const uint32_t timeIncrement)
 {
     count = count + timeIncrement;
     if (count >= getIrqRate())

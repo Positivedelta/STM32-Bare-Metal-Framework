@@ -11,13 +11,13 @@
 
 #include "systick_handler.hpp"
 
-SysTick& SysTick::getInstance(const int32_t timeBase, bpl::IrqListeners&& irqListeners, const uint8_t priority)
+SysTick& SysTick::getInstance(const int32_t timeBase, Listeners&& irqListeners, const uint8_t priority)
 {
     static SysTick instance = SysTick(timeBase, std::move(irqListeners), priority);
     return instance;
 }
 
-SysTick::SysTick(const int32_t timeBase, bpl::IrqListeners&& irqListeners, const uint8_t priority)
+SysTick::SysTick(const int32_t timeBase, Listeners&& irqListeners, const uint8_t priority)
 {
     timeIncrement = timeBase;
     listeners = std::move(irqListeners);

@@ -10,17 +10,14 @@
 #include <utility>
 #include <vector>
 
-#include "irq_consumer.hpp"
-
 namespace bpl
 {
-    using Consumer = std::reference_wrapper<IrqConsumer>;
-
-    class IrqListeners : public std::pmr::vector<Consumer>
+    template<class ConsumerType>
+    class IrqListeners : public std::pmr::vector<std::reference_wrapper<ConsumerType>>
     {
         public:
             template <typename ...T>
-            IrqListeners(T&& ...t) : std::pmr::vector<Consumer>{{std::forward<T>(t)...}}
+            IrqListeners(T&& ...t) : std::pmr::vector<std::reference_wrapper<ConsumerType>>{{std::forward<T>(t)...}}
             {
             }
     };

@@ -2,20 +2,20 @@
 // (c) Bit Parallel Ltd, October 2023
 //
 
-#ifndef BPL_IRQ_CONSUMER_H
-#define BPL_IRQ_CONSUMER_H
+#ifndef BPL_TIMER_IRQ_CONSUMER_H
+#define BPL_TIMER_IRQ_CONSUMER_H
 
 #include <cstdint>
 
 namespace bpl
 {
-    class IrqConsumer
+    class TimerIrqConsumer
     {
         private:
             uint32_t count;
 
         public:
-            IrqConsumer();
+            TimerIrqConsumer();
 
             virtual void irq() = 0;
             virtual uint32_t getIrqRate() const = 0;

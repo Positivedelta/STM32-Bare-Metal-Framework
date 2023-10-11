@@ -11,10 +11,10 @@
 // FIXME! probably does not need to have an IRQ handler
 //
 
-//#include "irq_consumer.hpp"
+//#include "timer_irq_consumer.hpp"
 #include "cli_provider.hpp"
 
-//class PWMServoDriver : public bpl::IrqConsumer, public CliProvider
+//class PWMServoDriver : public bpl::TimerIrqConsumer, public CliProvider
 class PWMServoDriver : public CliProvider
 {
     public:

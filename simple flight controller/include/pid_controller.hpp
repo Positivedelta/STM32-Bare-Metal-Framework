@@ -7,14 +7,14 @@
 
 #include <cstdint>
 
-#include "irq_consumer.hpp"
+#include "timer_irq_consumer.hpp"
 #include "cli_provider.hpp"
 #include "pinpoint_gyro_driver.hpp"
 #include "sbus_driver.hpp"
 #include "pwm_servo_driver.hpp"
 #include "led_driver.hpp"
 
-class PidController : public bpl::IrqConsumer, public CliProvider
+class PidController : public bpl::TimerIrqConsumer, public CliProvider
 {
     private:
         const uint32_t loopRate;

@@ -7,19 +7,19 @@
 
 #include <cstdint>
 
-#include "irq_consumer.hpp"
+#include "timer_irq_consumer.hpp"
 #include "simple_callback.hpp"
 
 namespace bpl
 {
-    class SimpleTimer : public IrqConsumer
+    class SimpleTimer : public bpl::TimerIrqConsumer
     {
         private:
             const uint32_t period;
-            SimpleCallBack& callBack;
+            bpl::SimpleCallBack& callBack;
 
         public:
-            SimpleTimer(const uint32_t period, SimpleCallBack& callBack);
+            SimpleTimer(const uint32_t period, bpl::SimpleCallBack& callBack);
             void irq() override;
             uint32_t getIrqRate() const override;
     };
