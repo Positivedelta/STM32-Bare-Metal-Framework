@@ -5,6 +5,8 @@
 #ifndef BPL_STM32_F446XX_IRQ_H
 #define BPL_STM32_F446XX_IRQ_H
 
+#include <cstdint>
+
 class Stm32F446IRQn
 {
     public:
