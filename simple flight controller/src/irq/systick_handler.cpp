@@ -24,7 +24,7 @@ SysTick::SysTick(const int32_t timeBase, Listeners&& irqListeners, const uint8_t
 
     Stm32f4::sysTick(Stk::CTRL) = Stm32f4::sysTick(Stk::CTRL) | (1 << 2);   // use system clock
     Stm32f4::sysTick(Stk::CTRL) = Stm32f4::sysTick(Stk::CTRL) | (1 << 1);   // enable the IRQ
-    Stm32f4::sysTick(Stk::LOAD) = 180 * timeBase;                         // timeBase is specified in us
+    Stm32f4::sysTick(Stk::LOAD) = 180 * timeBase;                           // timeBase is specified in us
     Stm32f4::sysTick(Stk::VAL) = 0;
 
     // set the IRQ priority, hi --> low encoded as 0 --> 15 and enable the IRQ
