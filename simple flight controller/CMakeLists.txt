@@ -22,11 +22,12 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 file(GLOB STM32F4_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/stm32f4/*.cpp)
 file(GLOB DRIVERS_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/drivers/*.cpp)
+file(GLOB TASKING_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/tasking/*.cpp)
 file(GLOB IRQ_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/irq/*.cpp)
 file(GLOB IO_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/io/*.cpp)
 file(GLOB UTILS_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/utils/*.cpp)
 file(GLOB NUCLEO_SIMPLE_FLIGHT_CONTROLLER_SRC ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/src/irq/*.cpp)
-list(APPEND NUCLEO_SIMPLE_FLIGHT_CONTROLLER_SRC ${STM32F4_SRC} ${DRIVERS_SRC} ${IRQ_SRC} ${IO_SRC} ${UTILS_SRC})
+list(APPEND NUCLEO_SIMPLE_FLIGHT_CONTROLLER_SRC ${STM32F4_SRC} ${DRIVERS_SRC} ${TASKING_SRC} ${IRQ_SRC} ${IO_SRC} ${UTILS_SRC})
 add_executable(${CMAKE_PROJECT_NAME} ${NUCLEO_SIMPLE_FLIGHT_CONTROLLER_SRC})
 
 # notes 1, the --no-warn-rwx-segments can be removed once the compiler is upgraded to v13, see the GCC v12 #1029 issue
