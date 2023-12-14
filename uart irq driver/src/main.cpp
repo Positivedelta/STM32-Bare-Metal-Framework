@@ -7,15 +7,14 @@
 #include <string>
 #include <vector>
 
-#include "stm32.hpp"
-#include "stm32_gpio.hpp"
-#include "stm32_nvic.hpp"
-#include "stm32_rcc.hpp"
-
-#include "baud_rate.hpp"
-#include "usart2_handler.hpp"
-#include "print_writer.hpp"
-#include "text_reader.hpp"
+#include "framework/stm32f4/stm32f4.hpp"
+#include "framework/stm32f4/gpio.hpp"
+#include "framework/stm32f4/nvic.hpp"
+#include "framework/stm32f4/rcc.hpp"
+#include "framework/drivers/usart2.hpp"
+#include "framework/io/baud_rate.hpp"
+#include "framework/io/print_writer.hpp"
+#include "framework/io/text_reader.hpp"
 
 //
 // note, the Nucleo can be configured to connect Usart2 to the virtual COM port on the ST-LINK module
@@ -40,14 +39,14 @@ int main()
     // enable the AHB1 clock required by gpioA and make PA5 an output, it's connected to led2
     // the led will be used as an input activity monitor, initialised off
     //
-    Stm32::rcc(Rcc::AHB1ENR) = Stm32::rcc(Rcc::AHB1ENR) | Rcc::AHB1ENR_GPIOA;
-    Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) & (Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
-    Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
-    Stm32::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
+    Stm32f4::rcc(Rcc::AHB1ENR) = Stm32f4::rcc(Rcc::AHB1ENR) | Rcc::AHB1ENR_GPIOA;
+    Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) & (Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+    Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+    Stm32f4::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
 
-    auto uart2 = Usart2IRQ::getInstance(bpl::BaudRate::BPS_115200, Nvic::Priority1);
-    const auto& inputStream = uart2.getInputStream();
-    const auto& outputStream = uart2.getOutputStream();
+    auto& uart = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
+    const auto& inputStream = uart.getInputStream();
+    const auto& outputStream = uart.getOutputStream();
 
     auto lines = std::pmr::vector<std::pmr::string>();
     lines.emplace_back("The cat sat on the mat and drank from a saucer of milk");
@@ -72,7 +71,7 @@ int main()
     //
     int32_t count = 0;
     const bpl::ByteListener listener = [&](const uint8_t rxedByte) {
-        if (++count % 3) Stm32::gpioA(Gpio::ODR) = Stm32::gpioA(Gpio::ODR) ^ (1 << Gpio::Pin5);
+        if (++count % 3) Stm32f4::gpioA(Gpio::ODR) = Stm32f4::gpioA(Gpio::ODR) ^ (1 << Gpio::Pin5);
     };
 
     inputStream.setByteListener(listener);
@@ -104,7 +103,7 @@ int main()
     //
     int32_t count = 0;
     const bpl::ByteListener listener = [&](const uint8_t rxedByte) {
-        if (++count % 3) Stm32::gpioA(Gpio::ODR) = Stm32::gpioA(Gpio::ODR) ^ (1 << Gpio::Pin5);
+        if (++count % 3) Stm32f4::gpioA(Gpio::ODR) = Stm32f4::gpioA(Gpio::ODR) ^ (1 << Gpio::Pin5);
     };
 
     inputStream.setByteListener(listener);

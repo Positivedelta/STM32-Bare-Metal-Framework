@@ -2,8 +2,8 @@
 // (c) Bit Parallel Ltd, 2021
 //
 
-#ifndef BPL_STM32RCC_H
-#define BPL_STM32RCC_H
+#ifndef BPL_STM32F4_RCC_H
+#define BPL_STM32F4_RCC_H
 
 class Rcc
 {

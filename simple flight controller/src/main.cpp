@@ -6,11 +6,10 @@
 #include <cstdint>
 #include <memory_resource>
 
-// framework includes
-//
-#include "stm32_nvic.hpp"
-#include "baud_rate.hpp"
-#include "text_io.hpp"
+#include "framework/drivers/usart2.hpp"
+#include "framework/io/baud_rate.hpp"
+#include "framework/io/text_io.hpp"
+#include "framework/stm32f4/nvic.hpp"
 
 // project includes
 //
@@ -19,9 +18,8 @@
 #include "sbus_driver.hpp"
 #include "pwm_servo_driver.hpp"
 #include "pid_controller.hpp"
-#include "systick_handler.hpp"
-#include "usart2_handler.hpp"
 #include "cli_handler.hpp"
+#include "irq/systick_handler.hpp"
 
 int main()
 {
@@ -59,7 +57,7 @@ int main()
     // the CLI runs as the main foreground task
     // set the uart IRQ priority to 1 (0..15 ==> high..low)
     //
-    auto uart = Usart2IRQ::getInstance(bpl::BaudRate::BPS_115200, Nvic::Priority1);
+    auto& uart = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
     const auto console = bpl::TextIO(uart.getInputStream(), uart.getOutputStream());
     auto cli = CliHandler(console, {led, gyros, sbus, servos, controller});
     while (true) cli.run();

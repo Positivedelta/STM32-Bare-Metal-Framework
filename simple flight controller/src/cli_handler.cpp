@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-#include "string_utils.hpp"
+#include "framework/utils/string_utils.hpp"
 #include "cli_handler.hpp"
 
 CliHandler::CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList):

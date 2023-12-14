@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-#include "timer_irq_consumer.hpp"
+#include "framework/irq/timer_irq_consumer.hpp"
 #include "cli_provider.hpp"
 #include "pinpoint_gyro_driver.hpp"
 #include "sbus_driver.hpp"

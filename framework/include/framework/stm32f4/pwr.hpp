@@ -2,8 +2,8 @@
 // (c) Bit Parallel Ltd, 2021
 //
 
-#ifndef BPL_STM32PWR_H
-#define BPL_STM32PWR_H
+#ifndef BPL_STM32F4_PWR_H
+#define BPL_STM32F4_PWR_H
 
 class Pwr
 {

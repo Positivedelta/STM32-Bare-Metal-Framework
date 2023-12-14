@@ -7,8 +7,8 @@
 
 #include <cstdint>
 
-#include "timer_irq_consumer.hpp"
-#include "simple_callback.hpp"
+#include "framework/irq/timer_irq_consumer.hpp"
+#include "framework/utils/simple_callback.hpp"
 
 namespace bpl
 {

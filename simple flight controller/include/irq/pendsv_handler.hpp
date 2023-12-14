@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <functional>
 
-#include "simple_irq_consumer.hpp"
+#include "framework/irq/simple_irq_consumer.hpp"
 
 class PendSV
 {

@@ -4,11 +4,11 @@
 
 #include <utility>
 
-//#include "stm32.hpp"
-#include "stm32_f446xx_irq_n.hpp"
-#include "stm32_nvic.hpp"
+//#include "framework/stm32f4/stm32f4.hpp"
+#include "framework/stm32f4/f446xx_irq_n.hpp"
+#include "framework/stm32f4/nvic.hpp"
 
-#include "pendsv_handler.hpp"
+#include "irq/pendsv_handler.hpp"
 
 PendSV& PendSV::getInstance(Listener&& irqListener, const uint8_t priority)
 {
@@ -27,7 +27,7 @@ PendSV::PendSV(Listener&& irqListener, const uint8_t priority)
 
     // set the IRQ priority, hi --> low encoded as 0 --> 15 and enable the IRQ
     //
-    Nvic::setPriority(Stm32F446IRQn::PendSV, priority);
+    Nvic::setPriority(F446IRQn::PendSV, priority);
 }
 
 void PendSV::handler()

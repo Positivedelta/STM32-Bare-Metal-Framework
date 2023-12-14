@@ -2,11 +2,12 @@
 // (c) Bit Parallel Ltd, October 2023
 //
 
-#ifndef BPL_STM32NVIC_H
-#define BPL_STM32NVIC_H
+#ifndef BPL_STM32F4_NVIC_H
+#define BPL_STM32F4_NVIC_H
 
-#include "stm32.hpp"
-#include "stm32_f446xx_irq_n.hpp"
+#include "framework/stm32f4/stm32f4.hpp"
+#include "framework/stm32f4/f446xx_irq_n.hpp"
+#include "framework/stm32f4/scb.hpp"
 
 class Nvic
 {
@@ -52,7 +53,7 @@ class Nvic
             // note 1, no need to OR in these bits, a 0 write does nothing - there is a separate IRQ clear enable register (ICER)
             //      2, the [] forces 32-bit word addressing
             //
-            (&Stm32::nvic32(Nvic::ISER))[irqNumber >> 5] = 1 << (irqNumber & uint32_t(0x1f));
+            (&Stm32f4::nvic32(Nvic::ISER))[irqNumber >> 5] = 1 << (irqNumber & uint32_t(0x1f));
             //Stm32::nvic32(Nvic::ISER + (Stm32IRQ::USART2_IRQn >> 4)) = 1 << (Stm32IRQ::USART2_IRQn & (uint32_t)0x1f);
         }
 
@@ -60,10 +61,10 @@ class Nvic
         {
             // note, as this register requires an unlock code, an intermediate variable must be used
             //
-            volatile uint32_t value = Stm32::scb32(Scb::AIRCR);
+            volatile uint32_t value = Stm32f4::scb32(Scb::AIRCR);
             value = value & (~(uint32_t(0xffff) << 16 | uint32_t(0b111) << 8));
             value = (((uint32_t)0x5fa << 16) | (priorityGrouping << 8));
-            Stm32::scb32(Scb::AIRCR) = value;
+            Stm32f4::scb32(Scb::AIRCR) = value;
         }
 
         // note 1, the priority value may be encoded to represent group and sub-premeption components
@@ -75,7 +76,7 @@ class Nvic
         {
             // note, Nmi and HardFault don't have settable priorities
             //
-            if ((int32_t(irqNumber) < 0) && (irqNumber != Stm32F446IRQn::Nmi) && (irqNumber != Stm32F446IRQn::HardFault))
+            if ((int32_t(irqNumber) < 0) && (irqNumber != F446IRQn::Nmi) && (irqNumber != F446IRQn::HardFault))
             {
                 // SHP byte layout, implemented as x3 32-bit registers
                 //
@@ -84,11 +85,11 @@ class Nvic
                 // SHPR2: SVCall  ----------  -------- -----------
                 // SHPR3: SysTick PendSV      -------- -----------
                 //
-                (&Stm32::scb8(Scb::SHPR1))[(irqNumber & 0x0f) - 4] = priority << 4;
+                (&Stm32f4::scb8(Scb::SHPR1))[(irqNumber & 0x0f) - 4] = priority << 4;
             }
             else
             {
-                (&Stm32::nvic8(Nvic::IP))[irqNumber] = priority << 4;
+                (&Stm32f4::nvic8(Nvic::IP))[irqNumber] = priority << 4;
             }
         }
 };

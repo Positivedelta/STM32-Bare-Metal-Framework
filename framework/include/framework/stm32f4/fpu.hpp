@@ -2,8 +2,8 @@
 // (c) Bit Parallel Ltd, 2022
 //
 
-#ifndef BPL_STM32FPU_H
-#define BPL_STM32FPU_H
+#ifndef BPL_STM32F4_FPU_H
+#define BPL_STM32F4_FPU_H
 
 class Fpu
 {

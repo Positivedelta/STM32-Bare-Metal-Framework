@@ -6,13 +6,13 @@
 #include <memory_resource>
 #include <vector>
 
-#include "stm32.hpp"
-#include "stm32_gpio.hpp"
-#include "stm32_nvic.hpp"
-#include "stm32_rcc.hpp"
+#include "framework/stm32f4/stm32f4.hpp"
+#include "framework/stm32f4/gpio.hpp"
+#include "framework/stm32f4/nvic.hpp"
+#include "framework/stm32f4/rcc.hpp"
+#include "framework/utils/simple_callback.hpp"
+#include "framework/utils/simple_timer.hpp"
 
-#include "simple_callback.hpp"
-#include "simple_timer.hpp"
 #include "systick_handler.hpp"
 
 int main()
@@ -33,16 +33,16 @@ int main()
 
     // enable the AHB1 clock, needed by gpioA
     //
-    Stm32::rcc(Rcc::AHB1ENR) = Stm32::rcc(Rcc::AHB1ENR) | 1;
+    Stm32f4::rcc(Rcc::AHB1ENR) = Stm32f4::rcc(Rcc::AHB1ENR) | 1;
     asm("nop");
 
     // setup and initialise the Nucleo's user led2
     // make PA5 an output, it's connected to led2
     // set led2 off as it's default state
     //
-    Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) & ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
-    Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
-    Stm32::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
+    Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) & ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+    Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+    Stm32f4::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
 
 /*  //
     // start of test code...
@@ -53,11 +53,11 @@ int main()
     for (auto number : numbers) acc += number;
     if (acc == 48.8)
     {
-        Stm32::gpioA(Gpio::BSR) = 1 << Gpio::Pin5;
+        Stm32f4::gpioA(Gpio::BSR) = 1 << Gpio::Pin5;
     }
     else
     {
-        Stm32::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
+        Stm32f4::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
     }
 
     //
@@ -73,7 +73,7 @@ int main()
     volatile auto ledOn = false;
     bpl::SimpleCallBack ledSlowFlash = [&ledOn] {
         ledOn = !ledOn;
-        Stm32::gpioA(Gpio::BSR) = (ledOn) ? (1 << Gpio::Pin5) : (1 << (Gpio::Pin5 + 16));
+        Stm32f4::gpioA(Gpio::BSR) = (ledOn) ? (1 << Gpio::Pin5) : (1 << (Gpio::Pin5 + 16));
     };
 
     // whilst on, toggle led2 3 times
@@ -83,12 +83,12 @@ int main()
         {
             if (toggleCount++ < 6)
             {
-                Stm32::gpioA(Gpio::BSR) = (toggle) ? (1 << (Gpio::Pin5 + 16)) : (1 << Gpio::Pin5);
+                Stm32f4::gpioA(Gpio::BSR) = (toggle) ? (1 << (Gpio::Pin5 + 16)) : (1 << Gpio::Pin5);
                 toggle = !toggle;
             }
             else
             {
-                if ((Stm32::gpioA(Gpio::IDR) & (1 << Gpio::Pin5)) > 0) Stm32::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
+                if ((Stm32f4::gpioA(Gpio::IDR) & (1 << Gpio::Pin5)) > 0) Stm32f4::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
             }
         }
         else

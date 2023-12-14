@@ -2,8 +2,8 @@
 // (c) Bit Parallel Ltd, 2021
 //
 
-#ifndef BPL_STM32FLASH_H
-#define BPL_STM32FLASH_H
+#ifndef BPL_STM32F4_FLASH_H
+#define BPL_STM32F4_FLASH_H
 
 class Flash
 {

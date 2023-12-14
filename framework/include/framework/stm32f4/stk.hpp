@@ -2,8 +2,8 @@
 // (c) Bit Parallel Ltd, 2021
 //
 
-#ifndef BPL_STM32STK_H
-#define BPL_STM32STK_H
+#ifndef BPL_STM32F4_STK_H
+#define BPL_STM32F4_STK_H
 
 class Stk
 {

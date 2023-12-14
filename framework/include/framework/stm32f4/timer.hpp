@@ -6,8 +6,8 @@
 // FIXME! only tested on timer4, will hopefully this will be generic...
 //
 
-#ifndef BPL_STM32TIMER_H
-#define BPL_STM32TIMER_H
+#ifndef BPL_STM32F4_TIMER_H
+#define BPL_STM32F4_TIMER_H
 
 class Timer
 {

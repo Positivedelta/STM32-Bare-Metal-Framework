@@ -2,7 +2,7 @@
 // (c) Bit Parallel Ltd, October 2023
 //
 
-#include "string_utils.hpp"
+#include "framework/utils/string_utils.hpp"
 #include "cli_provider.hpp"
 
 CliProvider::CliProvider(std::pmr::string name, std::pmr::string help):

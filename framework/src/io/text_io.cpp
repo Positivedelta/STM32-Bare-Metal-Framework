@@ -2,7 +2,7 @@
 // (c) Bit Parallel Ltd, October 2023
 //
 
-#include "text_io.hpp"
+#include "framework/io/text_io.hpp"
 
 bpl::TextIO::TextIO(const bpl::InputStream& inputStream, const bpl::OutputStream& outputStream, const bool localEcho):
     textReader((localEcho) ? bpl::TextReader(inputStream, outputStream) : bpl::TextReader(inputStream)),

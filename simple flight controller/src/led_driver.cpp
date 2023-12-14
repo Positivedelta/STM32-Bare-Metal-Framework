@@ -2,11 +2,11 @@
 // (c) Bit Parallel Ltd, October 2023
 //
 
-#include "stm32.hpp"
-#include "stm32_rcc.hpp"
-#include "stm32_gpio.hpp"
+#include "framework/stm32f4/stm32f4.hpp"
+#include "framework/stm32f4/rcc.hpp"
+#include "framework/stm32f4/gpio.hpp"
+#include "framework/utils/string_utils.hpp"
 
-#include "string_utils.hpp"
 #include "led_driver.hpp"
 
 LedDriver::LedDriver(const uint32_t timeBase):
@@ -14,16 +14,16 @@ LedDriver::LedDriver(const uint32_t timeBase):
     timeBase(timeBase), ledPeriod(1), ledPeriodCount(0), isActive(true), ledOn(false), ledFlashing(false), ledToggle(true) {
         // enable the AHB1 clock, needed by gpioA
         //
-        Stm32::rcc(Rcc::AHB1ENR) = Stm32::rcc(Rcc::AHB1ENR) | 1;
+        Stm32f4::rcc(Rcc::AHB1ENR) = Stm32f4::rcc(Rcc::AHB1ENR) | 1;
         asm("nop");
 
         // setup and initialise the Nucleo's user led2
         // make PA5 an output, it's connected to led2
         // set led2 off as it's default state
         //
-        Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) & ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
-        Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
-        Stm32::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
+        Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) & ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+        Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+        Stm32f4::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
 }
 
 void LedDriver::on()
@@ -69,7 +69,7 @@ void LedDriver::irq()
         ledPeriodCount = ledPeriodCount + 1;
         if (ledPeriodCount == ledPeriod)
         {
-            Stm32::gpioA(Gpio::BSR) = 1 << ((ledToggle) ? Gpio::Pin5 : Gpio::Pin5 + 16);
+            Stm32f4::gpioA(Gpio::BSR) = 1 << ((ledToggle) ? Gpio::Pin5 : Gpio::Pin5 + 16);
             ledToggle = !ledToggle;
 
             ledPeriodCount = 0;
@@ -78,7 +78,7 @@ void LedDriver::irq()
         return;
     }
 
-    Stm32::gpioA(Gpio::BSR) = 1 << ((ledOn) ? Gpio::Pin5 : Gpio::Pin5 + 16);
+    Stm32f4::gpioA(Gpio::BSR) = 1 << ((ledOn) ? Gpio::Pin5 : Gpio::Pin5 + 16);
 }
 
 uint32_t LedDriver::getIrqRate() const

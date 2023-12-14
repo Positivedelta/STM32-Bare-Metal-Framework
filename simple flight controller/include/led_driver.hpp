@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-#include "timer_irq_consumer.hpp"
+#include "framework/irq/timer_irq_consumer.hpp"
 #include "cli_provider.hpp"
 
 class LedDriver : public bpl::TimerIrqConsumer, public CliProvider

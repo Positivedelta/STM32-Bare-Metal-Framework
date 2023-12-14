@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <string_view>
 
-#include "output_stream.hpp"
+#include "framework/io/output_stream.hpp"
 
 namespace bpl
 {

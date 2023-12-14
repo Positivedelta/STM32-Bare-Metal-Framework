@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-#include "output_stream.hpp"
+#include "framework/io/output_stream.hpp"
 
 namespace bpl
 {

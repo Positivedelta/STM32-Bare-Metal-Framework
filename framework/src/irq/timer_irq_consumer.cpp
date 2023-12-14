@@ -2,7 +2,7 @@
 // (c) Bit Parallel Ltd, October 2023
 //
 
-#include "timer_irq_consumer.hpp"
+#include "framework/irq/timer_irq_consumer.hpp"
 
 bpl::TimerIrqConsumer::TimerIrqConsumer():
     count(0) {

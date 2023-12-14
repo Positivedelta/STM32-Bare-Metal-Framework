@@ -2,8 +2,8 @@
 // (c) Bit Parallel Ltd, September 2023
 //
 
-#include "null_output_stream.hpp"
-#include "text_reader.hpp"
+#include "framework/io/null_output_stream.hpp"
+#include "framework/io/text_reader.hpp"
 
 bpl::TextReader::TextReader(const InputStream& inputStream):
     inputStream(inputStream), outputStream(NullOutputStream()), echo(false) {

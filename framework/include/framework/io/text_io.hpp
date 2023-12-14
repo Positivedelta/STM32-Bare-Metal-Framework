@@ -5,8 +5,8 @@
 #ifndef BPL_TEXT_IO_H
 #define BPL_TEXT_IO_H
 
-#include "text_reader.hpp"
-#include "print_Writer.hpp"
+#include "framework/io/text_reader.hpp"
+#include "framework/io/print_Writer.hpp"
 
 namespace bpl
 {

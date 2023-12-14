@@ -5,7 +5,7 @@
 #ifndef BPL_PINPOINT_GYRO_DRIVER_H
 #define BPL_PINPOINT_GYRO_DRIVER_H
 
-#include "timer_irq_consumer.hpp"
+#include "framework/irq/timer_irq_consumer.hpp"
 #include "cli_provider.hpp"
 #include "led_driver.hpp"
 #include "axes_values.hpp"

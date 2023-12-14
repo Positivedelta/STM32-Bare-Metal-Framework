@@ -4,13 +4,13 @@
 
 #include <cstdint>
 
-#include "stm32.hpp"
-#include "stm32_flash.hpp"
-#include "stm32_fpu.hpp"
-#include "stm32_gpio.hpp"
-#include "stm32_pwr.hpp"
-#include "stm32_rcc.hpp"
-#include "stm32_f446xx_weak_handlers.hpp"
+#include "framework/stm32f4/stm32f4.hpp"
+#include "framework/stm32f4/flash.hpp"
+#include "framework/stm32f4/fpu.hpp"
+#include "framework/stm32f4/gpio.hpp"
+#include "framework/stm32f4/pwr.hpp"
+#include "framework/stm32f4/rcc.hpp"
+#include "framework/stm32f4/f446xx_weak_handlers.hpp"
 
 extern uint32_t _sidata;
 extern uint32_t _sdata;
@@ -37,13 +37,13 @@ extern "C"
         // use the LED on PA5 to indicate to the outside world that exit() has been invoked
         // note, this code is NucleoF446RE specific
         //
-        Stm32::rcc(Rcc::AHB1ENR) = Stm32::rcc(Rcc::AHB1ENR) | Rcc::AHB1ENR_GPIOA;
-        Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) & ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
-        Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+        Stm32f4::rcc(Rcc::AHB1ENR) = Stm32f4::rcc(Rcc::AHB1ENR) | Rcc::AHB1ENR_GPIOA;
+        Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) & ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+        Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
 
         // turn the led on and then lock-up...
         //
-        Stm32::gpioA(Gpio::BSR) = 1 << Gpio::Pin5;
+        Stm32f4::gpioA(Gpio::BSR) = 1 << Gpio::Pin5;
         while (true);
     }
 
@@ -104,14 +104,14 @@ class PowerOnReset
                 // use the LED on PA5 to indicate to the outside world that there was a problem reconfiguring the clocks
                 // note, this code is NucleoF446RE specific
                 //
-                Stm32::rcc(Rcc::AHB1ENR) = Stm32::rcc(Rcc::AHB1ENR) | Rcc::AHB1ENR_GPIOA;
-                Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) & ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
-                Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+                Stm32f4::rcc(Rcc::AHB1ENR) = Stm32f4::rcc(Rcc::AHB1ENR) | Rcc::AHB1ENR_GPIOA;
+                Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) & ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+                Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
 
                 // FIXME! use the return type to indicate the failure reason to the user
                 // turn the led on and then lock-up...
                 //
-                Stm32::gpioA(Gpio::BSR) = 1 << Gpio::Pin5;
+                Stm32f4::gpioA(Gpio::BSR) = 1 << Gpio::Pin5;
                 while (true);
             }
 
@@ -137,7 +137,7 @@ class PowerOnReset
 
             // enable the fpu
             //
-            Stm32::fpu(Fpu::CPACR) = Stm32::fpu(Fpu::CPACR) | Fpu::CPACR_CP10_FULL_ACCESS | Fpu::CPACR_CP11_FULL_ACCESS;
+            Stm32f4::fpu(Fpu::CPACR) = Stm32f4::fpu(Fpu::CPACR) | Fpu::CPACR_CP10_FULL_ACCESS | Fpu::CPACR_CP11_FULL_ACCESS;
 
             // call main() but don't expect to exit!
             //
@@ -150,7 +150,7 @@ class PowerOnReset
             //
         }
 
-    // note, the Stm32::AHB_CLOCK constant is set to 180 MHz (i.e. 180000000)
+    // note, the Stm32f4::AHB_CLOCK constant is set to 180 MHz (i.e. 180000000)
     //
     private:
         static ClockStatus configureClocks()
@@ -159,15 +159,15 @@ class PowerOnReset
             // also enable the data cache and instruction caches as well as the instruction prefetch pipeline
             // then verify that the wait states were accepted? (as recommended by the datasheet)
             //
-            Stm32::flash(Flash::ACR) = 5 | Flash::ACR_DCEN | Flash::ACR_ICEN | Flash::ACR_PRFTEN;
-            if ((Stm32::flash(Flash::ACR) & Flash::ACR_LATENCY_MASK) != 5) return ClockStatus::WaitStateFail;
+            Stm32f4::flash(Flash::ACR) = 5 | Flash::ACR_DCEN | Flash::ACR_ICEN | Flash::ACR_PRFTEN;
+            if ((Stm32f4::flash(Flash::ACR) & Flash::ACR_LATENCY_MASK) != 5) return ClockStatus::WaitStateFail;
 
             // enable the use of the external clock, connected to a 24 MHz oscillator
             // then wait for the oscillator to stabilise, after ~100 ms raise a warning or error
             //
             uint16_t watchdogCount = 0xffff;
-            Stm32::rcc(Rcc::CR) = Stm32::rcc(Rcc::CR) | Rcc::CR_HSEON;
-            while ((Stm32::rcc(Rcc::CR) & Rcc::CR_HSERDY) == 0) if (--watchdogCount == 0) return ClockStatus::SwitchToHseFail;
+            Stm32f4::rcc(Rcc::CR) = Stm32f4::rcc(Rcc::CR) | Rcc::CR_HSEON;
+            while ((Stm32f4::rcc(Rcc::CR) & Rcc::CR_HSERDY) == 0) if (--watchdogCount == 0) return ClockStatus::SwitchToHseFail;
 
             // as the 180 MHz maximum clock option is about to be selected, enable the required power control overdrive mode
             // notes 1, enable the power control clock
@@ -176,14 +176,14 @@ class PowerOnReset
             //          the System will be stalled during the switch but the PLL clock system will be still running during locking phase
             //       4, this process can be overlapped with the PPL locking phase during its setup
             //
-            Stm32::rcc(Rcc::APB1ENR) = Stm32::rcc(Rcc::APB1ENR) | Rcc::APB1ENR_PWREN;
-            Stm32::pwr(Pwr::CR) = Stm32::pwr(Pwr::CR) | Pwr::CR_ODEN;
+            Stm32f4::rcc(Rcc::APB1ENR) = Stm32f4::rcc(Rcc::APB1ENR) | Rcc::APB1ENR_PWREN;
+            Stm32f4::pwr(Pwr::CR) = Stm32f4::pwr(Pwr::CR) | Pwr::CR_ODEN;
             watchdogCount = 0xffff;
-            while ((Stm32::pwr(Pwr::CSR) & Pwr::CSR_ODRDY) == 0) if (--watchdogCount == 0) return ClockStatus::EnableOverdriveFail;
+            while ((Stm32f4::pwr(Pwr::CSR) & Pwr::CSR_ODRDY) == 0) if (--watchdogCount == 0) return ClockStatus::EnableOverdriveFail;
 
-            Stm32::pwr(Pwr::CR) = Stm32::pwr(Pwr::CR) | Pwr::CR_ODSWEN;
+            Stm32f4::pwr(Pwr::CR) = Stm32f4::pwr(Pwr::CR) | Pwr::CR_ODSWEN;
             watchdogCount = 0xffff;
-            while ((Stm32::pwr(Pwr::CSR) & Pwr::CSR_ODSWRDY) == 0) if (--watchdogCount == 0) return ClockStatus::SwitchToOverdriveFail;
+            while ((Stm32f4::pwr(Pwr::CSR) & Pwr::CSR_ODSWRDY) == 0) if (--watchdogCount == 0) return ClockStatus::SwitchToOverdriveFail;
 
             // main PLL config, then enable
             //   1, select the external 24 MHz oscillator (HSE)
@@ -194,10 +194,10 @@ class PowerOnReset
             //   6, set the division factor (PLLR) for I2Ss, SAIs, SYSTEM and SPDIF-Rx clocks, 336 / 2 = 180 MHz
             //   7, wait for the PLL to lock
             //
-            Stm32::rcc(Rcc::PLLCFGR) = Rcc::PLLCFGR_PLLSRC | 12 | (180 << Rcc::PLLCFGR_PLLN_SHIFT) | (8 << Rcc::PLLCFGR_PLLQ_SHIFT) | (2 << Rcc::PLLCFGR_PLLR_SHIFT);
-            Stm32::rcc(Rcc::CR) = Stm32::rcc(Rcc::CR) | Rcc::CR_PLLON;
+            Stm32f4::rcc(Rcc::PLLCFGR) = Rcc::PLLCFGR_PLLSRC | 12 | (180 << Rcc::PLLCFGR_PLLN_SHIFT) | (8 << Rcc::PLLCFGR_PLLQ_SHIFT) | (2 << Rcc::PLLCFGR_PLLR_SHIFT);
+            Stm32f4::rcc(Rcc::CR) = Stm32f4::rcc(Rcc::CR) | Rcc::CR_PLLON;
             watchdogCount = 0xffff;
-            while ((Stm32::rcc(Rcc::CR) & Rcc::CR_PLLRDY) == 0) if (--watchdogCount == 0) return ClockStatus::MainPllLockFail;
+            while ((Stm32f4::rcc(Rcc::CR) & Rcc::CR_PLLRDY) == 0) if (--watchdogCount == 0) return ClockStatus::MainPllLockFail;
 
             // configure the system clock multiplexor and the remaining main bus clocks
             //   1, use the default AHB prescaler value of 1 (HPRE)
@@ -206,9 +206,9 @@ class PowerOnReset
             //   4, set PLL_P (SW) as the selected system clock, i.e. configure the system clock multiplexer
             //   5, wait / verify for the main PLL to be selected by the system clock multiplexer
             //
-            Stm32::rcc(Rcc::CFGR) = (5 << Rcc::CFGR_PPRE1_SHIFT) | (4 << Rcc::CFGR_PPRE2_SHIFT) | 2;
+            Stm32f4::rcc(Rcc::CFGR) = (5 << Rcc::CFGR_PPRE1_SHIFT) | (4 << Rcc::CFGR_PPRE2_SHIFT) | 2;
             watchdogCount = 0xffff;
-            while ((Stm32::rcc(Rcc::CFGR) & (3 << Rcc::CFGR_SWS_SHIFT)) != (2 << Rcc::CFGR_SWS_SHIFT)) if (--watchdogCount == 0) return ClockStatus::SystemMultiplexerFail;
+            while ((Stm32f4::rcc(Rcc::CFGR) & (3 << Rcc::CFGR_SWS_SHIFT)) != (2 << Rcc::CFGR_SWS_SHIFT)) if (--watchdogCount == 0) return ClockStatus::SystemMultiplexerFail;
 
             // setup and enable the SAI PLL, will use it to setup the 48 MHz USB clock (can't use the main PLL when running at 180 MHz to do this)
             //  1, divide the input by 12 (PLLSAIM), i.e. feed the PLL with 2 MHz
@@ -217,14 +217,14 @@ class PowerOnReset
             //  4, generate the PLLSAIQ output, divide the VCO by 8 yeilding 48 MHz, note this is not going to be used so may need to be revised if this changes...
             //  5, wait for the SAI PLL to lock
             //
-            Stm32::rcc(Rcc::PLLSAICFGR) = 12 | (192 << Rcc::PLLSAICFGR_PLLSAIN_SHIFT) | (3 << Rcc::PLLSAICFGR_PLLSAIP_SHIFT) | (8 << Rcc::PLLSAICFGR_PLLSAIQ_SHIFT);
-            Stm32::rcc(Rcc::CR) = Stm32::rcc(Rcc::CR) | Rcc::CR_PLLSAION;
+            Stm32f4::rcc(Rcc::PLLSAICFGR) = 12 | (192 << Rcc::PLLSAICFGR_PLLSAIN_SHIFT) | (3 << Rcc::PLLSAICFGR_PLLSAIP_SHIFT) | (8 << Rcc::PLLSAICFGR_PLLSAIQ_SHIFT);
+            Stm32f4::rcc(Rcc::CR) = Stm32f4::rcc(Rcc::CR) | Rcc::CR_PLLSAION;
             watchdogCount = 0xffff;
-            while ((Stm32::rcc(Rcc::CR) & Rcc::CR_PLLSAIRDY) == 0) if (--watchdogCount == 0) return ClockStatus::SaiPllLockFail;
+            while ((Stm32f4::rcc(Rcc::CR) & Rcc::CR_PLLSAIRDY) == 0) if (--watchdogCount == 0) return ClockStatus::SaiPllLockFail;
 
             // select the USB clock to come from the SAI PPL, not the main PLL (this sets the PLL48CLK Mux, as displayed in CubeMX)
             //
-            Stm32::rcc(Rcc::DCKCFGR2) = Stm32::rcc(Rcc::DCKCFGR2) | Rcc::DCKCFGR2_CK48MSEL;
+            Stm32f4::rcc(Rcc::DCKCFGR2) = Stm32f4::rcc(Rcc::DCKCFGR2) | Rcc::DCKCFGR2_CK48MSEL;
 
             // it's all over... happy!
             //

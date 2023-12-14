@@ -17,26 +17,23 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3")
 
-include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include/stm32)
-include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include/irq)
-include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include/io)
-include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include/utils)
+include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include)
 include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${PROJECT_SOURCE_DIR}/include/irq)
 
-file(GLOB STM32_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/stm32/*.cpp)
+file(GLOB STM32F4_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/stm32f4/*.cpp)
+file(GLOB DRIVERS_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/drivers/*.cpp)
 file(GLOB IRQ_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/irq/*.cpp)
 file(GLOB IO_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/io/*.cpp)
 file(GLOB UTILS_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/utils/*.cpp)
 file(GLOB NUCLEO_SIMPLE_FLIGHT_CONTROLLER_SRC ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/src/irq/*.cpp)
-list(APPEND NUCLEO_SIMPLE_FLIGHT_CONTROLLER_SRC ${STM32_SRC} ${IRQ_SRC} ${IO_SRC} ${UTILS_SRC})
+list(APPEND NUCLEO_SIMPLE_FLIGHT_CONTROLLER_SRC ${STM32F4_SRC} ${DRIVERS_SRC} ${IRQ_SRC} ${IO_SRC} ${UTILS_SRC})
 add_executable(${CMAKE_PROJECT_NAME} ${NUCLEO_SIMPLE_FLIGHT_CONTROLLER_SRC})
 
 # notes 1, the --no-warn-rwx-segments can be removed once the compiler is upgraded to v13, see the GCC v12 #1029 issue
 #       2, added extra quotes to cater for spaces in paths
 #
 target_link_options(${CMAKE_PROJECT_NAME} PRIVATE "LINKER:--no-warn-rwx-segments")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T \"${BIT_PARALLEL_STM32_ROOT}/framework/linker/stm32_f446re_ldscript.ld\"")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T \"${BIT_PARALLEL_STM32_ROOT}/framework/linker/stm32f446re_ldscript.ld\"")
 target_link_libraries(${CMAKE_PROJECT_NAME})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}.elf")
 

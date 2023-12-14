@@ -4,8 +4,8 @@
 
 #include <cstring>
 
-#include "ascii.hpp"
-#include "print_writer.hpp"
+#include "framework/utils/ascii.hpp"
+#include "framework/io/print_writer.hpp"
 
 bpl::PrintWriter::PrintWriter(const bpl::OutputStream& outputStream):
     outputStream(outputStream) {

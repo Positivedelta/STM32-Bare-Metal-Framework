@@ -4,9 +4,10 @@
 
 #include <cstdint>
 
-#include "stm32.hpp"
-#include "stm32_rcc.hpp"
-#include "stm32_gpio.hpp"
+#include "framework/stm32f4/stm32f4.hpp"
+#include "framework/stm32f4/rcc.hpp"
+#include "framework/stm32f4/gpio.hpp"
+
 #include "systick_delay_handler.hpp"
 
 class LedFlasher
@@ -17,28 +18,28 @@ class LedFlasher
     public:
         LedFlasher(SysTick& sysTick) : sysTick(sysTick)
         {
-            Stm32::gpioA(Gpio::BSR) = 1 << 5;
+            Stm32f4::gpioA(Gpio::BSR) = 1 << 5;
             sysTick.delay();
         }
 
         ~LedFlasher()
         {
-            Stm32::gpioA(Gpio::BSR) = 1 << (5 + 16);
+            Stm32f4::gpioA(Gpio::BSR) = 1 << (5 + 16);
             sysTick.delay();
         }
 };
 
 int main()
 {
-    Stm32::rcc(Rcc::AHB1ENR) = Stm32::rcc(Rcc::AHB1ENR) | 1;                // enable the AHB1 clock, needed by gpioA
+    Stm32f4::rcc(Rcc::AHB1ENR) = Stm32f4::rcc(Rcc::AHB1ENR) | 1;            // enable the AHB1 clock, needed by gpioA
     asm("nop");
 
     // make PA5 an output, it's connected to led2
     // set led2 off as it's default state
     //
-    Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) & ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
-    Stm32::gpioA(Gpio::MODER) = Stm32::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
-    Stm32::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
+    Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) & ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+    Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+    Stm32f4::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
 
     // flash PA5...
     //

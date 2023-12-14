@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-class Stm32F446IRQn
+class F446IRQn
 {
     public:
         inline static constexpr uint32_t Wwdg            = 0;

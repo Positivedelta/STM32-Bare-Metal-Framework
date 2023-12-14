@@ -17,12 +17,10 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3")
 
-include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include/stm32)
-include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include/irq)
-include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include/utils)
+include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-file(GLOB STM32_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/stm32/*.cpp)
+file(GLOB STM32_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/stm32f4/*.cpp)
 file(GLOB IRQ_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/irq/*.cpp)
 file(GLOB UTILS_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/utils/*.cpp)
 file(GLOB NUCLEO_LED_FLASHER_SRC ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -33,7 +31,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${NUCLEO_LED_FLASHER_SRC})
 #       2, added extra quotes to cater for spaces in paths
 #
 target_link_options(${CMAKE_PROJECT_NAME} PRIVATE "LINKER:--no-warn-rwx-segments")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T \"${BIT_PARALLEL_STM32_ROOT}/framework/linker/stm32_f446re_ldscript.ld\"")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T \"${BIT_PARALLEL_STM32_ROOT}/framework/linker/stm32f446re_ldscript.ld\"")
 target_link_libraries(${CMAKE_PROJECT_NAME})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}.elf")
 

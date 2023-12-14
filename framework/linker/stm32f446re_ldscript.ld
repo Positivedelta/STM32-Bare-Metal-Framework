@@ -137,6 +137,6 @@ SECTIONS
         *(.heap_stack)
         __heap_stack_limit = .;
         . = ALIGN(4);
-        ASSERT((__ram_end__ - _heap_end) > (_min_stack_reserve + _min_heap_reserve), "Error: There is no SRAM left to satisfy the heap and stack minimums");
+        ASSERT((__ram_end__ - _heap_end) > (_min_stack_reserve + _min_heap_reserve), "Error: There is no SRAM left to satisfy the heap and stack minimum values");
     } >SRAM
 }

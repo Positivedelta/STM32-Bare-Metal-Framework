@@ -5,9 +5,9 @@
 #ifndef BPL_CLI_HANDLER_H
 #define BPL_CLI_HANDLER_H
 
-#include "text_reader.hpp"
-#include "print_writer.hpp"
-#include "text_io.hpp"
+#include "framework/io/text_reader.hpp"
+#include "framework/io/print_writer.hpp"
+#include "framework/io/text_io.hpp"
 #include "cli_provider_list.hpp"
 
 class CliHandler

@@ -9,9 +9,9 @@
 #include <memory_resource>
 #include <string>
 
-#include "ascii.hpp"
-#include "input_stream.hpp"
-#include "output_stream.hpp"
+#include "framework/utils/ascii.hpp"
+#include "framework/io/input_stream.hpp"
+#include "framework/io/output_stream.hpp"
 
 namespace bpl
 {

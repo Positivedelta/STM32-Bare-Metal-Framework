@@ -6,7 +6,7 @@
 #include <cctype>
 #include <ranges>
 
-#include "string_utils.hpp"
+#include "framework/utils/string_utils.hpp"
 
 void bpl::StringUtils::trim(std::pmr::string& string)
 {

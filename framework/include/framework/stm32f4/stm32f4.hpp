@@ -7,9 +7,7 @@
 
 #include <cstdint>
 
-#include "stm32_scb.hpp"
-
-class Stm32
+class Stm32f4
 {
     public:
         inline static constexpr uint32_t AHB_CLOCK = 180000000;

@@ -7,8 +7,8 @@
 
 #include <cstdint>
 
-#include "timer_irq_consumer.hpp"
-#include "irq_listeners.hpp"
+#include "framework/irq/timer_irq_consumer.hpp"
+#include "framework/irq/irq_listeners.hpp"
 
 class SysTick
 {
