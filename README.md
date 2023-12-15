@@ -16,7 +16,7 @@ plugin hat to host the 3-axis gyros, the RC interface and the speed controller P
 ## Prerequisites
 - CMake v3.27 (older versions are probably OK)
 - Nmake v14.34.x
-- GCC 12.3
+- GCC 13.2.1
 
 Notes
 - Microsoft `nmake` is installed as a component of Visual Studio but is also available separately as a download
