@@ -3,6 +3,7 @@
 //
 
 #include <cstdint>
+#include <functional>
 #include <memory_resource>
 #include <vector>
 
@@ -10,10 +11,9 @@
 #include "framework/stm32f4/gpio.hpp"
 #include "framework/stm32f4/nvic.hpp"
 #include "framework/stm32f4/rcc.hpp"
-#include "framework/utils/simple_callback.hpp"
-#include "framework/utils/simple_timer.hpp"
-
-#include "systick_handler.hpp"
+#include "framework/tasking/task.hpp"
+#include "framework/tasking/lambda_task.hpp"
+#include "framework/tasking/scheduler.hpp"
 
 int main()
 {
@@ -65,20 +65,20 @@ int main()
     // */
 
     //
-    // notes 1, this example is slightly contrived in order to demonstrate two SimpleTimers with a SysTick IRQ dependency
-    //       2, the ledSlowFlash callback simply flashes led2
-    //       3, the ledOnToggle callback toggles the led2 on state, i.e. causes led2 for flash more quickly when on
+    // notes 1, this example is slightly contrived in order to demonstrate two scheduled tasks implemented using lambdas
+    //       2, the ledSlowFlash task simply flashes led2
+    //       3, the ledOnToggle task toggles the led2 on state, i.e. causes led2 for flash more quickly when on
     //
 
     volatile auto ledOn = false;
-    bpl::SimpleCallBack ledSlowFlash = [&ledOn] {
+    auto ledSlowFlash = bpl::LambdaTask(1'000, "Slow Flash Task", [&ledOn] {
         ledOn = !ledOn;
         Stm32f4::gpioA(Gpio::BSR) = (ledOn) ? (1 << Gpio::Pin5) : (1 << (Gpio::Pin5 + 16));
-    };
+    }); 
 
     // whilst on, toggle led2 3 times
     //
-    bpl::SimpleCallBack ledOnToggle = [&ledOn, toggleCount = 0, toggle = true] mutable {
+    auto ledOnToggle = bpl::LambdaTask(100, "On Toggle Task", [&ledOn, toggleCount = 0, toggle = true] mutable {
         if (ledOn)
         {
             if (toggleCount++ < 6)
@@ -96,15 +96,12 @@ int main()
             toggleCount = 0;
             toggle = true;
         }
-    };
+    });
 
-    constexpr uint32_t TIME_BASE_US = 500;
-    auto&& slowFlasher = bpl::SimpleTimer(2000 * TIME_BASE_US, ledSlowFlash);   // trigger every 1s
-    auto&& onToggler = bpl::SimpleTimer(200 * TIME_BASE_US, ledOnToggle);       // trigget every 0.1s
-
-//  auto sysTick = SysTick::getInstance(TIME_BASE_US, slowFlasher, Nvic::Priority2);
-    auto sysTick = SysTick::getInstance(TIME_BASE_US, {slowFlasher, onToggler}, Nvic::Priority2);
-    sysTick.enable();
+    // scheduled the slow flash to occur at 1Hz and the fast flash to occur at 10Hz
+    //
+    auto& scheduler = bpl::TaskScheduler::getInstance().initialise(1'000, {ledSlowFlash, ledOnToggle}, Nvic::Priority10);
+    scheduler.start();
 
     // let the IRQs work their magic...
     //
