@@ -6,10 +6,10 @@
 #include <utility>
 #include <vector>
 
+#include "framework/cli/cli_handler.hpp"
 #include "framework/utils/string_utils.hpp"
-#include "cli_handler.hpp"
 
-CliHandler::CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList):
+bpl::CliHandler::CliHandler(const bpl::TextIO& console, bpl::CliProviderList&& cliProviderList):
     consoleReader(console.getTextReader()), consoleWriter(console.getPrintWriter()) {
         providers = std::move(cliProviderList);
 
@@ -18,7 +18,7 @@ CliHandler::CliHandler(const bpl::TextIO& console, CliProviderList&& cliProvider
         consoleWriter.println();
 }
 
-void CliHandler::run()
+void bpl::CliHandler::run()
 {
     consoleWriter.print("# ");
 
@@ -29,7 +29,7 @@ void CliHandler::run()
     bpl::StringUtils::tokenize(command, ' ', tokens);
     if (tokens.size() > 0)
     {
-        // special case to display "help all" as this case can't be delegated to a CliProvider instance
+        // special case to display "all" as a help option, this case can't be delegated to the individual CliProvider instances
         //
         if ((tokens.size() == 1) && (tokens.front() == "help")) consoleWriter.println("all");
 

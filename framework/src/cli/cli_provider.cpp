@@ -2,10 +2,10 @@
 // (c) Bit Parallel Ltd, October 2023
 //
 
+#include "framework/cli/cli_provider.hpp"
 #include "framework/utils/string_utils.hpp"
-#include "cli_provider.hpp"
 
-CliProvider::CliProvider(std::pmr::string name, std::pmr::string help):
+bpl::CliProvider::CliProvider(std::pmr::string name, std::pmr::string help):
     name(name), help(help) {
 }
 
@@ -13,22 +13,22 @@ CliProvider::CliProvider(std::pmr::string name, std::pmr::string help):
 //       2, all other commands are delegated to the inheriting instances and are then handled if appropriate by the given instances
 //       3, only a single instance is expected to handle a specific non help command
 //
-bool CliProvider::execute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+bool bpl::CliProvider::execute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
 {
     if (commandTokens.front() == "help")
     {
         const auto parts = commandTokens.size();
         if (parts == 1)
         {
-            consoleWriter.println(getName());
+            consoleWriter.println(getCommandName());
             return true;
         }
 
         // only expecting 2 parts, anything else is invalid
         //
-        if ((parts == 2) && ((commandTokens.back() == getName()) || (commandTokens.back() == "all")))
+        if ((parts == 2) && ((commandTokens.back() == getCommandName()) || (commandTokens.back() == "all")))
         {
-            consoleWriter.println(getName() + " " + getHelp());
+            consoleWriter.println(getCommandName() + " " + getCommandHelp());
             return true;
         }
 
@@ -37,15 +37,15 @@ bool CliProvider::execute(std::pmr::vector<std::string_view>& commandTokens, con
 
     // not a help command, so delegate
     //
-    return doExecute(commandTokens, consoleWriter);
+    return handleCliCommand(commandTokens, consoleWriter);
 }
 
-const std::pmr::string& CliProvider::getName() const
+const std::pmr::string& bpl::CliProvider::getCommandName() const
 {
     return name;
 }
 
-const std::pmr::string& CliProvider::getHelp() const
+const std::pmr::string& bpl::CliProvider::getCommandHelp() const
 {
     return help;
 }

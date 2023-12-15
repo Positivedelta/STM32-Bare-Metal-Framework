@@ -16,9 +16,9 @@ void PWMServoDriver::setPWM(const uint32_t servo, const uint32_t pwmValue)
 //{
 //}
 
-bool PWMServoDriver::doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+bool PWMServoDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
 {
-    if (commandTokens.front() == getName())
+    if (commandTokens.front() == getCommandName())
     {
         // FIXME! parse command and display the results
         //

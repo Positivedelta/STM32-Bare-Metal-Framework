@@ -8,9 +8,9 @@
 #include <cstdint>
 
 #include "framework/tasking/task.hpp"
-#include "cli_provider.hpp"
+#include "framework/cli/cli_provider.hpp"
 
-class LedDriver : public bpl::Task, public CliProvider
+class LedDriver : public bpl::Task, public bpl::CliProvider
 {
     private:
         volatile int32_t ledPeriod, ledPeriodCount;
@@ -27,7 +27,7 @@ class LedDriver : public bpl::Task, public CliProvider
 
     protected:
         void runTask() override;
-        bool doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
+        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
 
     private:
         void doLedOn();

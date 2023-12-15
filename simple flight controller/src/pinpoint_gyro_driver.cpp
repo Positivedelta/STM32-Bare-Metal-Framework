@@ -29,9 +29,9 @@ void PinPointGyroDriver::runTask()
 // protected CliProvider method
 //
 
-bool PinPointGyroDriver::doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+bool PinPointGyroDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
 {
-    if (commandTokens.front() == getName())
+    if (commandTokens.front() == getCommandName())
     {
         // FIXME! parse command and display the results
         //

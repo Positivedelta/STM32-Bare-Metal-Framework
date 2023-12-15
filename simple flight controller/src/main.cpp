@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <memory_resource>
 
+#include "framework/cli/cli_handler.hpp"
 #include "framework/drivers/usart2.hpp"
 #include "framework/io/baud_rate.hpp"
 #include "framework/io/text_io.hpp"
@@ -19,7 +20,6 @@
 #include "sbus_driver.hpp"
 #include "pwm_servo_driver.hpp"
 #include "pid_controller.hpp"
-#include "cli_handler.hpp"
 
 int main()
 {
@@ -55,7 +55,7 @@ int main()
     //
     auto& uart = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
     const auto console = bpl::TextIO(uart.getInputStream(), uart.getOutputStream());
-    auto cli = CliHandler(console, {led, gyros, sbus, servos, controller});
+    auto cli = bpl::CliHandler(console, {led, gyros, sbus, servos, controller});
     while (true) cli.run();
 
     return 0;

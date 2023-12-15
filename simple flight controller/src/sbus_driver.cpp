@@ -16,9 +16,9 @@ SBusDriver::SBusDriver():
 //{
 //}
 
-bool SBusDriver::doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+bool SBusDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
 {
-    if (commandTokens.front() == getName())
+    if (commandTokens.front() == getCommandName())
     {
         // FIXME! parse the sbus command and display the results
         //

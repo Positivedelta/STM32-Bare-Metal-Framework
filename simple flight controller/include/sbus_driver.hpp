@@ -10,11 +10,11 @@
 //
 
 //#include "framework/irq/timer_irq_consumer.hpp"
-#include "cli_provider.hpp"
+#include "framework/cli/cli_provider.hpp"
 //#include "sbus_values.hpp"
 
 //class SBusDriver : public bpl::TimerIrqConsumer, public CliProvider
-class SBusDriver : public CliProvider
+class SBusDriver : public bpl::CliProvider
 {
     public:
         SBusDriver();
@@ -23,7 +23,7 @@ class SBusDriver : public CliProvider
 //      void irq() override;
 
     protected:
-        bool doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
+        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
 };
 
 #endif

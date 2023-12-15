@@ -11,11 +11,11 @@
 // FIXME! probably does not need to have an IRQ handler
 //
 
-//#include "framework/irq/timer_irq_consumer.hpp"
-#include "cli_provider.hpp"
+//#include "framework/tasking/task.hpp"
+#include "framework/cli/cli_provider.hpp"
 
-//class PWMServoDriver : public bpl::TimerIrqConsumer, public CliProvider
-class PWMServoDriver : public CliProvider
+//class PWMServoDriver : public bpl::Task, public bpl::CliProvider
+class PWMServoDriver : public bpl::CliProvider
 {
     public:
         PWMServoDriver(const uint32_t frameRate);
@@ -26,10 +26,10 @@ class PWMServoDriver : public CliProvider
 //      {
 //      }
 
-//      void irq() override;
+//      void runTask() override;
 
     protected:
-        bool doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
+        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
 };
 
 #endif

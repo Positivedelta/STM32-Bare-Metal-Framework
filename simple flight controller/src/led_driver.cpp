@@ -116,11 +116,11 @@ void LedDriver::runTask()
 // protected CliProvider method
 //
 
-bool LedDriver::doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+bool LedDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
 {
     // allowed syntax: led off | on | flash #period | activate
     //
-    if (commandTokens.front() == getName())
+    if (commandTokens.front() == getCommandName())
     {
         if (commandTokens[1] == "off")
         {

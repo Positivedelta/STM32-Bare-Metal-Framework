@@ -20,9 +20,9 @@ void PidController::runTask()
 // protected CliProvider method
 //
 
-bool PidController::doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+bool PidController::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
 {
-    if (commandTokens.front() == getName())
+    if (commandTokens.front() == getCommandName())
     {
         // FIXME! parse command and display the results
         //
