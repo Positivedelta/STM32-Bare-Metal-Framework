@@ -60,7 +60,7 @@ float bpl::TaskScheduler::getMaxCpu() const
 // the SysTick IRQ handler
 //
 
-__attribute__((flatten, hot)) void SysTickIRQ::handler()
+__attribute__((flatten, hot)) void SysTick::handler()
 {
     auto& instance = bpl::TaskScheduler::getInstance();
 
@@ -68,7 +68,7 @@ __attribute__((flatten, hot)) void SysTickIRQ::handler()
     for (auto& schedulerTask : instance)
     {
         auto& task = schedulerTask.get();
-        task.run();
+        task.invoke();
 
         volatile uint32_t now = Stm32f4::sysTick(Stk::VAL);
         task.setUsedCycles(lastSysTick - now);

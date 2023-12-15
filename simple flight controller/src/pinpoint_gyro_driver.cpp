@@ -4,8 +4,8 @@
 
 #include "pinpoint_gyro_driver.hpp"
 
-PinPointGyroDriver::PinPointGyroDriver(const uint32_t samplingInterval, const LedDriver& led):
-    CliProvider("gyros", "[repeat] display | reset"), samplingInterval(samplingInterval) {
+PinPointGyroDriver::PinPointGyroDriver(const uint32_t period, const char* taskName, const LedDriver& led):
+    Task(period, taskName), CliProvider("gyros", "[repeat] display | reset") {
 }
 
 void PinPointGyroDriver::sample()
@@ -17,14 +17,17 @@ const AxesValues PinPointGyroDriver::getAxes()
     return AxesValues(0, 1, 2);
 }
 
-void PinPointGyroDriver::irq()
+//
+// protected Task method
+//
+
+void PinPointGyroDriver::runTask()
 {
 }
 
-uint32_t PinPointGyroDriver::getIrqRate() const
-{
-    return samplingInterval;
-}
+//
+// protected CliProvider method
+//
 
 bool PinPointGyroDriver::doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
 {

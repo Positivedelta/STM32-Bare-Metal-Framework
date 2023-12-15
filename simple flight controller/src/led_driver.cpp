@@ -1,5 +1,5 @@
 //
-// (c) Bit Parallel Ltd, October 2023
+// (c) Bit Parallel Ltd, December 2023
 //
 
 #include "framework/stm32f4/stm32f4.hpp"
@@ -9,9 +9,9 @@
 
 #include "led_driver.hpp"
 
-LedDriver::LedDriver(const uint32_t timeBase):
-    CliProvider("led", "off | on | flash #period | activate"),
-    timeBase(timeBase), ledPeriod(1), ledPeriodCount(0), isActive(true), ledOn(false), ledFlashing(false), ledToggle(true) {
+LedDriver::LedDriver(const uint32_t period, const char* taskName):
+    Task(period, taskName), CliProvider("led", "off | on | flash #period | activate"),
+    ledPeriod(1), ledPeriodCount(0), isActive(true), ledOn(false), ledFlashing(false), ledToggle(true) {
         // enable the AHB1 clock, needed by gpioA
         //
         Stm32f4::rcc(Rcc::AHB1ENR) = Stm32f4::rcc(Rcc::AHB1ENR) | 1;
@@ -25,6 +25,10 @@ LedDriver::LedDriver(const uint32_t timeBase):
         Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
         Stm32f4::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
 }
+
+//
+// LedDriver methods
+//
 
 void LedDriver::on()
 {
@@ -62,30 +66,6 @@ void LedDriver::doLedFlash(const uint32_t period)
     ledFlashing = true;
 }
 
-void LedDriver::irq()
-{
-    if (ledFlashing)
-    {
-        ledPeriodCount = ledPeriodCount + 1;
-        if (ledPeriodCount == ledPeriod)
-        {
-            Stm32f4::gpioA(Gpio::BSR) = 1 << ((ledToggle) ? Gpio::Pin5 : Gpio::Pin5 + 16);
-            ledToggle = !ledToggle;
-
-            ledPeriodCount = 0;
-        }
-
-        return;
-    }
-
-    Stm32f4::gpioA(Gpio::BSR) = 1 << ((ledOn) ? Gpio::Pin5 : Gpio::Pin5 + 16);
-}
-
-uint32_t LedDriver::getIrqRate() const
-{
-    return timeBase;
-}
-
 void LedDriver::ifActiveSaveStateAndReportCliControl(const bpl::PrintWriter& consoleWriter)
 {
     if (isActive)
@@ -108,6 +88,33 @@ void LedDriver::restoreActiveState()
     ledFlashing = currentLedFlashing;
     ledToggle = currentLedToggle;
 }
+
+//
+// protected Task method
+//
+
+void LedDriver::runTask()
+{
+    if (ledFlashing)
+    {
+        ledPeriodCount = ledPeriodCount + 1;
+        if (ledPeriodCount == ledPeriod)
+        {
+            Stm32f4::gpioA(Gpio::BSR) = 1 << ((ledToggle) ? Gpio::Pin5 : Gpio::Pin5 + 16);
+            ledToggle = !ledToggle;
+
+            ledPeriodCount = 0;
+        }
+
+        return;
+    }
+
+    Stm32f4::gpioA(Gpio::BSR) = 1 << ((ledOn) ? Gpio::Pin5 : Gpio::Pin5 + 16);
+}
+
+//
+// protected CliProvider method
+//
 
 bool LedDriver::doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
 {

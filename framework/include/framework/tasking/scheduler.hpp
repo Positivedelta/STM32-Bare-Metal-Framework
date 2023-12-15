@@ -12,7 +12,7 @@
 
 #include "framework/tasking/task.hpp"
 
-class SysTickIRQ
+class SysTick
 {
     public:
         static void handler();
@@ -22,7 +22,7 @@ namespace bpl
 {
     class TaskScheduler
     {
-        friend void ::SysTickIRQ::handler();
+        friend void ::SysTick::handler();
 
         using WrappedTask = std::reference_wrapper<bpl::Task>;
         using Tasks = std::pmr::vector<WrappedTask>;

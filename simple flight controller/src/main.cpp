@@ -1,5 +1,5 @@
 //
-// (c) Bit Parallel Ltd, October 2023
+// (c) Bit Parallel Ltd, December 2023
 //
 
 #include <array>
@@ -10,6 +10,7 @@
 #include "framework/io/baud_rate.hpp"
 #include "framework/io/text_io.hpp"
 #include "framework/stm32f4/nvic.hpp"
+#include "framework/tasking/scheduler.hpp"
 
 // project includes
 //
@@ -19,7 +20,6 @@
 #include "pwm_servo_driver.hpp"
 #include "pid_controller.hpp"
 #include "cli_handler.hpp"
-#include "irq/systick_handler.hpp"
 
 int main()
 {
@@ -38,17 +38,13 @@ int main()
     //
     Nvic::setPriorityGrouping(Nvic::PRE4_SUB0);
 
-    constexpr auto TIME_BASE = 500;
-    auto&& led = LedDriver(200 * TIME_BASE);                                    // 100ms timebase
-    auto&& gyros = PinPointGyroDriver(TIME_BASE, led);                          // sample every 500us
-    auto&& sbus = SBusDriver();
-    auto&& servos = PWMServoDriver(333);                                        // update the servos or ESCs at 333Hz
-    auto&& controller = PidController(6 * TIME_BASE, gyros, sbus, servos, led); // run the control loop every 3ms, i.e. at 333Hz
-//  auto&& pid = PidController(gyros, sbus, servos, led);
-//  auto&& controller = PendSV(3000 * TIME_BASE, pid);                          // run the control loop every 3ms, i.e. at 333Hz
-
-    auto sysTick = SysTick::getInstance(TIME_BASE, {led, gyros, controller}, Nvic::Priority2);
-    sysTick.enable();
+    auto led = LedDriver(100, "LED Task");                                      // 100ms timebase
+    auto gyros = PinPointGyroDriver(1, "Gyro Task", led);                       // sample every 1ms
+    auto sbus = SBusDriver();
+    auto servos = PWMServoDriver(333);                                          // update the servos or ESCs at 333Hz
+    auto controller = PidController(3, "PID Task", gyros, sbus, servos, led);   // run the control loop every 3ms, i.e. at 333Hz
+    auto& scheduler = bpl::TaskScheduler::getInstance().initialise(1'000, {gyros, controller, led}, Nvic::Priority10);
+    scheduler.start();
 
     // FIXME! just for testing...
     //

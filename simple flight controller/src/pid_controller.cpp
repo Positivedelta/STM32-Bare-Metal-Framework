@@ -4,22 +4,21 @@
 
 #include "pid_controller.hpp"
 
-PidController::PidController(const uint32_t loopRate, const PinPointGyroDriver& gyros, const SBusDriver& sbus, const PWMServoDriver& servos, const LedDriver& led):
-    CliProvider("loop", "set P=#gain and/or I=#gain and/or D=#gain"), loopRate(loopRate) {
+PidController::PidController(const uint32_t period, const char* taskName, const PinPointGyroDriver& gyros, const SBusDriver& sbus, const PWMServoDriver& servos, const LedDriver& led):
+    Task(period, taskName), CliProvider("loop", "set P=#gain and/or I=#gain and/or D=#gain") {
 }
 
-void PidController::run()
+//
+// protected Task method
+//
+
+void PidController::runTask()
 {
 }
 
-void PidController::irq()
-{
-}
-
-uint32_t PidController::getIrqRate() const
-{
-    return loopRate;
-}
+//
+// protected CliProvider method
+//
 
 bool PidController::doExecute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
 {

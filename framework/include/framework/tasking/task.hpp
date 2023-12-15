@@ -11,11 +11,21 @@ namespace bpl
 {
     class Task
     {
+        private:
+            const uint32_t period;
+            uint32_t counter;
+            uint32_t maxUsedCycles;
+            char name[32];
+
+        protected:
+            Task(const uint32_t period, const char* taskName);
+            virtual void runTask() = 0;
+
         public:
-            virtual void run() = 0;
-            virtual void setUsedCycles(uint32_t usedCycles) = 0;
-            virtual float getMaxCpu(const uint32_t availableCycles) const = 0;
-            virtual const char* getName() const = 0;
+            void invoke();
+            void setUsedCycles(uint32_t usedCycles);
+            float getMaxCpu(const uint32_t availableCycles) const;
+            const char* getTaskName() const;
     };
 }
 
