@@ -90,7 +90,7 @@ void LedDriver::restoreActiveState()
 }
 
 //
-// protected Task method
+// private Task method
 //
 
 void LedDriver::runTask()
@@ -113,7 +113,7 @@ void LedDriver::runTask()
 }
 
 //
-// protected CliProvider method
+// private CliProvider method
 //
 
 bool LedDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)

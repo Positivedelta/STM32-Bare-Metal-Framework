@@ -25,11 +25,10 @@ class LedDriver : public bpl::Task, public bpl::CliProvider
         void off();
         void flash(const uint32_t period);
 
-    protected:
+    private:
         void runTask() override;
         bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
 
-    private:
         void doLedOn();
         void doLedOff();
         void doLedFlash(const uint32_t period);

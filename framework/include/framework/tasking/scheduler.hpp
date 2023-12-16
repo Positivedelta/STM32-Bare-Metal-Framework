@@ -10,6 +10,7 @@
 #include <memory_resource>
 #include <vector>
 
+#include "framework/cli/cli_provider.hpp"
 #include "framework/tasking/task.hpp"
 
 class SysTick
@@ -20,7 +21,7 @@ class SysTick
 
 namespace bpl
 {
-    class TaskScheduler
+    class TaskScheduler : public bpl::CliProvider
     {
         friend void ::SysTick::handler();
 
@@ -38,8 +39,9 @@ namespace bpl
             };
 
             TaskList tasks;
-            uint32_t reloadValue;
+            uint32_t schedulerTimeBase, reloadValue;
             volatile uint32_t maxUsedCycles;
+            char taskStatistics[64];
 
         public:
             static TaskScheduler& getInstance();
@@ -90,6 +92,8 @@ namespace bpl
 
         private:
             TaskScheduler();
+            bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
+            void printTaskStatistics(const bpl::PrintWriter& consoleWriter);
     };
 }
 

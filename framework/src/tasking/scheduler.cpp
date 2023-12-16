@@ -2,17 +2,20 @@
 // (c) Bit Parallel Ltd, December 2023
 //
 
+#include <cstdio>
 #include <utility>
 
 #include "framework/stm32f4/stm32f4.hpp"
 #include "framework/stm32f4/f446xx_irq_n.hpp"
 #include "framework/stm32f4/nvic.hpp"
 #include "framework/stm32f4/stk.hpp"
+#include "framework/utils/string_utils.hpp"
 
 #include "framework/tasking/scheduler.hpp"
 
 bpl::TaskScheduler::TaskScheduler():
-    reloadValue(0x00ffffff), maxUsedCycles(0) {
+    CliProvider("tasks", "[#refresh]"),
+    schedulerTimeBase(10'000), reloadValue(0x00ffffff), maxUsedCycles(0) {
 }
 
 bpl::TaskScheduler& bpl::TaskScheduler::getInstance()
@@ -23,21 +26,22 @@ bpl::TaskScheduler& bpl::TaskScheduler::getInstance()
 
 bpl::TaskScheduler& bpl::TaskScheduler::initialise(const uint32_t timeBase, TaskList&& taskList, const uint8_t priority)
 {
+    schedulerTimeBase = timeBase;
     tasks = std::move(taskList);
     Nvic::setPriority(F446IRQn::SysTick, priority);
 
     reloadValue = (180 * timeBase) - 1;
-    Stm32f4::sysTick(Stk::LOAD) = reloadValue;                              // the timeBase is specified in us
+    Stm32f4::sysTick(Stk::LOAD) = reloadValue;                                          // the timeBase is specified in us
     Stm32f4::sysTick(Stk::VAL) = 0;
-    Stm32f4::sysTick(Stk::CTRL) = Stm32f4::sysTick(Stk::CTRL) | (1 << 2);   // use the system clock
-    Stm32f4::sysTick(Stk::CTRL) = Stm32f4::sysTick(Stk::CTRL) | (1 << 1);   // enable the IRQ
+    Stm32f4::sysTick(Stk::CTRL) = Stm32f4::sysTick(Stk::CTRL) | Stk::CTRL_CLKSOURCE;    // use the system clock
+    Stm32f4::sysTick(Stk::CTRL) = Stm32f4::sysTick(Stk::CTRL) | Stk::CTRL_TICKINT;      // enable the IRQ
 
     return *this;
 }
 
 void bpl::TaskScheduler::start() const
 {
-    Stm32f4::sysTick(Stk::CTRL) = Stm32f4::sysTick(Stk::CTRL) | (1 << 0);   // enable SysTick
+    Stm32f4::sysTick(Stk::CTRL) = Stm32f4::sysTick(Stk::CTRL) | Stk::CTRL_ENABLE;       // enable SysTick
     Nvic::enableIRQ(F446IRQn::SysTick);
 }
 
@@ -77,4 +81,58 @@ __attribute__((flatten, hot)) void SysTick::handler()
 
     volatile auto usedCycles = instance.reloadValue - Stm32f4::sysTick(Stk::VAL);
     if (usedCycles > instance.maxUsedCycles) instance.maxUsedCycles = usedCycles;
+}
+
+//
+// the inherited CLI handler
+//
+
+bool bpl::TaskScheduler::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+{
+    // allowed syntax: tasks [#refresh]
+    //
+    if (commandTokens.size() == 1)
+    {
+        printTaskStatistics(consoleWriter);
+        return true;
+    }
+
+    if (commandTokens.size() == 2)
+    {
+        int32_t refresh = 0;
+        if (bpl::StringUtils::stoi(commandTokens[1], refresh))
+        {
+            printTaskStatistics(consoleWriter);
+            for (auto i = 0; i < 4; i++)
+            {
+                uint32_t sysTickCounts = 0;
+                while (sysTickCounts < (schedulerTimeBase * refresh))
+                {
+                    while ((Stm32f4::sysTick(Stk::CTRL) & Stk::CTRL_COUNT) > 0) sysTickCounts++;
+                }
+
+                printTaskStatistics(consoleWriter);
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void bpl::TaskScheduler::printTaskStatistics(const bpl::PrintWriter& consoleWriter)
+{
+    std::snprintf(taskStatistics, sizeof(taskStatistics), "Scheduler CPU: %.2f%% [%lu Cycles]", getMaxCpu(), getMaxUsedCycles());
+    consoleWriter.println();
+    consoleWriter.println(taskStatistics);
+
+    consoleWriter.println("Task CPU:");
+    const auto availableCycles = getAvailableCycles();
+    for (auto& schedulerTask : *this)
+    {
+        auto& task = schedulerTask.get();
+        std::snprintf(taskStatistics, sizeof(taskStatistics), "    %5.2f%% [%s]", task.getMaxCpu(availableCycles), task.getTaskName());
+        consoleWriter.println(taskStatistics);
+    }
 }

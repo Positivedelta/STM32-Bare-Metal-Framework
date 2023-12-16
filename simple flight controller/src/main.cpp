@@ -55,7 +55,7 @@ int main()
     //
     auto& uart = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
     const auto console = bpl::TextIO(uart.getInputStream(), uart.getOutputStream());
-    auto cli = bpl::CliHandler(console, {led, gyros, sbus, servos, controller});
+    auto cli = bpl::CliHandler(console, {scheduler, led, gyros, sbus, servos, controller});
     while (true) cli.run();
 
     return 0;

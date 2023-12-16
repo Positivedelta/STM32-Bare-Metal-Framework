@@ -20,7 +20,7 @@ class PidController : public bpl::Task, public bpl::CliProvider
     public:
         PidController(const uint32_t period, const char* taskName, const PinPointGyroDriver& gyros, const SBusDriver& sbus, const PWMServoDriver& servos, const LedDriver& led);
 
-    protected:
+    private:
         void runTask() override;
         bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
 };
