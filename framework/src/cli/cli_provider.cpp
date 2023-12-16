@@ -35,9 +35,24 @@ bool bpl::CliProvider::execute(std::pmr::vector<std::string_view>& commandTokens
         return false;
     }
 
-    // not a help command, so delegate
+    // not a help command, so delegate to the appropriate handler
     //
-    return handleCliCommand(commandTokens, consoleWriter);
+    if (commandTokens.front() == getCommandName())
+    {
+        // notes 1, the handler can reject the command, bad syntax, invalid value etc, ...
+        //       2, under these circumstances, it's expected that the other handlers will return false (as they are different commands)
+        //          and the CliHandler instance will report an "Invalid command" (see below)
+        //
+        return handleCliCommand(commandTokens, consoleWriter);
+    }
+    else
+    {
+        // notes 1, no handler found for this command
+        //       2, the CliHandler instance will try the other registered handlers
+        //       3, if the command remains unhandled, the CliHandler instance will report an "Invalid command"
+        //
+        return false;
+    }
 }
 
 const std::pmr::string& bpl::CliProvider::getCommandName() const

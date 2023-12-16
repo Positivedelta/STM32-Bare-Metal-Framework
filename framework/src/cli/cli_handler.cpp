@@ -13,7 +13,7 @@ bpl::CliHandler::CliHandler(const bpl::TextIO& console, bpl::CliProviderList&& c
     consoleReader(console.getTextReader()), consoleWriter(console.getPrintWriter()) {
         providers = std::move(cliProviderList);
 
-        // always initialise with a prompt on a newline
+        // always initialise with a newline before printing the first ever prompt in run()
         //
         consoleWriter.println();
 }

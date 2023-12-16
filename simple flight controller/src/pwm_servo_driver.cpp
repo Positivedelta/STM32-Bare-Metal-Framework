@@ -18,13 +18,8 @@ void PWMServoDriver::setPWM(const uint32_t servo, const uint32_t pwmValue)
 
 bool PWMServoDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
 {
-    if (commandTokens.front() == getCommandName())
-    {
-        // FIXME! parse command and display the results
-        //
-        consoleWriter.println("The SERVOS command needs implementing...");
-        return true;
-    }
-
-    return false;
+    // FIXME! parse command and display the results
+    //
+    consoleWriter.println("The SERVOS command needs implementing...");
+    return true;
 }

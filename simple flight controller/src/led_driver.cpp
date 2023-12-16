@@ -120,67 +120,62 @@ bool LedDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandToke
 {
     // allowed syntax: led off | on | flash #period | activate
     //
-    if (commandTokens.front() == getCommandName())
+    if (commandTokens[1] == "off")
     {
-        if (commandTokens[1] == "off")
+        ifActiveSaveStateAndReportCliControl(consoleWriter);
+
+        isActive = false;
+        doLedOff();
+        consoleWriter.println("Set: OFF");
+
+        return true;
+    }
+
+    if (commandTokens[1] == "on")
+    {
+        ifActiveSaveStateAndReportCliControl(consoleWriter);
+
+        isActive = false;
+        doLedOn();
+        consoleWriter.println("Set: ON");
+
+        return true;
+    }
+
+    if ((commandTokens[1] == "flash") && (commandTokens.size() == 3))
+    {
+        int32_t period = 0;
+        const auto validPeriod = (commandTokens[2].size() < 4) && bpl::StringUtils::stoi(commandTokens[2], period);
+        if (validPeriod)
         {
             ifActiveSaveStateAndReportCliControl(consoleWriter);
 
             isActive = false;
-            doLedOff();
-            consoleWriter.println("Set: OFF");
-
-            return true;
-        }
-
-        if (commandTokens[1] == "on")
-        {
-            ifActiveSaveStateAndReportCliControl(consoleWriter);
-
-            isActive = false;
-            doLedOn();
-            consoleWriter.println("Set: ON");
-
-            return true;
-        }
-
-        if ((commandTokens[1] == "flash") && (commandTokens.size() == 3))
-        {
-            int32_t period = 0;
-            const auto validPeriod = (commandTokens[2].size() < 4) && bpl::StringUtils::stoi(commandTokens[2], period);
-            if (validPeriod)
-            {
-                ifActiveSaveStateAndReportCliControl(consoleWriter);
-
-                isActive = false;
-                doLedFlash(uint32_t(period));
-                consoleWriter.print("Set: FLASH = ");
-                consoleWriter.println(commandTokens[2]);
-
-                return true;
-            }
-
-            return false;
-        }
-
-        if (commandTokens[1] == "activate")
-        {
-            if (!isActive)
-            {
-                restoreActiveState();
-
-                isActive = true;
-                consoleWriter.println("Relinquished LED control, original state restored");
-            }
-            else
-            {
-                consoleWriter.println("Already active");
-            }
+            doLedFlash(uint32_t(period));
+            consoleWriter.print("Set: FLASH = ");
+            consoleWriter.println(commandTokens[2]);
 
             return true;
         }
 
         return false;
+    }
+
+    if (commandTokens[1] == "activate")
+    {
+        if (!isActive)
+        {
+            restoreActiveState();
+
+            isActive = true;
+            consoleWriter.println("Relinquished LED control, original state restored");
+        }
+        else
+        {
+            consoleWriter.println("Already active");
+        }
+
+        return true;
     }
 
     return false;
