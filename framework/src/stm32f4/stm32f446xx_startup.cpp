@@ -73,9 +73,71 @@ extern "C"
         return -1;
     }
 
-    int32_t _getpid(void)
+    int32_t _getpid()
     {
         return 1;
+    }
+
+    //
+    // added to support the "_printf_float" linker option
+    //
+
+    int32_t _isatty(int32_t file)
+    {
+        return 1;
+    }
+
+    int32_t _lseek(int32_t file, int32_t ptr, int32_t dir)
+    {
+        return 0;
+    }
+
+    int32_t _fstat(int32_t file, struct stat* st)
+    {
+        return 0;
+    }
+
+    int32_t _close(int32_t file)
+    {
+        return -1;
+    }
+
+    // notes 1, to support std::scanf() uncomment the code below and add and external reference to uartGetch()
+    //       2, in main() implement uartGetch()
+    //
+    int32_t _read(int32_t fd, char* data, int32_t length)
+    {
+        return -1;
+
+/*      if (fd != 0) return -1;
+
+        int32_t bytesRead = 0;
+        for (; length > 0; --length)
+        {
+            if (!uartGetch(data++)) break;
+            bytesRead++;
+        }
+
+        return bytesRead; */
+    }
+
+    // notes 1, to support std::printf() uncomment the code below and add and external reference to uartPutch()
+    //       2, in main() implement uartPutch()
+    //
+    int32_t _write(int32_t fd, char* text, int32_t length)
+    {
+        return -1;
+
+/*      if ((fd != 1) && (fd != 2) && (fd != 3)) return -1;
+
+        int32_t bytesWritten = 0;
+        for (; length != 0; --length)
+        {
+            if (!uartPutch(*text++)) return -1;
+            ++bytesWritten;
+        }
+
+        return bytesWritten; */
     }
 }
 

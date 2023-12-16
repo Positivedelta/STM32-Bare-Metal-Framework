@@ -13,4 +13,4 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 #       2, the required linker script is provided in the CMakeLists.txt file
 #
 set(CMAKE_CXX_FLAGS_INIT "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fno-exceptions -fno-use-cxa-atexit --specs=nano.specs")
-set(CMAKE_EXE_LINKER_FLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -lstdc++_nano -lsupc++_nano -lc_nano -Wl,--gc-sections")
+set(CMAKE_EXE_LINKER_FLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -u _printf_float -lstdc++_nano -lsupc++_nano -lc_nano -Wl,--gc-sections")
