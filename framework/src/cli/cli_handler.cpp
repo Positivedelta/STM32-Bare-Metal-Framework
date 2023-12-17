@@ -10,7 +10,7 @@
 #include "framework/utils/string_utils.hpp"
 
 bpl::CliHandler::CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList):
-    consoleReader(console.getTextReader()), consoleWriter(console.getPrintWriter()) {
+    console(console), consoleReader(console.getTextReader()), consoleWriter(console.getPrintWriter()) {
         providers = std::move(cliProviderList);
 
         // always initialise with a newline before printing the first ever prompt in run()
@@ -36,7 +36,7 @@ void bpl::CliHandler::run()
         auto success = false;
         for (auto& provider : providers)
         {
-            const auto handled = provider.get().execute(tokens, consoleWriter);
+            const auto handled = provider.get().execute(tokens, console);
             if (handled) success = true;
         }
 

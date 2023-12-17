@@ -18,6 +18,16 @@ const bool bpl::TextReader::read(uint8_t& byte) const
     return inputStream.read(byte);
 }
 
+const bool bpl::TextReader::isKey(uint8_t keyCode) const
+{
+    bool pressed = false;
+
+    uint8_t key;
+    while (read(key)) pressed = true;
+
+    return pressed && (key == keyCode);
+}
+
 // note, implements CR, BS and DEL handling
 //
 const std::pmr::string bpl::TextReader::readln() const

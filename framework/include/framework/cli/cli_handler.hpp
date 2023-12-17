@@ -9,7 +9,6 @@
 #include <memory_resource>
 #include <vector>
 
-//#include "framework/cli/cli_provider_list.hpp"
 #include "framework/cli/cli_provider.hpp"
 #include "framework/io/text_reader.hpp"
 #include "framework/io/print_writer.hpp"
@@ -33,6 +32,7 @@ namespace bpl
             };
 
             CliProviderList providers;
+            const bpl::TextIO& console;
             const bpl::TextReader& consoleReader;
             const bpl::PrintWriter& consoleWriter;
 

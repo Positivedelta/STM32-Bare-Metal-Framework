@@ -7,6 +7,7 @@
 
 #include <cstdint>
 
+#include "framework/io/print_writer.hpp"
 #include "framework/tasking/task.hpp"
 #include "framework/cli/cli_provider.hpp"
 
@@ -27,13 +28,13 @@ class LedDriver : public bpl::Task, public bpl::CliProvider
 
     private:
         void runTask() override;
-        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
+        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;
 
         void doLedOn();
         void doLedOff();
         void doLedFlash(const uint32_t period);
 
-        void ifActiveSaveStateAndReportCliControl(const bpl::PrintWriter& consoleWriter);
+        void ifActiveSaveStateAndReportCliControl(const bpl::PrintWriter& console);
         void restoreActiveState();
 };
 

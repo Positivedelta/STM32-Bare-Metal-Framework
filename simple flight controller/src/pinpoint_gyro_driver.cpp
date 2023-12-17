@@ -29,8 +29,10 @@ void PinPointGyroDriver::runTask()
 // protected CliProvider method
 //
 
-bool PinPointGyroDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+bool PinPointGyroDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
 {
+    const auto& consoleWriter = console.getPrintWriter();
+
     // FIXME! parse command and display the results
     //
     consoleWriter.println("The GYROS command needs implementing...");

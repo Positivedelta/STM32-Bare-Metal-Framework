@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "framework/cli/cli_provider.hpp"
+#include "framework/io/print_writer.hpp"
 #include "framework/tasking/task.hpp"
 
 class SysTick
@@ -92,7 +93,7 @@ namespace bpl
 
         private:
             TaskScheduler();
-            bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
+            bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;
             void printTaskStatistics(const bpl::PrintWriter& consoleWriter);
     };
 }

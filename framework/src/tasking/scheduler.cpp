@@ -9,6 +9,7 @@
 #include "framework/stm32f4/f446xx_irq_n.hpp"
 #include "framework/stm32f4/nvic.hpp"
 #include "framework/stm32f4/stk.hpp"
+#include "framework/utils/ascii.hpp"
 #include "framework/utils/string_utils.hpp"
 
 #include "framework/tasking/scheduler.hpp"
@@ -87,8 +88,11 @@ __attribute__((flatten, hot)) void SysTick::handler()
 // the inherited CLI handler
 //
 
-bool bpl::TaskScheduler::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+bool bpl::TaskScheduler::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
 {
+    const auto& consoleWriter = console.getPrintWriter();
+    const auto& consoleReader = console.getTextReader();
+
     // allowed syntax: tasks [#refresh]
     //
     if (commandTokens.size() == 1)
@@ -102,16 +106,32 @@ bool bpl::TaskScheduler::handleCliCommand(std::pmr::vector<std::string_view>& co
         int32_t refresh = 0;
         if (bpl::StringUtils::stoi(commandTokens[1], refresh))
         {
-            printTaskStatistics(consoleWriter);
-            for (auto i = 0; i < 4; i++)
+            // check every 1/4 second for an ESC key press, i.e. to quit
+            //
+            auto running = true;
+            while (running)
             {
-                uint32_t sysTickCounts = 0;
-                while (sysTickCounts < (schedulerTimeBase * refresh))
-                {
-                    while ((Stm32f4::sysTick(Stk::CTRL) & Stk::CTRL_COUNT) > 0) sysTickCounts++;
-                }
-
                 printTaskStatistics(consoleWriter);
+
+                for (auto interval = 0; interval < refresh * 4; interval++)
+                {
+                    if (consoleReader.isKey(bpl::Ascii::ESC))
+                    {
+                        running = false;
+                        break;
+                    }
+
+                    // wait for 1/4 second
+                    // notes 1, SysTick is configured to count in microseconds
+                    //       2, the timebase value represents the SysTick countdown period and is specified in microseconds
+                    //       3, it takes 1s to for SysTick to cycle "timebase" times 
+                    //
+                    uint32_t sysTickCounts = 0;
+                    while (sysTickCounts < (schedulerTimeBase >> 2))
+                    {
+                        while ((Stm32f4::sysTick(Stk::CTRL) & Stk::CTRL_COUNT) > 0) sysTickCounts++;
+                    }
+                }
             }
 
             return true;

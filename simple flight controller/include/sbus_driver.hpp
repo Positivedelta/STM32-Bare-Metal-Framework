@@ -23,7 +23,7 @@ class SBusDriver : public bpl::CliProvider
 //      void irq() override;
 
     private:
-        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
+        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;
 };
 
 #endif

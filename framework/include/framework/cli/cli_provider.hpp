@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "framework/io/print_writer.hpp"
+#include "framework/io/text_io.hpp"
 
 namespace bpl
 {
@@ -25,7 +25,7 @@ namespace bpl
 
             // note, expected to be called by execute() for non help commands
             //
-            virtual bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) = 0;
+            virtual bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) = 0;
 
         public:
             const std::pmr::string& getCommandName() const;
@@ -35,7 +35,7 @@ namespace bpl
             //       2, all other commands are delegated to the inheriting instances and are must be handled appropriately by doExecute()
             //       3, only a single instance is expected to handle a specific non help command
             //
-            bool execute(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter);
+            bool execute(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console);
     };
 }
 

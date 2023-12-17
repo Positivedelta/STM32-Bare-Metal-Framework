@@ -16,8 +16,10 @@ void PWMServoDriver::setPWM(const uint32_t servo, const uint32_t pwmValue)
 //{
 //}
 
-bool PWMServoDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+bool PWMServoDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
 {
+    const auto& consoleWriter = console.getPrintWriter();
+
     // FIXME! parse command and display the results
     //
     consoleWriter.println("The SERVOS command needs implementing...");

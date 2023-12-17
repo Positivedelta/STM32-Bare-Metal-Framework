@@ -29,6 +29,7 @@ namespace bpl
             TextReader(const bpl::InputStream& inputStream, const bpl::OutputStream& outputStream);
 
             const bool read(uint8_t& byte) const;
+            const bool isKey(uint8_t keyCode) const;
 
             // notes 1, the readln() methods return std::pmr::string or uint8_t[] values
             //       2, the use of std::prm::string will incur PMR memory allocation

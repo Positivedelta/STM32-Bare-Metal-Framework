@@ -16,8 +16,10 @@ SBusDriver::SBusDriver():
 //{
 //}
 
-bool SBusDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+bool SBusDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
 {
+    const auto& consoleWriter = console.getPrintWriter();
+
     // FIXME! parse the sbus command and display the results
     //
     consoleWriter.println("The SBUS command needs implementing...");

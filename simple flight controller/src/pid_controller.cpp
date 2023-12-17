@@ -20,8 +20,10 @@ void PidController::runTask()
 // protected CliProvider method
 //
 
-bool PidController::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter)
+bool PidController::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
 {
+    const auto& consoleWriter = console.getPrintWriter();
+
     // FIXME! parse command and display the results
     //
     consoleWriter.println("The LOOP command needs implementing...");

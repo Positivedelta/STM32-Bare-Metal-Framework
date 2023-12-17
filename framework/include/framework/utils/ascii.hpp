@@ -17,6 +17,7 @@ namespace bpl
             inline static const uint8_t LF = 0x0a;
             inline static const uint8_t SPACE = 0x20;
             inline static const uint8_t DEL = 0x7f;
+            inline static const uint8_t ESC = 0x1b;
 
             inline static const uint8_t NEW_LINE[] = {CR, LF};
     };

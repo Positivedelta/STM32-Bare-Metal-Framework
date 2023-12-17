@@ -20,7 +20,7 @@ class PinPointGyroDriver : public bpl::Task, public bpl::CliProvider
 
     private:
         void runTask() override;
-        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::PrintWriter& consoleWriter) override;
+        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;
 };
 
 #endif
