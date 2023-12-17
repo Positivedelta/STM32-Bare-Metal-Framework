@@ -9,7 +9,7 @@
 #include "framework/cli/cli_handler.hpp"
 #include "framework/utils/string_utils.hpp"
 
-bpl::CliHandler::CliHandler(const bpl::TextIO& console, bpl::CliProviderList&& cliProviderList):
+bpl::CliHandler::CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList):
     consoleReader(console.getTextReader()), consoleWriter(console.getPrintWriter()) {
         providers = std::move(cliProviderList);
 

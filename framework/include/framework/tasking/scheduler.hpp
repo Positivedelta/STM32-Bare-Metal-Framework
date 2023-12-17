@@ -34,7 +34,7 @@ namespace bpl
                 public:
                     template <typename ...T>
                     TaskList(T&& ...t):
-                        std::pmr::vector<WrappedTask>{{std::forward<T>(t)...}} {
+                        std::pmr::vector<WrappedTask>{std::forward<T>(t)...} {
                     }
             };
 
