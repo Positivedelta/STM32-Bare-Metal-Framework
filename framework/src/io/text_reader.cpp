@@ -30,11 +30,12 @@ const bool bpl::TextReader::isKey(uint8_t keyCode) const
 
 // notes 1, implements CR, BS and DEL handling
 //       2, supports editing using the LEFT / RIGHT cursor keys
+//       3, uses the UP / DOWN cursor keys to navigate the command history
 //
-const std::pmr::string bpl::TextReader::readln() const
+const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::string>&& history) const
 {
     uint8_t byte;
-    auto line = std::pmr::string();
+    auto line = history.input();
 
     auto compositeKeyDetectionLatch = false;
     auto deleteKeyDetectionLatch = false;
@@ -58,9 +59,41 @@ const std::pmr::string bpl::TextReader::readln() const
                 if (byte == '[') continue;
                 compositeKeyDetectionLatch = false;
 
-                // consume the UP and DOWN keys
+                // up cursor, go back through the command history
                 //
-                if ((byte == 'A') || (byte == 'B')) continue;
+                if (byte == 'A')
+                {
+                    if (history.back())
+                    {
+                        line = history.input();
+                        if (echo)
+                        {
+                            outputStream.write(bpl::Ascii::ERASE_LINE, sizeof(bpl::Ascii::ERASE_LINE));
+                            outputStream.write((uint8_t*)line.data(), line.size());
+                            cursorPosition = line.size();
+                        }
+                    }
+
+                    continue;
+                }
+
+                // down cursor, move forwards through the command history
+                //
+                if (byte == 'B')
+                {
+                    if (history.forward())
+                    {
+                        line = history.input();
+                        if (echo)
+                        {
+                            outputStream.write(bpl::Ascii::ERASE_LINE, sizeof(bpl::Ascii::ERASE_LINE));
+                            outputStream.write((uint8_t*)line.data(), line.size());
+                            cursorPosition = line.size();
+                        }
+                    }
+
+                    continue;
+                }
 
                 // right cursor
                 //

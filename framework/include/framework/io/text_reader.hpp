@@ -12,6 +12,9 @@
 #include "framework/io/ascii.hpp"
 #include "framework/io/input_stream.hpp"
 #include "framework/io/output_stream.hpp"
+#include "framework/io/input_history.hpp"
+#include "framework/io/null_string_input_history.hpp"
+#include "framework/io/null_char_array_input_history.hpp"
 
 namespace bpl
 {
@@ -34,9 +37,10 @@ namespace bpl
             // notes 1, the readln() methods return std::pmr::string or uint8_t[] values
             //       2, the use of std::prm::string will incur PMR memory allocation
             //
-            const std::pmr::string readln() const;
+            const std::pmr::string readln(bpl::InputHistory<std::pmr::string>&& history = bpl::NullStringInputHistory()) const;
 
-            // FIXME! update this version to allow editing with the cursor keys (as per the std::pmr::string version)
+            // FIXME! 1, update this version to allow editing with the cursor keys (as per the std::pmr::string version)
+            //        2, implement a command history provider
             //
             // notes 1, for the usual C++ reasons, the templated version of readln() is declared here in the .hpp file
             //       2, if the buffer is filled before CR is pressed the input will be truncated
@@ -44,7 +48,7 @@ namespace bpl
             //       4, implements CR, BS and DEL handling
             //
             template<size_t n>
-            const uint32_t readln(char(&text)[n]) const
+            const uint32_t readln(char(&text)[n], bpl::InputHistory<const char*>&& history = bpl::NullCharArrayInputHistory<n>()) const
             {
                 uint8_t byte;
                 uint32_t i = 0;
