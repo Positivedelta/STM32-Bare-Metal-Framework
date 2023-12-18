@@ -9,7 +9,7 @@
 #include <memory_resource>
 #include <string>
 
-#include "framework/utils/ascii.hpp"
+#include "framework/io/ascii.hpp"
 #include "framework/io/input_stream.hpp"
 #include "framework/io/output_stream.hpp"
 
@@ -36,7 +36,9 @@ namespace bpl
             //
             const std::pmr::string readln() const;
 
-            // notes 1, for the usual C++ reasons, the templated version of readln() has to be declared here in the .hpp file
+            // FIXME! update this version to allow editing with the cursor keys (as per the std::pmr::string version)
+            //
+            // notes 1, for the usual C++ reasons, the templated version of readln() is declared here in the .hpp file
             //       2, if the buffer is filled before CR is pressed the input will be truncated
             //       3, the output will always be 0x00 terminated and the returned length does not include the 0x00 byte
             //       4, implements CR, BS and DEL handling
@@ -51,7 +53,7 @@ namespace bpl
                 {
                     if (read(byte))
                     {
-                        if (echo && (byte != bpl::Ascii::BS) && (byte != bpl::Ascii::DEL))
+                        if (echo && (byte != bpl::Ascii::BS) && (byte != bpl::Ascii::BS_AS_DEL))
                         {
                             outputStream.write(byte);
                             if (byte == bpl::Ascii::CR) outputStream.write(bpl::Ascii::LF);
@@ -78,12 +80,12 @@ namespace bpl
                                 break;
                             }
 
-                            case bpl::Ascii::DEL:
+                            case bpl::Ascii::BS_AS_DEL:
                             {
                                 if (i > 0)
                                 {
                                     --i;
-                                    if (echo) outputStream.write(bpl::Ascii::DEL);
+                                    if (echo) outputStream.write(bpl::Ascii::BS_AS_DEL);
                                 }
 
                                 break;

@@ -9,7 +9,7 @@
 #include "framework/stm32f4/f446xx_irq_n.hpp"
 #include "framework/stm32f4/nvic.hpp"
 #include "framework/stm32f4/stk.hpp"
-#include "framework/utils/ascii.hpp"
+#include "framework/io/ascii.hpp"
 #include "framework/utils/string_utils.hpp"
 
 #include "framework/tasking/scheduler.hpp"

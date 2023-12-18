@@ -28,18 +28,178 @@ const bool bpl::TextReader::isKey(uint8_t keyCode) const
     return pressed && (key == keyCode);
 }
 
-// note, implements CR, BS and DEL handling
+// notes 1, implements CR, BS and DEL handling
+//       2, supports editing using the LEFT / RIGHT cursor keys
 //
 const std::pmr::string bpl::TextReader::readln() const
 {
     uint8_t byte;
     auto line = std::pmr::string();
+
+    auto compositeKeyDetectionLatch = false;
+    auto deleteKeyDetectionLatch = false;
+    uint32_t cursorPosition = 0;
+
     auto keepReading = true;
     while (keepReading)
     {
         if (read(byte))
         {
-            if (echo && (byte != bpl::Ascii::BS) && (byte != bpl::Ascii::DEL))
+            // consume the cursor keys
+            //
+            if ((!compositeKeyDetectionLatch) && (byte == bpl::Ascii::ESC))
+            {
+                compositeKeyDetectionLatch = true;
+                continue;
+            }
+
+            if (compositeKeyDetectionLatch)
+            {
+                if (byte == '[') continue;
+                compositeKeyDetectionLatch = false;
+
+                // consume the UP and DOWN keys
+                //
+                if ((byte == 'A') || (byte == 'B')) continue;
+
+                // right cursor
+                //
+                if (byte == 'C')
+                {
+                    if (cursorPosition == line.size()) continue;
+
+                    cursorPosition++;
+                    if (echo) outputStream.write(bpl::Ascii::CURSOR_RIGHT, sizeof(bpl::Ascii::CURSOR_RIGHT));
+                    continue;
+                }
+
+                // left cursor
+                //
+                if (byte == 'D')
+                {
+                    if (cursorPosition == 0) continue;
+
+                    cursorPosition--;
+                    if (echo) outputStream.write(bpl::Ascii::CURSOR_LEFT, sizeof(bpl::Ascii::CURSOR_LEFT));
+                    continue;
+                }
+
+                // note, ^[3 is the start of the DEL key sequence
+                //
+                if (byte == '3')
+                {
+                    deleteKeyDetectionLatch = true;
+                    continue;
+                }
+            }
+
+            // look for the remaining character of the DEL key sequence and then fake it as the delete character
+            //
+            if (deleteKeyDetectionLatch)
+            {
+                deleteKeyDetectionLatch = false;
+                if (byte == '~') byte = bpl::Ascii::BS_AS_DEL;
+            }
+
+            // echo the append or insert
+            // notes 1, add the new character at the current cursor position and the cursor will advance
+            //       2, if this is an insert, overwite the existing characters starting from the insert index
+            //          also, save and restore the cursor back to the new insert point
+            //
+            if (echo && (byte != bpl::Ascii::BS) && (byte != bpl::Ascii::BS_AS_DEL))
+            {
+                outputStream.write(byte);
+                if (byte == bpl::Ascii::CR)
+                {
+                    outputStream.write(bpl::Ascii::LF);
+                }
+                else
+                {
+                    if (cursorPosition < line.size())
+                    {
+                        outputStream.write(bpl::Ascii::SAVE_CURSOR, sizeof(bpl::Ascii::SAVE_CURSOR));
+                        for (size_t i = cursorPosition; i < line.size(); i++) outputStream.write(line[i]);
+                        outputStream.write(bpl::Ascii::RESTORE_CURSOR, sizeof(bpl::Ascii::RESTORE_CURSOR));
+                    }
+                }
+            }
+
+            switch (byte)
+            {
+                case bpl::Ascii::CR:
+                    keepReading = false;
+                    break;
+
+                case bpl::Ascii::BS:
+                case bpl::Ascii::BS_AS_DEL:
+                {
+                    if ((cursorPosition > 0) && (line.size() > 0))
+                    {
+                        cursorPosition--;
+                        line.erase(cursorPosition, 1);
+
+                        if (echo)
+                        {
+                            outputStream.write(bpl::Ascii::BS_SAVE_CURSOR_ERASE_TO_EOL, sizeof(bpl::Ascii::BS_SAVE_CURSOR_ERASE_TO_EOL));
+                            for (size_t i = cursorPosition; i < line.size(); i++) outputStream.write(line[i]);
+                            outputStream.write(bpl::Ascii::RESTORE_CURSOR, sizeof(bpl::Ascii::RESTORE_CURSOR));
+                        }
+                    }
+
+                    break;
+                }
+
+                default:
+                {
+                    // note, insert() will append when the cursorPosition == line.size()
+                    //
+                    line.insert(cursorPosition, 1, char(byte));
+                    cursorPosition++;
+                }
+            }
+        }
+        else
+        {
+            asm volatile ("wfi");
+        }
+    }
+
+    return line;
+}
+
+/*
+// note, implements CR, BS and DEL handling, consumes the cursor keys
+//
+const std::pmr::string bpl::TextReader::readln() const
+{
+    uint8_t byte;
+    auto line = std::pmr::string();
+
+    auto handleCursor = false;
+    auto keepReading = true;
+    while (keepReading)
+    {
+        if (read(byte))
+        {
+            // consume the cursor keys
+            //
+            if ((!handleCursor) && (byte == bpl::Ascii::ESC))
+            {
+                handleCursor = true;
+                continue;
+            }
+
+            if (handleCursor)
+            {
+                if (byte == '[') continue;
+                handleCursor = false;
+
+                // check for UP, DOWN, RIGHT and LEFT respectively
+                //
+                if ((byte == 'A') || (byte == 'B') || (byte == 'C') || (byte == 'D')) continue;
+            }
+
+            if (echo && (byte != bpl::Ascii::BS) && (byte != bpl::Ascii::BS_AS_DEL))
             {
                 outputStream.write(byte);
                 if (byte == bpl::Ascii::CR) outputStream.write(bpl::Ascii::LF);
@@ -66,12 +226,12 @@ const std::pmr::string bpl::TextReader::readln() const
                     break;
                 }
 
-                case bpl::Ascii::DEL:
+                case bpl::Ascii::BS_AS_DEL:
                 {
                     if (line.size() > 0)
                     {
                         line.pop_back();
-                        if (echo) outputStream.write(bpl::Ascii::DEL);
+                        if (echo) outputStream.write(bpl::Ascii::BS_AS_DEL);
                     }
 
                     break;
@@ -89,3 +249,4 @@ const std::pmr::string bpl::TextReader::readln() const
 
     return line;
 }
+*/
