@@ -1,9 +1,10 @@
 //
-// (c) Bit Parallel Ltd, September 2023
+// (c) Bit Parallel Ltd, December 2023
 //
 
-#include "framework/io/null_output_stream.hpp"
 #include "framework/io/text_reader.hpp"
+#include "framework/io/null_output_stream.hpp"
+#include "framework/io/null_string_input_history.hpp"
 
 bpl::TextReader::TextReader(const InputStream& inputStream):
     inputStream(inputStream), outputStream(NullOutputStream()), echo(false) {
@@ -28,14 +29,23 @@ const bool bpl::TextReader::isKey(uint8_t keyCode) const
     return pressed && (key == keyCode);
 }
 
-// notes 1, implements CR, BS and DEL handling
-//       2, supports editing using the LEFT / RIGHT cursor keys
-//       3, uses the UP / DOWN cursor keys to navigate the command history
+// implements CR, BS and DEL handling
+// supports editing using the LEFT / RIGHT cursor keys
 //
-const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::string>&& history) const
+const std::pmr::string bpl::TextReader::readln() const //, bpl::InputPrompt& prompt) const
+{
+    auto nullStringHistory = bpl::NullStringInputHistory();
+    return readln(nullStringHistory);
+}
+
+// implements CR, BS and DEL handling
+// supports editing using the LEFT / RIGHT cursor keys
+// uses the UP / DOWN cursor keys to navigate the command history
+//
+const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::string>& history) const //, bpl::InputPrompt& prompt) const
 {
     uint8_t byte;
-    auto line = history.input();
+    auto& line = history.emptyBuffer();
 
     auto compositeKeyDetectionLatch = false;
     auto deleteKeyDetectionLatch = false;
@@ -65,10 +75,12 @@ const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::strin
                 {
                     if (history.back())
                     {
-                        line = history.input();
+                        line = history.buffer();
                         if (echo)
                         {
                             outputStream.write(bpl::Ascii::ERASE_LINE, sizeof(bpl::Ascii::ERASE_LINE));
+/* FIXME! */                outputStream.write('#');
+                            outputStream.write(' ');
                             outputStream.write((uint8_t*)line.data(), line.size());
                             cursorPosition = line.size();
                         }
@@ -83,10 +95,12 @@ const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::strin
                 {
                     if (history.forward())
                     {
-                        line = history.input();
+                        line = history.buffer();
                         if (echo)
                         {
                             outputStream.write(bpl::Ascii::ERASE_LINE, sizeof(bpl::Ascii::ERASE_LINE));
+/* FIXME! */                outputStream.write('#');
+                            outputStream.write(' ');
                             outputStream.write((uint8_t*)line.data(), line.size());
                             cursorPosition = line.size();
                         }
@@ -160,8 +174,11 @@ const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::strin
             switch (byte)
             {
                 case bpl::Ascii::CR:
+                {
+                    history.commit();
                     keepReading = false;
                     break;
+                }
 
                 case bpl::Ascii::BS:
                 case bpl::Ascii::BS_AS_DEL:

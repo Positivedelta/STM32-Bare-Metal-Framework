@@ -7,12 +7,14 @@
 
 #include <functional>
 #include <memory_resource>
+#include <string>
 #include <vector>
 
 #include "framework/cli/cli_provider.hpp"
 #include "framework/io/text_reader.hpp"
 #include "framework/io/print_writer.hpp"
 #include "framework/io/text_io.hpp"
+#include "framework/io/string_input_history.hpp"
 
 namespace bpl
 {
@@ -35,6 +37,7 @@ namespace bpl
             const bpl::TextIO& console;
             const bpl::TextReader& consoleReader;
             const bpl::PrintWriter& consoleWriter;
+            bpl::StringInputHistory history;
 
         public:
             CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList);

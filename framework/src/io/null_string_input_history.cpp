@@ -4,6 +4,18 @@
 
 #include "framework/io/null_string_input_history.hpp"
 
+std::pmr::string& bpl::NullStringInputHistory::emptyBuffer()
+{
+    workingBuffer.clear();
+
+    return workingBuffer;
+}
+
+std::pmr::string& bpl::NullStringInputHistory::buffer()
+{
+    return workingBuffer;
+}
+
 const bool bpl::NullStringInputHistory::back()
 {
     return false;
@@ -14,7 +26,6 @@ const bool bpl::NullStringInputHistory::forward()
     return false;
 }
 
-std::pmr::string& bpl::NullStringInputHistory::input()
+void bpl::NullStringInputHistory::commit()
 {
-    return data;
 }

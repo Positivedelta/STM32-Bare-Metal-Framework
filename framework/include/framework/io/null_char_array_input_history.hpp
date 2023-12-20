@@ -15,9 +15,19 @@ namespace bpl
     class NullCharArrayInputHistory : public bpl::InputHistory<const char*>
     {
         private:
-            char data[N];
+            char workingBuffer[N];
 
         public:
+            const char*& emptyBuffer() override
+            {
+                return workingBuffer;
+            }
+
+            const char*& buffer() override
+            {
+                return workingBuffer;
+            }
+
             const bool back() override
             {
                 return false;
@@ -28,9 +38,8 @@ namespace bpl
                 return false;
             }
 
-            const char*& input() override
+            void commit() override
             {
-                return data;
             }
     };
 }

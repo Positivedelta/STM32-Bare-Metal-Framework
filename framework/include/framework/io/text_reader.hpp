@@ -13,7 +13,6 @@
 #include "framework/io/input_stream.hpp"
 #include "framework/io/output_stream.hpp"
 #include "framework/io/input_history.hpp"
-#include "framework/io/null_string_input_history.hpp"
 #include "framework/io/null_char_array_input_history.hpp"
 
 namespace bpl
@@ -32,25 +31,37 @@ namespace bpl
             TextReader(const bpl::InputStream& inputStream, const bpl::OutputStream& outputStream);
 
             const bool read(uint8_t& byte) const;
+
+            // consume the contents of the input buffer and return true if the last character matches the keyCode
+            //
             const bool isKey(uint8_t keyCode) const;
 
-            // notes 1, the readln() methods return std::pmr::string or uint8_t[] values
-            //       2, the use of std::prm::string will incur PMR memory allocation
+            // the use of std::prm::string will incur PMR memory allocation
+            // lines can be edited using the left / right cursor keys in conjunction with the backspace and DEL keys
             //
-            const std::pmr::string readln(bpl::InputHistory<std::pmr::string>&& history = bpl::NullStringInputHistory()) const;
+            const std::pmr::string readln() const; //, bpl::InputPrompt& prompt = nullInputPrompt) const;
+
+            // the use of std::prm::string will incur PMR memory allocation
+            // lines can be edited using the left / right cursor keys in conjunction with the backspace and DEL keys
+            // supports input history using the up / down cursor keys if an appropriate provider argument is supplied
+            //
+            const std::pmr::string readln(bpl::InputHistory<std::pmr::string>& history) const; //, bpl::InputPrompt& prompt = nullInputPrompt) const;
 
             // FIXME! 1, update this version to allow editing with the cursor keys (as per the std::pmr::string version)
             //        2, implement a command history provider
+            //        3, refactor the default parameter as it's broken, use the "std::pmr::string readln()" technique
             //
-            // notes 1, for the usual C++ reasons, the templated version of readln() is declared here in the .hpp file
-            //       2, if the buffer is filled before CR is pressed the input will be truncated
-            //       3, the output will always be 0x00 terminated and the returned length does not include the 0x00 byte
-            //       4, implements CR, BS and DEL handling
+            // for the usual C++ reasons, the templated version of readln() is declared here in the .hpp file
+            // if the buffer is filled before CR is pressed the input will be truncated
+            // the output will always be 0x00 terminated
+            // implements CR, BS and DEL handling
             //
-            template<size_t n>
-            const uint32_t readln(char(&text)[n], bpl::InputHistory<const char*>&& history = bpl::NullCharArrayInputHistory<n>()) const
+            template<size_t maxSize>
+            const char* readln(bpl::InputHistory<const char*>& history = bpl::NullCharArrayInputHistory<maxSize>()) const //, bpl::InputPrompt& prompt = nullInputPrompt) const
             {
                 uint8_t byte;
+                auto& text = history.emptyBuffer();
+
                 uint32_t i = 0;
                 auto keepReading = true;
                 while (keepReading)
@@ -98,7 +109,7 @@ namespace bpl
                             // don't allow the buffer to overflow, just truncate the input
                             //
                             default:
-                                (i < n) ? text[i++] = byte : --i;
+                                (i < maxSize) ? text[i++] = byte : --i;
                         }
                     }
                     else
@@ -111,7 +122,7 @@ namespace bpl
                 //
                 text[i] = 0x00;
 
-                return i;
+                return text;
             }
     };
 }

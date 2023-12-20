@@ -11,9 +11,11 @@ namespace bpl
     class InputHistory
     {
         public:
+            virtual T& emptyBuffer() = 0;
+            virtual T& buffer() = 0;
             virtual const bool back() = 0;
             virtual const bool forward() = 0;
-            virtual T& input() = 0;
+            virtual void commit() = 0;
     };
 }
 

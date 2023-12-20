@@ -10,7 +10,7 @@
 #include "framework/utils/string_utils.hpp"
 
 bpl::CliHandler::CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList):
-    console(console), consoleReader(console.getTextReader()), consoleWriter(console.getPrintWriter()) {
+    console(console), consoleReader(console.getTextReader()), consoleWriter(console.getPrintWriter()), history(bpl::StringInputHistory(8)) {
         providers = std::move(cliProviderList);
 
         // always initialise with a newline before printing the first ever prompt in run()
@@ -24,7 +24,7 @@ void bpl::CliHandler::run()
 
     // note, the tokenize() method also trims by definition
     //
-    auto command = consoleReader.readln();
+    auto command = consoleReader.readln(history);
     auto tokens = std::pmr::vector<std::string_view>();
     bpl::StringUtils::tokenize(command, ' ', tokens);
     if (tokens.size() > 0)

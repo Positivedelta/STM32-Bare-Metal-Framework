@@ -42,7 +42,7 @@ namespace bpl
             //
             inline static const uint8_t ERASE_CURSOR_TO_EOL[] = {ESC, '[', 'K'};
             inline static const uint8_t ERASE_SOL_TO_CURSOR[] = {ESC, '[', '1', 'K'};
-            inline static const uint8_t ERASE_LINE[] = {ESC, '[', '2', 'K'};
+            inline static const uint8_t ERASE_LINE[] = {ESC, '[', '2', 'K', '\r'};
 
             // composite escape codes
             //
