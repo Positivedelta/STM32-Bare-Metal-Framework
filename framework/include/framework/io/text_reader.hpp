@@ -13,6 +13,7 @@
 #include "framework/io/input_stream.hpp"
 #include "framework/io/output_stream.hpp"
 #include "framework/io/input_history.hpp"
+#include "framework/io/input_prompt.hpp"
 #include "framework/io/null_char_array_input_history.hpp"
 
 namespace bpl
@@ -39,13 +40,13 @@ namespace bpl
             // the use of std::prm::string will incur PMR memory allocation
             // lines can be edited using the left / right cursor keys in conjunction with the backspace and DEL keys
             //
-            const std::pmr::string readln() const; //, bpl::InputPrompt& prompt = nullInputPrompt) const;
+            const std::pmr::string readln(const bpl::InputPrompt& prompt = bpl::InputPrompt()) const;
 
             // the use of std::prm::string will incur PMR memory allocation
             // lines can be edited using the left / right cursor keys in conjunction with the backspace and DEL keys
             // supports input history using the up / down cursor keys if an appropriate provider argument is supplied
             //
-            const std::pmr::string readln(bpl::InputHistory<std::pmr::string>& history) const; //, bpl::InputPrompt& prompt = nullInputPrompt) const;
+            const std::pmr::string readln(bpl::InputHistory<std::pmr::string>& history, const bpl::InputPrompt& prompt = bpl::InputPrompt()) const;
 
             // FIXME! 1, update this version to allow editing with the cursor keys (as per the std::pmr::string version)
             //        2, implement a command history provider
@@ -57,7 +58,7 @@ namespace bpl
             // implements CR, BS and DEL handling
             //
             template<size_t maxSize>
-            const char* readln(bpl::InputHistory<const char*>& history = bpl::NullCharArrayInputHistory<maxSize>()) const //, bpl::InputPrompt& prompt = nullInputPrompt) const
+            const char* readln(bpl::InputHistory<const char*>& history = bpl::NullCharArrayInputHistory<maxSize>(), const bpl::InputPrompt& prompt = bpl::InputPrompt()) const
             {
                 uint8_t byte;
                 auto& text = history.emptyBuffer();

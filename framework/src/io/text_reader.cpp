@@ -32,17 +32,17 @@ const bool bpl::TextReader::isKey(uint8_t keyCode) const
 // implements CR, BS and DEL handling
 // supports editing using the LEFT / RIGHT cursor keys
 //
-const std::pmr::string bpl::TextReader::readln() const //, bpl::InputPrompt& prompt) const
+const std::pmr::string bpl::TextReader::readln(const bpl::InputPrompt& prompt) const
 {
     auto nullStringHistory = bpl::NullStringInputHistory();
-    return readln(nullStringHistory);
+    return readln(nullStringHistory, prompt);
 }
 
 // implements CR, BS and DEL handling
 // supports editing using the LEFT / RIGHT cursor keys
 // uses the UP / DOWN cursor keys to navigate the command history
 //
-const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::string>& history) const //, bpl::InputPrompt& prompt) const
+const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::string>& history, const bpl::InputPrompt& prompt) const
 {
     uint8_t byte;
     auto& line = history.emptyBuffer();
@@ -79,8 +79,7 @@ const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::strin
                         if (echo)
                         {
                             outputStream.write(bpl::Ascii::ERASE_LINE, sizeof(bpl::Ascii::ERASE_LINE));
-/* FIXME! */                outputStream.write('#');
-                            outputStream.write(' ');
+                            prompt.display(outputStream);
                             outputStream.write((uint8_t*)line.data(), line.size());
                             cursorPosition = line.size();
                         }
@@ -99,8 +98,7 @@ const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::strin
                         if (echo)
                         {
                             outputStream.write(bpl::Ascii::ERASE_LINE, sizeof(bpl::Ascii::ERASE_LINE));
-/* FIXME! */                outputStream.write('#');
-                            outputStream.write(' ');
+                            prompt.display(outputStream);
                             outputStream.write((uint8_t*)line.data(), line.size());
                             cursorPosition = line.size();
                         }

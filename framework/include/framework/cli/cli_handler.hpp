@@ -14,6 +14,7 @@
 #include "framework/io/text_reader.hpp"
 #include "framework/io/print_writer.hpp"
 #include "framework/io/text_io.hpp"
+#include "framework/io/input_prompt.hpp"
 #include "framework/io/string_input_history.hpp"
 
 namespace bpl
@@ -37,6 +38,7 @@ namespace bpl
             const bpl::TextIO& console;
             const bpl::TextReader& consoleReader;
             const bpl::PrintWriter& consoleWriter;
+            const bpl::InputPrompt prompt;
             bpl::StringInputHistory history;
 
         // note, bpl::TextIO will accept implementations of bpl::IOStream, e.g. uarts

@@ -21,6 +21,11 @@ const uint8_t bpl::PrintWriter::print(const char* text) const
     return outputStream.write((uint8_t*)text, strlen(text));
 }
 
+const uint8_t bpl::PrintWriter::print(const char* text, size_t length) const
+{
+    return outputStream.write((uint8_t*)text, length);
+}
+
 const uint8_t bpl::PrintWriter::print(const std::string_view& text) const
 {
     return outputStream.write((uint8_t*)text.data(), text.size());

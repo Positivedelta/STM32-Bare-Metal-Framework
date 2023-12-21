@@ -25,6 +25,7 @@ namespace bpl
             //
             const bool print(const uint8_t byte) const;
             const uint8_t print(const char* text) const;
+            const uint8_t print(const char* text, const size_t length) const;
             const uint8_t print(const std::string_view& text) const;
             const uint8_t println(const char* text) const;
             const uint8_t println(const std::string_view& text) const;
