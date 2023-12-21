@@ -2,13 +2,13 @@
 // (c) Bit Parallel Ltd, December 2023
 //
 
-#ifndef BPL_INPUT_HISTORY_H
-#define BPL_INPUT_HISTORY_H
+#ifndef BPL_INPUT_EDIT_PROVIDER_H
+#define BPL_INPUT_EDIT_PROVIDER_H
 
 namespace bpl
 {
     template<typename T>
-    class InputHistory
+    class InputEditProvider
     {
         public:
             virtual T& emptyBuffer() = 0;

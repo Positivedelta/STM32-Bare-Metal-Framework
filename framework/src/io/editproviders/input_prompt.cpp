@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <cstdio>
 
-#include "framework/io/input_prompt.hpp"
+#include "framework/io/editproviders/input_prompt.hpp"
 
 bpl::InputPrompt::InputPrompt():
     length(0) {

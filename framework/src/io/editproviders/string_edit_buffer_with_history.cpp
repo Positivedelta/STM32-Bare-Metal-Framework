@@ -3,25 +3,25 @@
 //
 
 #include "framework/utils/string_utils.hpp"
-#include "framework/io/string_input_history.hpp"
+#include "framework/io/editproviders/string_edit_buffer_with_history.hpp"
 
-bpl::StringInputHistory::StringInputHistory(const size_t maxHistorySize):
+bpl::StringEditBufferWithHistory::StringEditBufferWithHistory(const size_t maxHistorySize):
     maxHistorySize(maxHistorySize), index(-1) {
 }
 
-std::pmr::string& bpl::StringInputHistory::emptyBuffer()
+std::pmr::string& bpl::StringEditBufferWithHistory::emptyBuffer()
 {
     workingBuffer.clear();
 
     return workingBuffer;
 }
 
-std::pmr::string& bpl::StringInputHistory::buffer()
+std::pmr::string& bpl::StringEditBufferWithHistory::buffer()
 {
     return workingBuffer;
 }
 
-const bool bpl::StringInputHistory::back()
+const bool bpl::StringEditBufferWithHistory::back()
 {
     if (index == -1) uncommittedBuffer = workingBuffer;
 
@@ -35,7 +35,7 @@ const bool bpl::StringInputHistory::back()
     return false;
 }
 
-const bool bpl::StringInputHistory::forward()
+const bool bpl::StringEditBufferWithHistory::forward()
 {
     if ((history.size() > 0) && (index >= 0))
     {
@@ -53,7 +53,7 @@ const bool bpl::StringInputHistory::forward()
     return false;
 }
 
-void bpl::StringInputHistory::commit()
+void bpl::StringEditBufferWithHistory::commit()
 {
     // notes 1, don't alter the existing raw buffer as it is being used externally
     //       2, only commit trimmed commands to the history

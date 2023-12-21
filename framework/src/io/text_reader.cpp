@@ -4,7 +4,7 @@
 
 #include "framework/io/text_reader.hpp"
 #include "framework/io/null_output_stream.hpp"
-#include "framework/io/null_string_input_history.hpp"
+#include "framework/io/editproviders/string_edit_buffer.hpp"
 
 bpl::TextReader::TextReader(const InputStream& inputStream):
     inputStream(inputStream), outputStream(NullOutputStream()), echo(false) {
@@ -30,22 +30,22 @@ const bool bpl::TextReader::isKey(uint8_t keyCode) const
 }
 
 // implements CR, BS and DEL handling
-// supports editing using the LEFT / RIGHT cursor keys
+// supports editing using the LEFT / RIGHT cursor keys (no history)
 //
 const std::pmr::string bpl::TextReader::readln(const bpl::InputPrompt& prompt) const
 {
-    auto nullStringHistory = bpl::NullStringInputHistory();
-    return readln(nullStringHistory, prompt);
+    auto editBuffer = bpl::StringEditBuffer();
+    return readln(editBuffer, prompt);
 }
 
 // implements CR, BS and DEL handling
 // supports editing using the LEFT / RIGHT cursor keys
 // uses the UP / DOWN cursor keys to navigate the command history
 //
-const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::string>& history, const bpl::InputPrompt& prompt) const
+const std::pmr::string bpl::TextReader::readln(bpl::InputEditProvider<std::pmr::string>& editProvider, const bpl::InputPrompt& prompt) const
 {
     uint8_t byte;
-    auto& line = history.emptyBuffer();
+    auto& line = editProvider.emptyBuffer();
 
     auto compositeKeyDetectionLatch = false;
     auto deleteKeyDetectionLatch = false;
@@ -73,9 +73,9 @@ const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::strin
                 //
                 if (byte == 'A')
                 {
-                    if (history.back())
+                    if (editProvider.back())
                     {
-                        line = history.buffer();
+                        line = editProvider.buffer();
                         if (echo)
                         {
                             outputStream.write(bpl::Ascii::ERASE_LINE, sizeof(bpl::Ascii::ERASE_LINE));
@@ -92,9 +92,9 @@ const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::strin
                 //
                 if (byte == 'B')
                 {
-                    if (history.forward())
+                    if (editProvider.forward())
                     {
-                        line = history.buffer();
+                        line = editProvider.buffer();
                         if (echo)
                         {
                             outputStream.write(bpl::Ascii::ERASE_LINE, sizeof(bpl::Ascii::ERASE_LINE));
@@ -173,7 +173,7 @@ const std::pmr::string bpl::TextReader::readln(bpl::InputHistory<std::pmr::strin
             {
                 case bpl::Ascii::CR:
                 {
-                    history.commit();
+                    editProvider.commit();
                     keepReading = false;
                     break;
                 }

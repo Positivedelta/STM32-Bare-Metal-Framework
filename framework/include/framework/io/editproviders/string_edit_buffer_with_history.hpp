@@ -2,18 +2,18 @@
 // (c) Bit Parallel Ltd, December 2023
 //
 
-#ifndef BPL_STRING_INPUT_HISTORY_H
-#define BPL_STRING_INPUT_HISTORY_H
+#ifndef BPL_STRING_EDIT_BUFFER_WITH_HISTORY_H
+#define BPL_STRING_EDIT_BUFFER_WITH_HISTORY_H
 
 #include <cstdint>
 #include <deque>
 #include <string>
 
-#include "framework/io/input_history.hpp"
+#include "framework/io/editproviders/input_edit_provider.hpp"
 
 namespace bpl
 {
-    class StringInputHistory : public bpl::InputHistory<std::pmr::string>
+    class StringEditBufferWithHistory : public bpl::InputEditProvider<std::pmr::string>
     {
         private:
             const size_t maxHistorySize;
@@ -23,7 +23,7 @@ namespace bpl
             std::pmr::string uncommittedBuffer;
 
         public:
-            StringInputHistory(const size_t historySize);
+            StringEditBufferWithHistory(const size_t historySize);
 
             std::pmr::string& emptyBuffer() override;
             std::pmr::string& buffer() override;

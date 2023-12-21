@@ -12,9 +12,8 @@
 #include "framework/io/ascii.hpp"
 #include "framework/io/input_stream.hpp"
 #include "framework/io/output_stream.hpp"
-#include "framework/io/input_history.hpp"
-#include "framework/io/input_prompt.hpp"
-#include "framework/io/null_char_array_input_history.hpp"
+#include "framework/io/editproviders/input_edit_provider.hpp"
+#include "framework/io/editproviders/input_prompt.hpp"
 
 namespace bpl
 {
@@ -46,11 +45,10 @@ namespace bpl
             // lines can be edited using the left / right cursor keys in conjunction with the backspace and DEL keys
             // supports input history using the up / down cursor keys if an appropriate provider argument is supplied
             //
-            const std::pmr::string readln(bpl::InputHistory<std::pmr::string>& history, const bpl::InputPrompt& prompt = bpl::InputPrompt()) const;
+            const std::pmr::string readln(bpl::InputEditProvider<std::pmr::string>& editProvider, const bpl::InputPrompt& prompt = bpl::InputPrompt()) const;
 
             // FIXME! 1, update this version to allow editing with the cursor keys (as per the std::pmr::string version)
             //        2, implement a command history provider
-            //        3, refactor the default parameter as it's broken, use the "std::pmr::string readln()" technique
             //
             // for the usual C++ reasons, the templated version of readln() is declared here in the .hpp file
             // if the buffer is filled before CR is pressed the input will be truncated
@@ -58,12 +56,12 @@ namespace bpl
             // implements CR, BS and DEL handling
             //
             template<size_t maxSize>
-            const char* readln(bpl::InputHistory<const char*>& history = bpl::NullCharArrayInputHistory<maxSize>(), const bpl::InputPrompt& prompt = bpl::InputPrompt()) const
+            const size_t readln(bpl::InputEditProvider<char*>& editProvider, const bpl::InputPrompt& prompt = bpl::InputPrompt()) const
             {
                 uint8_t byte;
-                auto& text = history.emptyBuffer();
+                auto& text = editProvider.emptyBuffer();
 
-                uint32_t i = 0;
+                size_t i = 0;
                 auto keepReading = true;
                 while (keepReading)
                 {
@@ -123,7 +121,7 @@ namespace bpl
                 //
                 text[i] = 0x00;
 
-                return text;
+                return i;
             }
     };
 }

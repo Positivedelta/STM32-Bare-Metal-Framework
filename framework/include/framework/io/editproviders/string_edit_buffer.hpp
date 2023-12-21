@@ -2,16 +2,16 @@
 // (c) Bit Parallel Ltd, December 2023
 //
 
-#ifndef BPL_NULL_STRING_INPUT_HISTORY_H
-#define BPL_NULL_STRING_INPUT_HISTORY_H
+#ifndef BPL_STRING_EDIT_BUFFER_H
+#define BPL_STRING_EDIT_BUFFER_H
 
 #include <string>
 
-#include "framework/io/input_history.hpp"
+#include "framework/io/editproviders/input_edit_provider.hpp"
 
 namespace bpl
 {
-    class NullStringInputHistory : public bpl::InputHistory<std::pmr::string>
+    class StringEditBuffer : public bpl::InputEditProvider<std::pmr::string>
     {
         private:
             std::pmr::string workingBuffer;
