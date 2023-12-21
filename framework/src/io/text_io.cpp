@@ -4,6 +4,11 @@
 
 #include "framework/io/text_io.hpp"
 
+bpl::TextIO::TextIO(const bpl::IOStream& ioStream, const bool localEcho):
+    textReader((localEcho) ? bpl::TextReader(ioStream.getInputStream(), ioStream.getOutputStream()) : bpl::TextReader(ioStream.getInputStream())),
+    printWriter(bpl::PrintWriter(ioStream.getOutputStream())), localEcho(localEcho) {
+};
+
 bpl::TextIO::TextIO(const bpl::InputStream& inputStream, const bpl::OutputStream& outputStream, const bool localEcho):
     textReader((localEcho) ? bpl::TextReader(inputStream, outputStream) : bpl::TextReader(inputStream)),
     printWriter(bpl::PrintWriter(outputStream)), localEcho(localEcho) {

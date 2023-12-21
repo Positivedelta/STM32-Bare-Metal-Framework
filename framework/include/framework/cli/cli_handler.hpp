@@ -39,6 +39,8 @@ namespace bpl
             const bpl::PrintWriter& consoleWriter;
             bpl::StringInputHistory history;
 
+        // note, bpl::TextIO will accept implementations of bpl::IOStream, e.g. uarts
+        //
         public:
             CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList);
             void run();

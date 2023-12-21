@@ -9,7 +9,6 @@
 #include "framework/cli/cli_handler.hpp"
 #include "framework/drivers/usart2.hpp"
 #include "framework/io/baud_rate.hpp"
-#include "framework/io/text_io.hpp"
 #include "framework/stm32f4/nvic.hpp"
 #include "framework/tasking/scheduler.hpp"
 
@@ -54,8 +53,7 @@ int main()
     // set the uart IRQ priority to 1 (0..15 ==> high..low)
     //
     auto& uart = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
-    const auto console = bpl::TextIO(uart.getInputStream(), uart.getOutputStream());
-    auto cli = bpl::CliHandler(console, {scheduler, led, gyros, sbus, servos, controller});
+    auto cli = bpl::CliHandler(uart, {scheduler, led, gyros, sbus, servos, controller});
     while (true) cli.run();
 
     return 0;

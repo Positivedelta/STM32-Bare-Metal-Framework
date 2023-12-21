@@ -10,6 +10,7 @@
 
 #include "framework/io/byte_listener.hpp"
 #include "framework/io/baud_rate.hpp"
+#include "framework/io/io_stream.hpp"
 #include "framework/io/input_stream.hpp"
 #include "framework/io/output_stream.hpp"
 
@@ -21,7 +22,7 @@ class Usart2IRQ
 
 namespace driver
 {
-    class Usart2
+    class Usart2 : public bpl::IOStream
     {
         friend void ::Usart2IRQ::handler();
 
@@ -73,8 +74,8 @@ namespace driver
             static Usart2& getInstance();
 
             Usart2& initialise(const bpl::BaudRate& baudRate, const uint8_t priority);
-            const bpl::InputStream& getInputStream() const;
-            const bpl::OutputStream& getOutputStream() const;
+            const bpl::InputStream& getInputStream() const override;
+            const bpl::OutputStream& getOutputStream() const override;
 
         private:
             const In inputStream;
