@@ -9,7 +9,7 @@
 #include "framework/cli/cli_handler.hpp"
 #include "framework/utils/string_utils.hpp"
 
-// FIXME! for testing...
+// FIXME! for testing for char* version of bpl::TextReader::readln()
 //
 //#include "framework/io/editproviders/char_array_edit_buffer.hpp"
 
@@ -28,10 +28,12 @@ void bpl::CliHandler::run()
     prompt.display(consoleWriter);
     auto command = consoleReader.readln(history, prompt);
 
-/*  // FIXME! for testing...
+/*  // FIXME! for testing for char* version of bpl::TextReader::readln()
     //
-    auto editBuffer = bpl::CharArrayEditBuffer<64>();
-    consoleReader.readln<64>(editBuffer);
+    // note, specify (1 + buffer) size if you want to discount the 0x00 termination character
+    //
+    auto editBuffer = bpl::CharArrayEditBuffer<65>();
+    consoleReader.readln<65>(editBuffer);
     auto command = std::pmr::string(editBuffer.buffer()); */
 
     // note, the tokenize() method also trims by definition when using ' ' tokens

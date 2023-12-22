@@ -56,7 +56,7 @@ const std::pmr::string bpl::TextReader::readln(bpl::InputEditProvider<std::pmr::
     {
         if (read(byte))
         {
-            // consume the cursor keys
+            // handle the cursor keys
             //
             if ((!compositeKeyDetectionLatch) && (byte == bpl::Ascii::ESC))
             {
@@ -214,87 +214,3 @@ const std::pmr::string bpl::TextReader::readln(bpl::InputEditProvider<std::pmr::
 
     return line;
 }
-
-/*
-// note, implements CR, BS and DEL handling, consumes the cursor keys
-//
-const std::pmr::string bpl::TextReader::readln() const
-{
-    uint8_t byte;
-    auto line = std::pmr::string();
-
-    auto handleCursor = false;
-    auto keepReading = true;
-    while (keepReading)
-    {
-        if (read(byte))
-        {
-            // consume the cursor keys
-            //
-            if ((!handleCursor) && (byte == bpl::Ascii::ESC))
-            {
-                handleCursor = true;
-                continue;
-            }
-
-            if (handleCursor)
-            {
-                if (byte == '[') continue;
-                handleCursor = false;
-
-                // check for UP, DOWN, RIGHT and LEFT respectively
-                //
-                if ((byte == 'A') || (byte == 'B') || (byte == 'C') || (byte == 'D')) continue;
-            }
-
-            if (echo && (byte != bpl::Ascii::BS) && (byte != bpl::Ascii::BS_AS_DEL))
-            {
-                outputStream.write(byte);
-                if (byte == bpl::Ascii::CR) outputStream.write(bpl::Ascii::LF);
-            }
-
-            switch (byte)
-            {
-                case bpl::Ascii::CR:
-                    keepReading = false;
-                    break;
-
-                case bpl::Ascii::BS:
-                {
-                    if (line.size() > 0)
-                    {
-                        line.pop_back();
-                        if (echo)
-                        {
-                            const uint8_t action[] = {bpl::Ascii::BS, bpl::Ascii::SPACE, bpl::Ascii::BS};
-                            outputStream.write(action, sizeof(action));
-                        }
-                    }
-
-                    break;
-                }
-
-                case bpl::Ascii::BS_AS_DEL:
-                {
-                    if (line.size() > 0)
-                    {
-                        line.pop_back();
-                        if (echo) outputStream.write(bpl::Ascii::BS_AS_DEL);
-                    }
-
-                    break;
-                }
-
-                default:
-                    line.push_back(byte);
-            }
-        }
-        else
-        {
-            asm volatile ("wfi");
-        }
-    }
-
-    return line;
-}
-*/
