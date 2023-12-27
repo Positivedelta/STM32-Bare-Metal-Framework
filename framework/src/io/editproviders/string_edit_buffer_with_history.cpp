@@ -6,29 +6,32 @@
 #include "framework/io/editproviders/string_edit_buffer_with_history.hpp"
 
 bpl::StringEditBufferWithHistory::StringEditBufferWithHistory(const size_t maxHistorySize):
-    maxHistorySize(maxHistorySize), index(-1) {
+    maxHistorySize(maxHistorySize), history(std::pmr::vector<std::pmr::string>(std::bit_ceil<size_t>(maxHistorySize))),
+    currentSize(0), commitIndex(maxHistorySize), index(0) {
 }
 
 std::pmr::string& bpl::StringEditBufferWithHistory::emptyBuffer()
 {
-    workingBuffer.clear();
+    editBuffer.clear();
 
-    return workingBuffer;
+    return editBuffer;
 }
 
 std::pmr::string& bpl::StringEditBufferWithHistory::buffer()
 {
-    return workingBuffer;
+    return editBuffer;
 }
 
 const bool bpl::StringEditBufferWithHistory::back()
 {
-    if (index == -1) uncommittedBuffer = workingBuffer;
-
-    const auto maxIndex = int32_t(history.size()) - 1;
-    if ((maxIndex >= 0) && (index < maxIndex))
+    if ((currentSize > 0) && (index != int32_t(currentSize)))
     {
-        workingBuffer = history[++index];
+        if (index == 0) uncommittedEditBuffer = editBuffer;
+
+        const auto i = (commitIndex - index) & (maxHistorySize - 1);
+        editBuffer = history[i];
+        index++;
+
         return true;
     }
 
@@ -37,16 +40,18 @@ const bool bpl::StringEditBufferWithHistory::back()
 
 const bool bpl::StringEditBufferWithHistory::forward()
 {
-    if ((history.size() > 0) && (index >= 0))
+    if ((currentSize > 0) && (index > 0))
     {
         index--;
-        if (index == -1)
+        if (index == 0)
         {
-            workingBuffer = uncommittedBuffer;
+            editBuffer = uncommittedEditBuffer;
             return true;
         }
 
-        workingBuffer = history[index];
+        const auto i = (commitIndex - index + 1) & (maxHistorySize - 1);
+        editBuffer = history[i];
+
         return true;
     }
 
@@ -55,17 +60,18 @@ const bool bpl::StringEditBufferWithHistory::forward()
 
 void bpl::StringEditBufferWithHistory::commit()
 {
-    // notes 1, don't alter the existing raw buffer as it is being used externally
+    // notes 1, copy the contents of the edit buffer as it's being referenced and will have been rendered to the console
     //       2, only commit trimmed commands to the history
     //
-    auto command = workingBuffer;
+    auto command = editBuffer;
     bpl::StringUtils::trim(command);
     if (command.size() > 0)
     {
-        if (history.size() == maxHistorySize) history.pop_back();
-        history.push_front(command);
+        commitIndex = (commitIndex + 1) & (maxHistorySize - 1);
+        history[commitIndex] = command;
+
+        if (currentSize < maxHistorySize) currentSize++;
     }
 
-    index = -1;
-    uncommittedBuffer = std::pmr::string();
+    index = 0;
 }

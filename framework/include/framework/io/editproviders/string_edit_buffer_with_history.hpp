@@ -5,9 +5,10 @@
 #ifndef BPL_STRING_EDIT_BUFFER_WITH_HISTORY_H
 #define BPL_STRING_EDIT_BUFFER_WITH_HISTORY_H
 
+#include <bit>
 #include <cstdint>
-#include <deque>
 #include <string>
+#include <vector>
 
 #include "framework/io/editproviders/input_edit_provider.hpp"
 
@@ -17,11 +18,15 @@ namespace bpl
     {
         private:
             const size_t maxHistorySize;
-            int32_t index;
-            std::deque<std::pmr::string> history;
-            std::pmr::string workingBuffer;
-            std::pmr::string uncommittedBuffer;
+            std::pmr::vector<std::pmr::string> history;
+            std::pmr::string editBuffer;
+            std::pmr::string uncommittedEditBuffer;
+            size_t currentSize;
+            int32_t commitIndex, index;
 
+        // notes 1, for efficiency the maximum history size must be a power of 2
+        //       2, as a precaution, non powers of 2 will be rounded up to the nearest power
+        //
         public:
             StringEditBufferWithHistory(const size_t historySize);
 
