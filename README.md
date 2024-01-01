@@ -13,13 +13,16 @@ This project was inspired by the Jason Turner talk at CppCon 2016: "Rich Code fo
 **Note**, the `simple flight controller` project is incomplete. When it's finished it will be able to fly an RC Quadcopter using the Nucleo-64 board described above. This board will also need a
 plugin hat to host the 3-axis gyros, the RC interface and the speed controller PWM connectors. The KiCad PCB design and layout will be included here once it's complete. Watch this space for updates...
 
+This project is currently configured to build with `ninja`, see `PreLoad.cmake` for details
+
 ## Prerequisites
 - CMake v3.27 (older versions are probably OK)
-- Nmake v14.34.x
+- Nmake v14.34.x or Ninja v1.11.1
 - GCC 13.2.1
 
 Notes
 - Microsoft `nmake` is installed as a component of Visual Studio but is also available separately as a download
+- The `ninja` build tool is available from https://www.ninja-build.org/
 - If building on a Linux box, edit the `PreLoad.cmake` files to specify `Unix Makefiles` and then use `make`
 - The mingw-w64-i686 AArch32 bare-metal target (arm-none-eabi) GCC 12.3 compiler was used
 - A Linux version of the CGG cross compiler is also available
@@ -31,7 +34,7 @@ In the desired example directory perform the following steps
 - `mkdir build`
 - `cd build`
 - `cmake ..`
-- `nmake`
+- `nmake` or `ninja -j0` for the `simple flight controller` project
 
 ## Execute
 - Plug the Nucleo into a PC, it will mount a drive
