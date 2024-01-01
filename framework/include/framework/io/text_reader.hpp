@@ -48,12 +48,11 @@ namespace bpl
             //
             const std::pmr::string readln(bpl::InputEditProvider<std::pmr::string>& editProvider, const bpl::InputPrompt& prompt = bpl::InputPrompt()) const;
 
-            // FIXME! implement a command history provider
-            //
             // for the usual C++ reasons, the templated version of readln() is declared here in the .hpp file
             // if the buffer is filled before CR is pressed the input will be truncated
-            // the output will always be 0x00 terminated
-            // implements CR, BS and DEL handling
+            // the output is always 0x00 terminated
+            // lines can be edited using the left / right cursor keys in conjunction with the backspace and DEL keys
+            // supports input history using the up / down cursor keys if an appropriate provider argument is supplied
             //
             // note, specify (1 + maxSize) if you want to discount the 0x00 termination character
             //
@@ -90,17 +89,19 @@ namespace bpl
                             //
                             if (byte == 'A')
                             {
-/*                              if (editProvider.back())
+                                if (editProvider.back())
                                 {
                                     line = editProvider.buffer();
                                     if (echo)
                                     {
                                         outputStream.write(bpl::Ascii::ERASE_LINE, sizeof(bpl::Ascii::ERASE_LINE));
                                         prompt.display(outputStream);
-                                        outputStream.write((uint8_t*)line.data(), line.size());
-                                        cursorPosition = line.size();
+
+                                        size = std::strlen(line);
+                                        outputStream.write((uint8_t*)line, size);
+                                        cursorPosition = size;
                                     }
-                                } */
+                                }
 
                                 continue;
                             }
@@ -109,17 +110,19 @@ namespace bpl
                             //
                             if (byte == 'B')
                             {
-/*                              if (editProvider.forward())
+                                if (editProvider.forward())
                                 {
                                     line = editProvider.buffer();
                                     if (echo)
                                     {
                                         outputStream.write(bpl::Ascii::ERASE_LINE, sizeof(bpl::Ascii::ERASE_LINE));
                                         prompt.display(outputStream);
-                                        outputStream.write((uint8_t*)line.data(), line.size());
-                                        cursorPosition = line.size();
+
+                                        size = std::strlen(line);
+                                        outputStream.write((uint8_t*)line, size);
+                                        cursorPosition = size;
                                     }
-                                } */
+                                }
 
                                 continue;
                             }
@@ -198,9 +201,16 @@ namespace bpl
                         switch (byte)
                         {
                             case bpl::Ascii::CR:
-//                              editProvider.commit();      // FIXME! not needed until the bpl::CharArrayEditBufferWithHistory provider is ready
+                            {
                                 keepReading = false;
+
+                                // terminate the char[] to generate the equivalent of a c_str()
+                                // note, size has already been appropriately adjusted
+                                //
+                                line[size] = 0x00;
+                                editProvider.commit();
                                 break;
+                            }
 
                             case bpl::Ascii::BS:
                             case bpl::Ascii::BS_AS_DEL:
@@ -212,6 +222,8 @@ namespace bpl
                                     if (cursorPosition < size) std::memmove(&line[cursorPosition - 1], &line[cursorPosition], size - cursorPosition);
 
                                     size--;
+                                    line[size] = '\0';
+
                                     cursorPosition--;
                                     if (echo)
                                     {
@@ -254,6 +266,7 @@ namespace bpl
                                 // too long, either make space for another insert (at the expense of the last character) or for the '0x00' termination byte
                                 //
                                 if (size == maxSize) size--;
+                                line[size] = '\0';
                             }
                         }
                     }
@@ -262,11 +275,6 @@ namespace bpl
                         asm volatile ("wfi");
                     }
                 }
-
-                // terminate to generate the equivalent of a c_str()
-                // note, size has already been appropriately adjusted
-                //
-                line[size] = 0x00;
 
                 return size;
             }

@@ -2,8 +2,8 @@
 // (c) Bit Parallel Ltd, December 2023
 //
 
-#ifndef BPL_NULL_CHAR_ARRAY_EDIT_BUFFER_H
-#define BPL_NULL_CHAR_ARRAY_EDIT_BUFFER_H
+#ifndef BPL_CHAR_ARRAY_EDIT_BUFFER_H
+#define BPL_CHAR_ARRAY_EDIT_BUFFER_H
 
 #include <cstddef>
 
@@ -21,6 +21,8 @@ namespace bpl
         public:
             char*& emptyBuffer() override
             {
+                workingBuffer[0] = '\0';
+
                 return workingBufferPtr;
             }
 
