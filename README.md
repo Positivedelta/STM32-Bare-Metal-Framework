@@ -11,9 +11,7 @@ It is assumed that you have some knowledge of embedded programming on STM32 or s
 This project was inspired by the Jason Turner talk at CppCon 2016: "Rich Code for Tiny Computers: A Simple Commodore 64 Game in C++17", see https://www.youtube.com/watch?v=zBkNBP00wJE This is an excellent talk and is well worth watching, as is his "C++ Weekly" channel
 
 **Note**, the `simple flight controller` project is incomplete. When it's finished it will be able to fly an RC Quadcopter using the Nucleo-64 board described above. This board will also need a
-plugin hat to host the 3-axis gyros, the RC interface and the speed controller PWM connectors. The KiCad PCB design and layout will be included here once it's complete. Watch this space for updates...
-
-This project is currently configured to build with `ninja`, see `PreLoad.cmake` for details
+plugin hat to host the 3-axis gyros, the RC interface and the speed controller PWM connectors. The KiCad PCB design and layout will be included here once it's complete. This project is also currently configured to build with `ninja`, see `PreLoad.cmake` for details. Watch this space for further updates...
 
 ## Prerequisites
 - CMake v3.27 (older versions are probably OK)
