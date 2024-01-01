@@ -9,13 +9,10 @@
 #include "framework/cli/cli_handler.hpp"
 #include "framework/utils/string_utils.hpp"
 
-// FIXME! for testing for char* version of bpl::TextReader::readln()
-//
-//#include "framework/io/editproviders/char_array_edit_buffer.hpp"
-
 bpl::CliHandler::CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList):
     console(console), consoleReader(console.getTextReader()), consoleWriter(console.getPrintWriter()),
     prompt(bpl::InputPrompt(PROMPT_TEXT)), history(bpl::StringEditBufferWithHistory(HISTORY_SIZE)) {
+//  prompt(bpl::InputPrompt(PROMPT_TEXT)), history(bpl::CharArrayEditBufferWithHistory<65, 8>()) {      // FIXME! for testing the char* version of bpl::TextReader::readln()
         providers = std::move(cliProviderList);
 
         // always initialise with a newline before printing the first ever prompt in run()
@@ -28,13 +25,12 @@ void bpl::CliHandler::run()
     prompt.display(consoleWriter);
     auto command = consoleReader.readln(history, prompt);
 
-/*  // FIXME! for testing for char* version of bpl::TextReader::readln()
-    //
-    // note, specify (1 + buffer) size if you want to discount the 0x00 termination character
-    //
-    auto editBuffer = bpl::CharArrayEditBuffer<65>();
-    consoleReader.readln<65>(editBuffer);
-    auto command = std::pmr::string(editBuffer.buffer()); */
+//  // FIXME! for testing for char* version of bpl::TextReader::readln()
+//  //
+//  // note, specify (1 + buffer) size if you want to discount the 0x00 termination character
+//  //
+//  consoleReader.readln<65>(history, prompt);
+//  auto command = std::pmr::string(history.buffer());
 
     // note, the tokenize() method also trims by definition when using ' ' tokens
     //

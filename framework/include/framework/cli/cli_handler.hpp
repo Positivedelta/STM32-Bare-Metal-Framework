@@ -17,6 +17,10 @@
 #include "framework/io/editproviders/input_prompt.hpp"
 #include "framework/io/editproviders/string_edit_buffer_with_history.hpp"
 
+// FIXME! for testing for char* version of bpl::TextReader::readln()
+//
+//#include "framework/io/editproviders/char_array_edit_buffer_with_history.hpp"
+
 namespace bpl
 {
     class CliHandler
@@ -44,6 +48,10 @@ namespace bpl
             const bpl::PrintWriter& consoleWriter;
             const bpl::InputPrompt prompt;
             bpl::StringEditBufferWithHistory history;
+
+//          // FIXME! for testing for char* version of bpl::TextReader::readln()
+//          //
+//          bpl::CharArrayEditBufferWithHistory<65, 8> history;
 
         // note, bpl::TextIO will accept implementations of bpl::IOStream, e.g. uarts
         //
