@@ -63,7 +63,8 @@ int main()
             writer.println(unavailable);
         }
 
-
+        // a crude but brief delay and LED flash...
+        //
         Stm32f4::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5);
         for (auto i = 0; i < 2'500'000; i++) asm volatile ("nop");
         Stm32f4::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
