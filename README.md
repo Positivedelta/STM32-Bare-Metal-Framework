@@ -32,7 +32,7 @@ In the desired example directory perform the following steps
 - `mkdir build`
 - `cd build`
 - `cmake ..`
-- `nmake` or `ninja -j0` for the `simple flight controller` project
+- `nmake` or `ninja -j0` for the `simple flight controller` and `random numbers` projects
 
 ## Execute
 - Plug the Nucleo into a PC, it will mount a drive
