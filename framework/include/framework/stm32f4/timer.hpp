@@ -3,7 +3,7 @@
 //
 
 //
-// FIXME! only tested on timer4, will hopefully this will be generic...
+// FIXME! only tested on timer3/4, this will hopefully be generic...
 //
 
 #ifndef BPL_STM32F4_TIMER_H

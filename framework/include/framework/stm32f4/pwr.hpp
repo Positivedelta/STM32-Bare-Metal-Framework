@@ -9,6 +9,7 @@ class Pwr
 {
     public:
         inline static constexpr uint32_t CR = 0x00;
+        inline static constexpr uint32_t CR_DBP = 1 << 8;
         inline static constexpr uint32_t CR_ODEN = 1 << 16;
         inline static constexpr uint32_t CR_ODSWEN = 1 << 17;
 

@@ -2,8 +2,8 @@
 // (c) Bit Parallel Ltd, 2021
 //
 
-#ifndef BPL_STM32_H
-#define BPL_STM32_H
+#ifndef BPL_STM32F4_H
+#define BPL_STM32F4_H
 
 #include <cstdint>
 
@@ -30,8 +30,13 @@ class Stm32f4
 
         inline static constexpr uint32_t APB1_BASE = 0x40000000;
         inline static constexpr uint32_t USART_2 = 0x4400;
+        inline static constexpr uint32_t TIMER_3 = 0x0400;
         inline static constexpr uint32_t TIMER_4 = 0x0800;
         inline static constexpr uint32_t PWR = 0x7000;
+        inline static constexpr uint32_t RTC_BKP = 0x2800;
+
+        inline static constexpr uint32_t APB2_BASE = 0x40010000;
+        inline static constexpr uint32_t EXTI = 0x3C00;
 
     public:
         volatile constexpr static uint32_t& fpu(const uint32_t reg)
@@ -69,6 +74,11 @@ class Stm32f4
             return peripheral(APB1_BASE + USART_2 + reg);
         }
 
+        volatile constexpr static uint32_t& timer3(const uint32_t reg)
+        {
+            return peripheral(APB1_BASE + TIMER_3 + reg);
+        }
+
         volatile constexpr static uint32_t& timer4(const uint32_t reg)
         {
             return peripheral(APB1_BASE + TIMER_4 + reg);
@@ -82,6 +92,16 @@ class Stm32f4
         volatile constexpr static uint32_t& pwr(const uint32_t reg)
         {
             return peripheral(APB1_BASE + PWR + reg);
+        }
+
+        volatile constexpr static uint32_t& rtc(const uint32_t reg)
+        {
+            return peripheral(APB1_BASE + RTC_BKP + reg);
+        }
+
+        volatile constexpr static uint32_t& exti(const uint32_t reg)
+        {
+            return peripheral(APB2_BASE + EXTI + reg);
         }
 
         //

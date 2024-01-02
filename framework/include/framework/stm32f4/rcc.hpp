@@ -27,6 +27,16 @@ class Rcc
         inline static constexpr uint32_t CFGR_PPRE1_SHIFT = 10;
         inline static constexpr uint32_t CFGR_PPRE2_SHIFT = 13;
 
+        inline static constexpr uint32_t CSR = 0x74;
+        inline static constexpr uint32_t CSR_LSION = 1;
+        inline static constexpr uint32_t CSR_LSIRDY = 2;
+
+        inline static constexpr uint32_t BDCR = 0x70;
+        inline static constexpr uint32_t BDCR_RTCSEL_0 = 1 << 8;
+        inline static constexpr uint32_t BDCR_RTCSEL_1 = 1 << 9;
+        inline static constexpr uint32_t BDCR_RTCEN = 1 << 15;
+        inline static constexpr uint32_t BDCR_BDRST = 1 << 16;
+
         inline static constexpr uint32_t PLLSAICFGR = 0x88;
         inline static constexpr uint32_t PLLSAICFGR_PLLSAIN_SHIFT = 6;
         inline static constexpr uint32_t PLLSAICFGR_PLLSAIP_SHIFT = 16;
@@ -36,6 +46,7 @@ class Rcc
         inline static constexpr uint32_t DCKCFGR2_CK48MSEL = 1 << 27;
 
         inline static constexpr uint32_t APB1RSTR = 0x20;
+        inline static constexpr uint32_t APB1RSTR_TIM3RST = 1 << 1;
         inline static constexpr uint32_t APB1RSTR_TIM4RST = 1 << 2;
 
         inline static constexpr uint32_t AHB1ENR = 0x30;
@@ -44,6 +55,7 @@ class Rcc
         inline static constexpr uint32_t AHB1ENR_GPIOC = 0x04;
 
         inline static constexpr uint32_t APB1ENR = 0x40;
+        inline static constexpr uint32_t APB1ENR_TIM3EN = 1 << 1;
         inline static constexpr uint32_t APB1ENR_TIM4EN = 1 << 2;
         inline static constexpr uint32_t APB1ENR_USART2EN = 1 << 17;
         inline static constexpr uint32_t APB1ENR_PWREN = 1 << 28;

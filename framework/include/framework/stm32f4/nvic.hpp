@@ -57,6 +57,13 @@ class Nvic
             //Stm32::nvic32(Nvic::ISER + (Stm32IRQ::USART2_IRQn >> 4)) = 1 << (Stm32IRQ::USART2_IRQn & (uint32_t)0x1f);
         }
 
+        static void disableIRQ(const uint32_t irqNumber)
+        {
+            // see enableIRQ() as the disable proceedure works the same way
+            //
+            (&Stm32f4::nvic32(Nvic::ICER))[irqNumber >> 5] = 1 << (irqNumber & uint32_t(0x1f));
+        }
+
         static void setPriorityGrouping(const uint32_t priorityGrouping)
         {
             // note, as this register requires an unlock code, an intermediate variable must be used
