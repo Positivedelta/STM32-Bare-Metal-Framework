@@ -16,6 +16,10 @@
 #include "framework/io/print_writer.hpp"
 #include "framework/io/text_reader.hpp"
 
+// note, required by the char* version of TextReader::readln()
+//
+#include "framework/io/editproviders/char_array_edit_buffer.hpp"
+
 //
 // note, the Nucleo can be configured to connect Usart2 to the virtual COM port on the ST-LINK module
 //       this is very useful when running / testing this application
@@ -76,9 +80,10 @@ int main()
 
     inputStream.setByteListener(listener);
 
-    // notes 1, readline() blocks, internally it uses WFI in order to sip power...
-    //       2, the TextReader class can optionally take an OutputStream, this is to allow local echo
-    //       3, use the templated TextReader::readln<N>(char(&textBuffer)[n]) method if you want to avoid allocating a std::pmr::string
+    // notes 1, readln() blocks, internally it uses WFI in order to sip power...
+    //       2, the readln() method also supports history, just override the default edit provider
+    //       3, the TextReader class can optionally take an OutputStream, this is to allow local echo
+    //       4, use the templated TextReader::readln<N>(char(&textBuffer)[n]) method if you want to avoid allocating a std::pmr::string
     //
     const auto input = bpl::TextReader(inputStream, outputStream);
     std::string_view userName = input.readln();
@@ -115,15 +120,15 @@ int main()
     const auto input = bpl::TextReader(inputStream, outputStream);
 
     const auto BUFFER_SIZE = 1024;
-    char buffer[BUFFER_SIZE];
-    input.readln<BUFFER_SIZE>(buffer);
+    auto editProvider = bpl::CharArrayEditBuffer<BUFFER_SIZE>();
+    input.readln<BUFFER_SIZE>(editProvider);
     writer.print("Hello ");
-    writer.print(buffer);
+    writer.print(editProvider.buffer());
     writer.println("!");
 
     writer.println();
     writer.println("Typed characters will now be echoed back to the terminal");
-    while (true) input.readln<BUFFER_SIZE>(buffer); */
+    while (true) input.readln<BUFFER_SIZE>(editProvider); */
 
     return 0;
 }
