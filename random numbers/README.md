@@ -1,7 +1,7 @@
 ## Basic Operation
-- The Entropy class configures the RTC wakeup down counter to run from the internal 38KHz RC oscillator and triggers an IRQ each time it cycles
+- The RTC wakeup counter is configured to run from the internal 32KHz RC oscillator and to trigger IRQs each time it cycles
 - The RC oscillator is not particularly accurate and drifts, so can be used as a reasonable source of entropy
-- Timer 3 is runs from the much more accurate crystal controlled clock and is sampled on each RTC wakeup IRQ, thus generating random values
+- Timer 3 is runs from the crystal controlled clock and is sampled on each RTC wakeup IRQ, thus generating random values
 - For the full details, please refer to the `entropy.cpp` source code
 
 ## Frequency Histogram Plot
