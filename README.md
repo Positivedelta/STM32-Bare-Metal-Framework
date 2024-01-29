@@ -27,6 +27,10 @@ Notes
 - These can be download from https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
 - If necessary edit the `stm32_toolchain.cmake` file to suit your cross compiler toolchain
 
+On Going Development tasks
+- Review and test the no local echo behaviour of the TextReader.readln() methods
+- Implement the SBus, PWM out and PID controller classes
+
 ## Build
 In the desired example directory perform the following steps
 - `mkdir build`
