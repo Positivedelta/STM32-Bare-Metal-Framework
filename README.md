@@ -10,15 +10,17 @@ It is assumed that you have some knowledge of embedded programming on STM32 or s
 
 This project was inspired by the Jason Turner talk at CppCon 2016: "Rich Code for Tiny Computers: A Simple Commodore 64 Game in C++17", see https://www.youtube.com/watch?v=zBkNBP00wJE This is an excellent talk and is well worth watching, as is his "C++ Weekly" channel
 
-**Note**, the `simple flight controller` project is incomplete. When it's finished it will be able to fly an RC Quadcopter using the Nucleo-64 board described above. This board will also need a
-plugin hat to host the 3-axis gyros, the RC interface and the speed controller PWM connectors. The KiCad PCB design and layout will be included here once it's complete. This project is also currently configured to build with `ninja`, see `PreLoad.cmake` for details. Watch this space for further updates...
+#### Notes
+- The `simple flight controller` project is incomplete. When it's finished it will be able to fly an RC Quadcopter using the Nucleo-64 board described above. This board will also need a
+plugin hat to host the 3-axis gyros, the RC interface and the speed controller PWM connectors. The KiCad PCB design and layout will be included here once it's complete
+- This project is also currently configured to build with `ninja`, see `PreLoad.cmake` for details. Watch this space for further updates...
 
 ## Prerequisites
 - CMake v3.27 (older versions are probably OK)
 - Nmake v14.34.x or Ninja v1.11.1
 - GCC 13.2.1
 
-Notes
+#### Notes
 - Microsoft `nmake` is installed as a component of Visual Studio but is also available separately as a download
 - The `ninja` build tool is available from https://www.ninja-build.org/
 - If building on a Linux box, edit the `PreLoad.cmake` files to specify `Unix Makefiles` and then use `make`
@@ -27,7 +29,7 @@ Notes
 - These can be download from https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
 - If necessary edit the `stm32_toolchain.cmake` file to suit your cross compiler toolchain
 
-On Going Development tasks
+#### On Going Development tasks
 - Review and test the no local echo behaviour of the TextReader.readln() methods
 - Implement the SBus, PWM out and PID controller classes
 
@@ -43,7 +45,7 @@ In the desired example directory perform the following steps
 - Drag the .bin file to the drive mounted by the Nucleo
 - The code should now execute on the Nucleo
 
-Notes
+#### Notes
 - Use the generated .hex file with a JTAG/SWD style programmers
 - The compiled assembler is available in the .asm file
 
