@@ -31,12 +31,12 @@ namespace bpl
                 return workingBufferPtr;
             }
 
-            const bool back() override
+            bool back() override
             {
                 return false;
             }
 
-            const bool forward() override
+            bool forward() override
             {
                 return false;
             }

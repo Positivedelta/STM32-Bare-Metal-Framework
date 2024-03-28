@@ -121,7 +121,7 @@ driver::Usart2::In::In(Usart2& usart2):
     usart2(usart2) {
 }
 
-const bool driver::Usart2::In::read(uint8_t& byte) const
+bool driver::Usart2::In::read(uint8_t& byte) const
 {
     // check that there is data in the input buffer?
     //
@@ -151,7 +151,7 @@ driver::Usart2::Out::Out(Usart2& usart2):
     usart2(usart2) {
 }
 
-const bool driver::Usart2::Out::write(const uint8_t byte) const
+bool driver::Usart2::Out::write(const uint8_t byte) const
 {
     // exit ASAP is the buffer is full, the supplied byte will be lost, i.e. not transmitted
     //
@@ -173,7 +173,7 @@ const bool driver::Usart2::Out::write(const uint8_t byte) const
     return true;
 }
 
-const uint32_t driver::Usart2::Out::write(const uint8_t bytes[], const uint32_t length) const
+uint32_t driver::Usart2::Out::write(const uint8_t bytes[], const uint32_t length) const
 {
     for (uint32_t i = 0; i < length; i++)
     {
@@ -183,7 +183,7 @@ const uint32_t driver::Usart2::Out::write(const uint8_t bytes[], const uint32_t 
     return length;
 }
 
-const bool driver::Usart2::Out::bufferFull() const
+bool driver::Usart2::Out::bufferFull() const
 {
     return (usart2.outBufferHead - usart2.outBufferTail) == OUT_BUFFER_SIZE;
 }

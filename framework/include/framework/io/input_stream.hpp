@@ -14,7 +14,7 @@ namespace bpl
     class InputStream
     {
         public:
-            virtual const bool read(uint8_t& byte) const = 0;
+            virtual bool read(uint8_t& byte) const = 0;
 
             // note, any registered listener must be quick as it will execute in the context of the IRQ handler
             //

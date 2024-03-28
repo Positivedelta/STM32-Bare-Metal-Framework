@@ -19,8 +19,8 @@ namespace bpl
         public:
             std::pmr::string& emptyBuffer() override;
             std::pmr::string& buffer() override;
-            const bool back() override;
-            const bool forward() override;
+            bool back() override;
+            bool forward() override;
             void commit() override;
     };
 }

@@ -23,7 +23,7 @@ namespace bpl
             TextIO(const bpl::InputStream& inputStream, const bpl::OutputStream& outputStream, const bool localEcho = true);
             const bpl::TextReader& getTextReader() const;
             const bpl::PrintWriter& getPrintWriter() const;
-            const bool hasLocalEcho() const;
+            bool hasLocalEcho() const;
     };
 }
 

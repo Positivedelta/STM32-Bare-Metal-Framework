@@ -14,8 +14,8 @@ namespace bpl
     class NullOutputStream : public bpl::OutputStream
     {
         public:
-            virtual const bool write(const uint8_t byte) const override;
-            virtual const uint32_t write(const uint8_t bytes[], const uint32_t length) const override;
+            virtual bool write(const uint8_t byte) const override;
+            virtual uint32_t write(const uint8_t bytes[], const uint32_t length) const override;
     };
 }
 

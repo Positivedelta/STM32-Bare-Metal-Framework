@@ -12,8 +12,8 @@ namespace bpl
     class OutputStream
     {
         public:
-            virtual const bool write(const uint8_t byte) const = 0;
-            virtual const uint32_t write(const uint8_t bytes[], const uint32_t length) const = 0;
+            virtual bool write(const uint8_t byte) const = 0;
+            virtual uint32_t write(const uint8_t bytes[], const uint32_t length) const = 0;
     };
 }
 

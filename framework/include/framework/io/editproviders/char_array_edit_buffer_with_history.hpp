@@ -45,7 +45,7 @@ namespace bpl
                 return editBufferPtr;
             }
 
-            const bool back() override
+            bool back() override
             {
                 if ((currentSize > 0) && (index != int32_t(currentSize)))
                 {
@@ -61,7 +61,7 @@ namespace bpl
                 return false;
             }
 
-            const bool forward() override
+            bool forward() override
             {
                 if ((currentSize > 0) && (index > 0))
                 {

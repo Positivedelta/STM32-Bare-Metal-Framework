@@ -22,7 +22,7 @@ std::pmr::string& bpl::StringEditBufferWithHistory::buffer()
     return editBuffer;
 }
 
-const bool bpl::StringEditBufferWithHistory::back()
+bool bpl::StringEditBufferWithHistory::back()
 {
     if ((currentSize > 0) && (index != int32_t(currentSize)))
     {
@@ -38,7 +38,7 @@ const bool bpl::StringEditBufferWithHistory::back()
     return false;
 }
 
-const bool bpl::StringEditBufferWithHistory::forward()
+bool bpl::StringEditBufferWithHistory::forward()
 {
     if ((currentSize > 0) && (index > 0))
     {

@@ -3,23 +3,22 @@
 //
 
 #include "framework/io/text_reader.hpp"
-#include "framework/io/null_output_stream.hpp"
 #include "framework/io/editproviders/string_edit_buffer.hpp"
 
 bpl::TextReader::TextReader(const InputStream& inputStream):
-    inputStream(inputStream), outputStream(NullOutputStream()), echo(false) {
+    inputStream(inputStream), outputStream(nullOutputStream), echo(false) {
 }
 
 bpl::TextReader::TextReader(const bpl::InputStream& inputStream, const bpl::OutputStream& outputStream):
     inputStream(inputStream), outputStream(outputStream), echo(true) {
 }
 
-const bool bpl::TextReader::read(uint8_t& byte) const
+bool bpl::TextReader::read(uint8_t& byte) const
 {
     return inputStream.read(byte);
 }
 
-const bool bpl::TextReader::isKey(uint8_t keyCode) const
+bool bpl::TextReader::isKey(uint8_t keyCode) const
 {
     bool pressed = false;
 

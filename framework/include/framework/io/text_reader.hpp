@@ -13,6 +13,7 @@
 #include "framework/io/ascii.hpp"
 #include "framework/io/input_stream.hpp"
 #include "framework/io/output_stream.hpp"
+#include "framework/io/null_output_stream.hpp"
 #include "framework/io/editproviders/input_edit_provider.hpp"
 #include "framework/io/editproviders/input_prompt.hpp"
 
@@ -25,17 +26,19 @@ namespace bpl
             const bpl::OutputStream& outputStream;
             const bool echo;
 
+            static constexpr bpl::NullOutputStream nullOutputStream = bpl::NullOutputStream();
+
         public:
             // include an OutputStream in order to echo RXed characters
             //
             TextReader(const bpl::InputStream& inputStream);
             TextReader(const bpl::InputStream& inputStream, const bpl::OutputStream& outputStream);
 
-            const bool read(uint8_t& byte) const;
+            bool read(uint8_t& byte) const;
 
             // consume the contents of the input buffer and return true if the last character matches the keyCode
             //
-            const bool isKey(uint8_t keyCode) const;
+            bool isKey(uint8_t keyCode) const;
 
             // the use of std::prm::string will incur PMR memory allocation
             // lines can be edited using the left / right cursor keys in conjunction with the backspace and DEL keys
@@ -57,7 +60,7 @@ namespace bpl
             // note, specify (1 + maxSize) if you want to discount the 0x00 termination character
             //
             template<size_t maxSize>
-            const size_t readln(bpl::InputEditProvider<char*>& editProvider, const bpl::InputPrompt& prompt = bpl::InputPrompt()) const
+            size_t readln(bpl::InputEditProvider<char*>& editProvider, const bpl::InputPrompt& prompt = bpl::InputPrompt()) const
             {
                 uint8_t byte;
                 auto& line = editProvider.emptyBuffer();

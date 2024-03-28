@@ -14,9 +14,9 @@ class AxesValues
 
     public:
         AxesValues(const int32_t x, const int32_t y, const int32_t z);
-        const int32_t getX() const;
-        const int32_t getY() const;
-        const int32_t getZ() const;
+        int32_t getX() const;
+        int32_t getY() const;
+        int32_t getZ() const;
 };
 
 #endif

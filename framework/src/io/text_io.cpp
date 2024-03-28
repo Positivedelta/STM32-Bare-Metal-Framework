@@ -24,7 +24,7 @@ const bpl::PrintWriter& bpl::TextIO::getPrintWriter() const
     return printWriter;
 }
 
-const bool bpl::TextIO::hasLocalEcho() const
+bool bpl::TextIO::hasLocalEcho() const
 {
     return localEcho;
 }

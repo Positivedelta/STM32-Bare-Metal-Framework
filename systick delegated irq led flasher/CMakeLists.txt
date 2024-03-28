@@ -15,15 +15,19 @@ project("nucleo_f446re_systick_delegated_irq_led_flasher" CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wextra -Wno-unused-parameter")
 
 include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 file(GLOB STM32F4_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/stm32f4/*.cpp)
+file(GLOB CLI_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/cli/*.cpp)
+file(GLOB IO_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/io/*.cpp)
+file(GLOB IO_EDIT_PROVIDERS_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/io/editproviders/*.cpp)
 file(GLOB TASKING_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/tasking/*.cpp)
+file(GLOB UTILS_SRC ${BIT_PARALLEL_STM32_ROOT}/framework/src/utils/*.cpp)
 file(GLOB NUCLEO_LED_FLASHER_SRC ${PROJECT_SOURCE_DIR}/src/*.cpp)
-list(APPEND NUCLEO_LED_FLASHER_SRC ${STM32F4_SRC} ${TASKING_SRC})
+list(APPEND NUCLEO_LED_FLASHER_SRC ${STM32F4_SRC} ${CLI_SRC} ${IO_SRC} ${IO_EDIT_PROVIDERS_SRC} ${TASKING_SRC} ${UTILS_SRC})
 add_executable(${CMAKE_PROJECT_NAME} ${NUCLEO_LED_FLASHER_SRC})
 
 # notes 1, the --no-warn-rwx-segments can be removed once the compiler is upgraded to v13, see the GCC v12 #1029 issue

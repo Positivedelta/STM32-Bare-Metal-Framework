@@ -47,7 +47,7 @@ namespace driver
             {
                 public:
                     In(Usart2& usart2);
-                    const bool read(uint8_t& byte) const override;
+                    bool read(uint8_t& byte) const override;
 
                     // note, any registered listener must be quick as it will execute in the context of the IRQ handler
                     //
@@ -61,11 +61,11 @@ namespace driver
             {
                 public:
                     Out(Usart2& usart2);
-                    const bool write(const uint8_t byte) const override;
-                    const uint32_t write(const uint8_t bytes[], const uint32_t length) const override;
+                    bool write(const uint8_t byte) const override;
+                    uint32_t write(const uint8_t bytes[], const uint32_t length) const override;
 
                 private:
-                    const bool bufferFull() const;
+                    bool bufferFull() const;
 
                 private:
                     Usart2& usart2;

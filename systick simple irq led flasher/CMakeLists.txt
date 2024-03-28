@@ -15,7 +15,7 @@ project("nucleo_f446re_systick_simple_irq_led_flasher" CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wextra -Wno-unused-parameter")
 
 include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include)
 include_directories(${PROJECT_SOURCE_DIR}/include)

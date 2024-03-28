@@ -16,12 +16,12 @@ std::pmr::string& bpl::StringEditBuffer::buffer()
     return workingBuffer;
 }
 
-const bool bpl::StringEditBuffer::back()
+bool bpl::StringEditBuffer::back()
 {
     return false;
 }
 
-const bool bpl::StringEditBuffer::forward()
+bool bpl::StringEditBuffer::forward()
 {
     return false;
 }
