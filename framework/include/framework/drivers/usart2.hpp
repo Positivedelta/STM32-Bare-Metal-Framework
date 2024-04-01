@@ -40,7 +40,7 @@ namespace driver
             volatile uint8_t inBuffer[IN_BUFFER_SIZE], outBuffer[OUT_BUFFER_SIZE];
             volatile uint32_t inBufferHead, inBufferTail;
             volatile uint32_t outBufferHead, outBufferTail;
-            std::reference_wrapper<bpl::ByteListener> wrappedListener;
+            std::reference_wrapper<const bpl::ByteListener> wrappedListener;
 
         public:
             class In : public bpl::InputStream

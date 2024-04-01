@@ -10,7 +10,7 @@
 
 namespace bpl
 {
-    using ByteListener = const std::function<void (const uint8_t byte)>;
+    using ByteListener = std::function<void (const uint8_t byte)>;
 }
 
 #endif
