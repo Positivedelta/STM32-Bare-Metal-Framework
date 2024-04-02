@@ -17,9 +17,13 @@ driver::Usart2& driver::Usart2::getInstance()
     return instance;
 }
 
+// the lambda is used by the base call to enable the IRQ and then trigger the transmission of the first and subsequent bytes
+//
 driver::Usart2::Usart2():
-    inBufferHead(0), inBufferTail(0), outBufferHead(0), outBufferTail(0), wrappedListener(nullListener),
-    inputStream(Usart2::In(*this)), outputStream(Usart2::Out(*this)) {
+    Uart([]() {
+        Stm32f4::usart2(Usart::CR1) = Stm32f4::usart2(Usart::CR1) | Usart::CR1_TXEIE;
+        (&Stm32f4::nvic32(Nvic::ISPR))[F446IRQn::Usart2 >> 5] = 1 << (F446IRQn::Usart2 & uint32_t(0x1f));
+    }) {
 }
 
 driver::Usart2& driver::Usart2::initialise(const bpl::BaudRate& baudRate, const uint8_t priority)
@@ -56,45 +60,45 @@ driver::Usart2& driver::Usart2::initialise(const bpl::BaudRate& baudRate, const 
     //
     switch (baudRate)
     {
+        // 585.9375 (closest fraction), i.e. 585 | 15 (has a 0% error)
+        //
         case bpl::BaudRate::BPS_4800:
-            // 585.9375 (closest fraction), i.e. 585 | 15 (has a 0% error)
-            //
             Stm32f4::usart2(Usart::BRR) = (585 << 4) | 15;
             break;
 
+        // 293.0000 (closest fraction), i.e. 292 | 16 (has a 0.011% error)
+        //
         case bpl::BaudRate::BPS_9600:
-            // 293.0000 (closest fraction), i.e. 292 | 16 (has a 0.011% error)
-            //
             Stm32f4::usart2(Usart::BRR) = (292 << 4) | 16;
             break;
 
+        // 48.8125 (closest fraction), i.e. 48 | 13 (has a -0.032% error)
+        //
         case bpl::BaudRate::BPS_57600:
-            // 48.8125 (closest fraction), i.e. 48 | 13 (has a -0.032% error)
-            //
             Stm32f4::usart2(Usart::BRR) = (48 << 4) | 13;
             break;
 
+        // 24.4375 (closest fraction), i.e. 24 | 7 (has an 0.096% error)
+        //
         case bpl::BaudRate::BPS_115200:
-            // 24.4375 (closest fraction), i.e. 24 | 7 (has an 0.096% error)
-            //
             Stm32f4::usart2(Usart::BRR) = (24 << 4) | 7;
             break;
 
+        // 12.1875 (closest fraction), i.e. 12 | 3 (has an 0.096% error)
+        //
         case bpl::BaudRate::BPS_230400:
-            // 12.1875 (closest fraction), i.e. 12 | 3 (has an 0.096% error)
-            //
             Stm32f4::usart2(Usart::BRR) = (12 << 4) | 3;
             break;
 
+        // 6.125 (closest fraction), i.e. 6 | 2 (has an 0.351% error)
+        //
         case bpl::BaudRate::BPS_460800:
-            // 6.125 (closest fraction), i.e. 6 | 2 (has an 0.351% error)
-            //
             Stm32f4::usart2(Usart::BRR) = (6 << 4) | 2;
             break;
 
+        // 3.0625 (closest fraction), i.e. 3 | 1 (has an 0.351% error)
+        //
         case bpl::BaudRate::BPS_921600:
-            // 3.0625 (closest fraction), i.e. 3 | 1 (has an 0.351% error)
-            //
             Stm32f4::usart2(Usart::BRR) = (3 << 4) | 1;
             break;
     }
@@ -114,93 +118,8 @@ driver::Usart2& driver::Usart2::initialise(const bpl::BaudRate& baudRate, const 
 }
 
 //
-// Usart2::In inner class methods
-//
-
-driver::Usart2::In::In(Usart2& usart2):
-    usart2(usart2) {
-}
-
-bool driver::Usart2::In::read(uint8_t& byte) const
-{
-    // check that there is data in the input buffer?
-    //
-    if (usart2.inBufferHead != usart2.inBufferTail)
-    {
-        byte = usart2.inBuffer[usart2.inBufferTail & (IN_BUFFER_SIZE - 1)];
-        usart2.inBufferTail = usart2.inBufferTail + 1;
-
-        return true;
-    }
-
-    return false;
-}
-
-// note, any registered listener must be quick as it will execute in the context of the IRQ handler
-//
-void driver::Usart2::In::setByteListener(const bpl::ByteListener& listener) const
-{
-    usart2.wrappedListener = listener;
-}
-
-//
-// Usart2::Out inner class methods
-//
-
-driver::Usart2::Out::Out(Usart2& usart2):
-    usart2(usart2) {
-}
-
-bool driver::Usart2::Out::write(const uint8_t byte) const
-{
-    // exit ASAP is the buffer is full, the supplied byte will be lost, i.e. not transmitted
-    //
-    if (bufferFull()) return false;
-
-    usart2.outBuffer[usart2.outBufferHead & (OUT_BUFFER_SIZE - 1)] = byte;
-    usart2.outBufferHead = usart2.outBufferHead + 1;
-
-    // is this the 1st byte in the buffer?
-    //
-    if (usart2.outBufferHead - usart2.outBufferTail == 1)
-    {
-        // enable the IRQ and trigger the transmission of this and subsequent bytes
-        //
-        Stm32f4::usart2(Usart::CR1) = Stm32f4::usart2(Usart::CR1) | Usart::CR1_TXEIE;
-        (&Stm32f4::nvic32(Nvic::ISPR))[F446IRQn::Usart2 >> 5] = 1 << (F446IRQn::Usart2 & uint32_t(0x1f));
-    }
-
-    return true;
-}
-
-uint32_t driver::Usart2::Out::write(const uint8_t bytes[], const uint32_t length) const
-{
-    for (uint32_t i = 0; i < length; i++)
-    {
-        if (write(bytes[i]) == false) return i;
-    }
-
-    return length;
-}
-
-bool driver::Usart2::Out::bufferFull() const
-{
-    return (usart2.outBufferHead - usart2.outBufferTail) == OUT_BUFFER_SIZE;
-}
-
-//
 // the main Usart2 class methods
 //
-
-const bpl::InputStream& driver::Usart2::getInputStream() const
-{
-    return inputStream;
-}
-
-const bpl::OutputStream& driver::Usart2::getOutputStream() const
-{
-    return outputStream;
-}
 
 __attribute__((flatten, hot)) void Usart2IRQ::handler()
 {

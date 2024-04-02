@@ -6,13 +6,9 @@
 #define BPL_STM32F4_USART2_DRIVER_H
 
 #include <cstdint>
-#include <functional>
 
-#include "framework/io/byte_listener.hpp"
+#include "framework/drivers/uart.hpp"
 #include "framework/io/baud_rate.hpp"
-#include "framework/io/io_stream.hpp"
-#include "framework/io/input_stream.hpp"
-#include "framework/io/output_stream.hpp"
 
 class Usart2IRQ
 {
@@ -22,64 +18,13 @@ class Usart2IRQ
 
 namespace driver
 {
-    class Usart2 : public bpl::IOStream
+    class Usart2 : public driver::Uart
     {
         friend void ::Usart2IRQ::handler();
 
-        // note, buffer sizes must be a power of 2
-        //
-        private:
-            inline constexpr static uint32_t IN_BUFFER_SIZE = 256, OUT_BUFFER_SIZE = 256;
-
-            inline const static bpl::ByteListener nullListener = [](const uint8_t rxedByte) {
-                //
-                // benign, if needed can be replaced using In::setByteListener()
-                //
-            };
-
-            volatile uint8_t inBuffer[IN_BUFFER_SIZE], outBuffer[OUT_BUFFER_SIZE];
-            volatile uint32_t inBufferHead, inBufferTail;
-            volatile uint32_t outBufferHead, outBufferTail;
-            std::reference_wrapper<const bpl::ByteListener> wrappedListener;
-
         public:
-            class In : public bpl::InputStream
-            {
-                public:
-                    In(Usart2& usart2);
-                    bool read(uint8_t& byte) const override;
-
-                    // note, any registered listener must be quick as it will execute in the context of the IRQ handler
-                    //
-                    void setByteListener(const bpl::ByteListener& listener) const override;
-
-                private:
-                    Usart2& usart2;
-            };
-
-            class Out : public bpl::OutputStream
-            {
-                public:
-                    Out(Usart2& usart2);
-                    bool write(const uint8_t byte) const override;
-                    uint32_t write(const uint8_t bytes[], const uint32_t length) const override;
-
-                private:
-                    bool bufferFull() const;
-
-                private:
-                    Usart2& usart2;
-            };
-
             static Usart2& getInstance();
-
             Usart2& initialise(const bpl::BaudRate& baudRate, const uint8_t priority);
-            const bpl::InputStream& getInputStream() const override;
-            const bpl::OutputStream& getOutputStream() const override;
-
-        private:
-            const In inputStream;
-            const Out outputStream;
 
         private:
             Usart2();
