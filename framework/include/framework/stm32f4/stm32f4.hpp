@@ -36,6 +36,7 @@ class Stm32f4
         inline static constexpr uint32_t RTC_BKP = 0x2800;
 
         inline static constexpr uint32_t APB2_BASE = 0x40010000;
+        inline static constexpr uint32_t USART_1 = 0x1000;
         inline static constexpr uint32_t EXTI = 0x3C00;
 
     public:
@@ -67,6 +68,11 @@ class Stm32f4
         volatile constexpr static uint32_t& gpioC(const uint32_t reg)
         {
             return peripheral(AHB1_BASE + GPIO_C + reg);
+        }
+
+        volatile constexpr static uint32_t& usart1(const uint32_t reg)
+        {
+            return peripheral(APB2_BASE + USART_1 + reg);
         }
 
         volatile constexpr static uint32_t& usart2(const uint32_t reg)

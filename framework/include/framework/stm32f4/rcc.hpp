@@ -59,6 +59,10 @@ class Rcc
         inline static constexpr uint32_t APB1ENR_TIM4EN = 1 << 2;
         inline static constexpr uint32_t APB1ENR_USART2EN = 1 << 17;
         inline static constexpr uint32_t APB1ENR_PWREN = 1 << 28;
+
+        inline static constexpr uint32_t APB2ENR = 0x44;
+        inline static constexpr uint32_t APB2ENR_USART1EN = 1 << 4;
+        inline static constexpr uint32_t APB2ENR_USART6EN = 1 << 5;
 };
 
 #endif

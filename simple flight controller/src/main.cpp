@@ -52,8 +52,8 @@ int main()
     // the CLI runs as the main foreground task
     // set the uart IRQ priority to 1 (0..15 ==> high..low)
     //
-    auto& uart = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
-    auto cli = bpl::CliHandler(uart, {scheduler, led, gyros, sbus, servos, controller});
+    auto& console = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
+    auto cli = bpl::CliHandler(console, {scheduler, led, gyros, sbus, servos, controller});
     while (true) cli.run();
 
     return 0;
