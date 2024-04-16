@@ -96,19 +96,20 @@ __attribute__((flatten, hot)) void Usart2IRQ::handler()
     {
         const uint8_t byte = Stm32f4::usart2(Usart::DR);
 
-        // buffer the byte, will be discarded if the input buffer is full
-        //
-        if ((instance.inBufferHead - instance.inBufferTail) != instance.IN_BUFFER_SIZE)
-        {
-            instance.inBuffer[instance.inBufferHead & (instance.IN_BUFFER_SIZE - 1)] = byte;
-            instance.inBufferHead = instance.inBufferHead + 1;
-        }
-
         // pass the byte the registered listener
-        // notes 1, if a listener has not been provided the byte will be consumed by the default handler
-        //       2, the associated listener must be quick!
+        // notes 1, if the listener fully handles the byte, don't buffer it as it won't be needed  / used
+        //       2. the associated listener must be quick!
         //
-        instance.wrappedListener(byte);
+        if (!instance.wrappedListener(byte))
+        {
+            // buffer the byte, will be discarded if the input buffer is full
+            //
+            if ((instance.inBufferHead - instance.inBufferTail) != instance.IN_BUFFER_SIZE)
+            {
+                instance.inBuffer[instance.inBufferHead & (instance.IN_BUFFER_SIZE - 1)] = byte;
+                instance.inBufferHead = instance.inBufferHead + 1;
+            }
+        }
     }
 
     // handle the tx IRQ

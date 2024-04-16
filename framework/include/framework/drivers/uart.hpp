@@ -21,10 +21,11 @@ namespace driver
     class Uart : public bpl::IOStream
     {
         private:
+            // benign, if needed can be replaced using In::setByteListener()
+            // note, returns false to indicate that the byte has not been fully handled and that further action is likely to be required
+            //
             inline const static bpl::ByteListener nullListener = [](const uint8_t byte) {
-                //
-                // benign, if needed can be replaced using In::setByteListener()
-                //
+                return false;
             };
 
         // note, buffer sizes must be a power of 2

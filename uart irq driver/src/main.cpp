@@ -71,11 +71,13 @@ int main()
     writer.print("Please enter your name: ");
 
     // indicate uart activity by alternating the led2 state as characters
-    // note, this is purely and example to demonstrate a possible use for a ByteListener
+    // notes 1, this is purely and example to demonstrate a possible use for a ByteListener
+    //       2, it returns false to allow the uart IRQ handler to continue processing the RXed byte
     //
     int32_t count = 0;
     const bpl::ByteListener listener = [&](const uint8_t rxedByte) {
         if (++count % 3) Stm32f4::gpioA(Gpio::ODR) = Stm32f4::gpioA(Gpio::ODR) ^ (1 << Gpio::Pin5);
+        return false;
     };
 
     inputStream.setByteListener(listener);

@@ -10,7 +10,9 @@
 
 namespace bpl
 {
-    using ByteListener = std::function<void (const uint8_t byte)>;
+    // a return value of true is intended to indicate that the byte has been fully handled and no futher action is required
+    //
+    using ByteListener = std::function<bool (const uint8_t byte)>;
 }
 
 #endif
