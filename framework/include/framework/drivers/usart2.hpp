@@ -10,21 +10,13 @@
 #include "framework/drivers/uart.hpp"
 #include "framework/io/baud_rate.hpp"
 
-class Usart2IRQ
-{
-    public:
-        static void handler();
-};
-
 namespace driver
 {
     class Usart2 : public driver::Uart
     {
-        friend void ::Usart2IRQ::handler();
-
         public:
-            static Usart2& getInstance();
-            Usart2& initialise(const bpl::BaudRate& baudRate, const uint8_t priority);
+            static Uart& getInstance();
+            Uart& initialise(const bpl::BaudRate& baudRate, const uint8_t priority) override;
 
         private:
             Usart2();

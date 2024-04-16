@@ -14,12 +14,33 @@
 #include "framework/io/input_stream.hpp"
 #include "framework/io/output_stream.hpp"
 
+//
+// note, as more uarts are added add the required forward references to their associated IRQ handler classes here...
+//
+
+class Usart1IRQ
+{
+    public:
+        static void handler();
+};
+
+class Usart2IRQ
+{
+    public:
+        static void handler();
+};
+
 namespace driver
 {
     using ScheduleTxProvider = std::function<void()>;
 
     class Uart : public bpl::IOStream
     {
+        // note, as more uarts are added add their associated IRQ handlers as friends here...
+        //
+        friend void ::Usart1IRQ::handler();
+        friend void ::Usart2IRQ::handler();
+
         private:
             // benign, if needed can be replaced using In::setByteListener()
             // note, returns false to indicate that the byte has not been fully handled and that further action is likely to be required
@@ -116,6 +137,8 @@ namespace driver
                 inBufferHead(0), inBufferTail(0), outBufferHead(0), outBufferTail(0), wrappedListener(nullListener),
                 inputStream(Uart::In(*this)), outputStream(Uart::Out(*this, scheduleTx)) {
             }
+
+            virtual Uart& initialise(const bpl::BaudRate& baudRate, const uint8_t priority) = 0;
 
             const bpl::InputStream& getInputStream() const override
             {

@@ -11,7 +11,7 @@
 
 #include "framework/drivers/usart2.hpp"
 
-driver::Usart2& driver::Usart2::getInstance()
+driver::Uart& driver::Usart2::getInstance()
 {
     static auto instance = driver::Usart2();
     return instance;
@@ -29,7 +29,7 @@ driver::Usart2::Usart2():
 // note, serial tx/rx port designations
 // PA2: tx, PA3: rx
 //
-driver::Usart2& driver::Usart2::initialise(const bpl::BaudRate& baudRate, const uint8_t priority)
+driver::Uart& driver::Usart2::initialise(const bpl::BaudRate& baudRate, const uint8_t priority)
 {
     // enable the gpioA and usart2 clocks
     //
