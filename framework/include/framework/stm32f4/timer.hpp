@@ -29,6 +29,14 @@ class Timer
         inline static constexpr uint32_t CR1_CKD_2 = 0x01 << 8;
         inline static constexpr uint32_t CR1_CKD_4 = 0x02 << 8;
 
+        inline static constexpr uint32_t DIER = 0x0c;
+        inline static constexpr uint32_t DIER_UIE = 1;
+        inline static constexpr uint32_t DIER_TIE = 1 << 6;
+
+        inline static constexpr uint32_t SR = 0x10;
+        inline static constexpr uint32_t SR_UIF = 1;
+        inline static constexpr uint32_t SR_TIF = 1 << 6;
+
         inline static constexpr uint32_t EGR = 0x14;
         inline static constexpr uint32_t EGR_UG = 1;
 

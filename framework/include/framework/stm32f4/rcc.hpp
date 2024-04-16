@@ -46,8 +46,9 @@ class Rcc
         inline static constexpr uint32_t DCKCFGR2_CK48MSEL = 1 << 27;
 
         inline static constexpr uint32_t APB1RSTR = 0x20;
-        inline static constexpr uint32_t APB1RSTR_TIM3RST = 1 << 1;
-        inline static constexpr uint32_t APB1RSTR_TIM4RST = 1 << 2;
+        inline static constexpr uint32_t APB1RSTR_TIMER2RST = 1;
+        inline static constexpr uint32_t APB1RSTR_TIMER3RST = 1 << 1;
+        inline static constexpr uint32_t APB1RSTR_TIMER4RST = 1 << 2;
 
         inline static constexpr uint32_t AHB1ENR = 0x30;
         inline static constexpr uint32_t AHB1ENR_GPIOA = 0x01;
@@ -55,8 +56,12 @@ class Rcc
         inline static constexpr uint32_t AHB1ENR_GPIOC = 0x04;
 
         inline static constexpr uint32_t APB1ENR = 0x40;
-        inline static constexpr uint32_t APB1ENR_TIM3EN = 1 << 1;
-        inline static constexpr uint32_t APB1ENR_TIM4EN = 1 << 2;
+        inline static constexpr uint32_t APB1ENR_TIMER2EN = 1;
+        inline static constexpr uint32_t APB1ENR_TIMER3EN = 1 << 1;
+        inline static constexpr uint32_t APB1ENR_TIMER4EN = 1 << 2;
+        inline static constexpr uint32_t APB1ENR_TIMER5EN = 1 << 3;
+        inline static constexpr uint32_t APB1ENR_TIMER6EN = 1 << 4;
+        inline static constexpr uint32_t APB1ENR_TIMER7EN = 1 << 5;
         inline static constexpr uint32_t APB1ENR_USART2EN = 1 << 17;
         inline static constexpr uint32_t APB1ENR_PWREN = 1 << 28;
 

@@ -30,6 +30,7 @@ class Stm32f4
 
         inline static constexpr uint32_t APB1_BASE = 0x40000000;
         inline static constexpr uint32_t USART_2 = 0x4400;
+        inline static constexpr uint32_t TIMER_2 = 0x0000;
         inline static constexpr uint32_t TIMER_3 = 0x0400;
         inline static constexpr uint32_t TIMER_4 = 0x0800;
         inline static constexpr uint32_t PWR = 0x7000;
@@ -78,6 +79,11 @@ class Stm32f4
         volatile constexpr static uint32_t& usart2(const uint32_t reg)
         {
             return peripheral(APB1_BASE + USART_2 + reg);
+        }
+
+        volatile constexpr static uint32_t& timer2(const uint32_t reg)
+        {
+            return peripheral(APB1_BASE + TIMER_2 + reg);
         }
 
         volatile constexpr static uint32_t& timer3(const uint32_t reg)

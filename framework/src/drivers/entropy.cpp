@@ -68,13 +68,13 @@ driver::Entropy::Entropy() : cache(EntropyCache())
     // setup the 16-bit timer 3 peripheral, running as fast as possible and gets sampled by the RTC wakeup IRQ
     //
 
-    Stm32f4::rcc(Rcc::APB1ENR) = Stm32f4::rcc(Rcc::APB1ENR) | Rcc::APB1ENR_TIM3EN;
+    Stm32f4::rcc(Rcc::APB1ENR) = Stm32f4::rcc(Rcc::APB1ENR) | Rcc::APB1ENR_TIMER3EN;
 
     // timer off and reset
     //
     Stm32f4::timer3(Timer::CR1) = Stm32f4::timer3(Timer::CR1) & ~Timer::CR1_CEN;
-    Stm32f4::rcc(Rcc::APB1RSTR) = Stm32f4::rcc(Rcc::APB1RSTR) | Rcc::APB1RSTR_TIM3RST;
-    Stm32f4::rcc(Rcc::APB1RSTR) = Stm32f4::rcc(Rcc::APB1RSTR) & ~Rcc::APB1RSTR_TIM3RST;
+    Stm32f4::rcc(Rcc::APB1RSTR) = Stm32f4::rcc(Rcc::APB1RSTR) | Rcc::APB1RSTR_TIMER3RST;
+    Stm32f4::rcc(Rcc::APB1RSTR) = Stm32f4::rcc(Rcc::APB1RSTR) & ~Rcc::APB1RSTR_TIMER3RST;
 
     // FIXME! investigate further, clock set to be ~16 times faster than the RTC wakeup counter
     //
