@@ -302,7 +302,7 @@ class Exti9To5IRQ
         }
 };
 
-class Tim1BrkTim9IRQ
+class Timer1BrkTimer9IRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -311,7 +311,7 @@ class Tim1BrkTim9IRQ
         }
 };
 
-class Tim1UpTim10IRQ
+class Timer1UpTimer10IRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -320,7 +320,7 @@ class Tim1UpTim10IRQ
         }
 };
 
-class Tim1TrgComTim11IRQ
+class Timer1TrgComTimer11IRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -329,7 +329,7 @@ class Tim1TrgComTim11IRQ
         }
 };
 
-class Tim1CcIRQ
+class Timer1CcIRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -338,7 +338,7 @@ class Tim1CcIRQ
         }
 };
 
-class Tim2IRQ
+class Timer2IRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -347,7 +347,7 @@ class Tim2IRQ
         }
 };
 
-class Tim3IRQ
+class Timer3IRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -356,7 +356,7 @@ class Tim3IRQ
         }
 };
 
-class Tim4IRQ
+class Timer4IRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -473,7 +473,7 @@ class OtgFsWkup_IRQ
         }
 };
 
-class Tim8BrkTim12IRQ
+class Timer8BrkTimer12IRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -482,7 +482,7 @@ class Tim8BrkTim12IRQ
         }
 };
 
-class Tim8UpTim13IRQ
+class Timer8UpTimer13IRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -491,7 +491,7 @@ class Tim8UpTim13IRQ
         }
 };
 
-class Tim8TrgComTim14IRQ
+class Timer8TrgComTimer14IRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -536,7 +536,7 @@ class SdioIRQ
         }
 };
 
-class Tim5IRQ
+class Timer5IRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -572,7 +572,7 @@ class Uart5IRQ
         }
 };
 
-class Tim6DacIRQ
+class Timer6DacIRQ
 {
     public:
         __attribute__((weak)) static void handler()
@@ -581,7 +581,7 @@ class Tim6DacIRQ
         }
 };
 
-class Tim7IRQ
+class Timer7IRQ
 {
     public:
         __attribute__((weak)) static void handler()
