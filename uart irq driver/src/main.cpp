@@ -80,7 +80,7 @@ int main()
         return false;
     };
 
-    inputStream.setByteListener(listener);
+    uart.setByteListener(listener);
 
     // notes 1, readln() blocks, internally it uses WFI in order to sip power...
     //       2, the readln() method also supports history, just override the default edit provider
@@ -113,7 +113,7 @@ int main()
         if (++count % 3) Stm32f4::gpioA(Gpio::ODR) = Stm32f4::gpioA(Gpio::ODR) ^ (1 << Gpio::Pin5);
     };
 
-    inputStream.setByteListener(listener);
+    uart.setByteListener(listener);
 
     // notes 1, readline() blocks, internally it uses WFI in order to sip power...
     //       2, the TextReader class can optionally take an OutputStream, this is to allow local echo

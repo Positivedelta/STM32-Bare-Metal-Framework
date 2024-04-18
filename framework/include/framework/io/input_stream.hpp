@@ -15,10 +15,6 @@ namespace bpl
     {
         public:
             virtual bool read(uint8_t& byte) const = 0;
-
-            // note, any registered listener must be quick as it will execute in the context of the IRQ handler
-            //
-            virtual void setByteListener(const bpl::ByteListener& byteListener) const = 0;
     };
 }
 

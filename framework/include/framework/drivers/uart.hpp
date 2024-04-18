@@ -42,6 +42,8 @@ namespace driver
         friend void ::Usart2IRQ::handler();
 
         private:
+            bpl::ByteListener wrappedListener;
+
             // benign, if needed can be replaced using In::setByteListener()
             // note, returns false to indicate that the byte has not been fully handled and that further action is likely to be required
             //
@@ -57,7 +59,6 @@ namespace driver
             volatile uint8_t inBuffer[IN_BUFFER_SIZE], outBuffer[OUT_BUFFER_SIZE];
             volatile uint32_t inBufferHead, inBufferTail;
             volatile uint32_t outBufferHead, outBufferTail;
-            bpl::ByteListener wrappedListener;
 
         public:
             class In : public bpl::InputStream
@@ -81,11 +82,6 @@ namespace driver
                         }
 
                         return false;
-                    }
-
-                    void setByteListener(const bpl::ByteListener& listener = nullListener) const override
-                    {
-                        uart.wrappedListener = listener;
                     }
             };
 
@@ -134,7 +130,7 @@ namespace driver
 
         public:
             Uart(const auto& scheduleTx):
-                inBufferHead(0), inBufferTail(0), outBufferHead(0), outBufferTail(0), wrappedListener(nullListener),
+                wrappedListener(nullListener), inBufferHead(0), inBufferTail(0), outBufferHead(0), outBufferTail(0),
                 inputStream(Uart::In(*this)), outputStream(Uart::Out(*this, scheduleTx)) {
             }
 
@@ -148,6 +144,11 @@ namespace driver
             const bpl::OutputStream& getOutputStream() const override
             {
                 return outputStream;
+            }
+
+            void setByteListener(const bpl::ByteListener& listener = nullListener)
+            {
+                wrappedListener = listener;
             }
 
             //
