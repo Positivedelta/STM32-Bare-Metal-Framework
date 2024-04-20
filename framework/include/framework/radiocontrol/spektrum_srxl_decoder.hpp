@@ -8,6 +8,7 @@
 #include <array>
 #include <cstdint>
 
+#include "framework/data/ccitt_crc_16.hpp"
 #include "framework/drivers/time.hpp"
 #include "framework/drivers/uart.hpp"
 #include "framework/radiocontrol/srxl_status.hpp"
@@ -28,6 +29,7 @@ namespace bpl
             driver::Time& time;
             std::array<uint8_t, BUFFER_SIZE> buffer;
             uint64_t lastTimestamp;
+            bpl::CcittCrc16<BUFFER_SIZE, 0x1021, false> crc;
             uint32_t index;
             bool processed;
             bpl::SrxlStatus status;
@@ -36,11 +38,6 @@ namespace bpl
             SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time);
             bpl::SrxlStatus decode();
             int32_t getChannel(const int32_t channel) const;
-
-        // FIXME! pass this in as a Crc type
-        //
-        private:
-            bool checkCrc(std::array<uint8_t, BUFFER_SIZE> packet) const;
     };
 }
 
