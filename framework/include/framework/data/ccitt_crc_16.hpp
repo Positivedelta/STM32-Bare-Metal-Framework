@@ -31,6 +31,8 @@ namespace bpl
             static constexpr uint16_t mask = (1 << (bitLength - 1));
             static constexpr int32_t lookupEntries = 256;
 
+            // note, a CRC table is essentially the CRCs of the one-byte messages from 0 to 255
+            //
             static constexpr std::array<uint16_t, lookupEntries> generateTable()
             {
                 auto table = std::array<uint16_t, lookupEntries>();
