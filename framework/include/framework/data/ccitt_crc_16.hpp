@@ -19,9 +19,10 @@ namespace bpl
     // kermit, poly: 0x1021, seed: 0, reverse: true
     // ibm, ploy: 0x8005, seed: 0, reverse: true
     //
-    // notes 1, if the data is already byte reversed, negate the above boolean reverse flags
-    //       2 when the reverse flag is set, the polynomial is reversed internally
-    //         i.e. do not swap 0x1021 for 0x8408 etc. if reverse is specified
+    // notes 1, the lookup table is generated at compile time via the specified and included constexpr ststic methods
+    //       2, if the data is already byte reversed, negate the above boolean reverse flags
+    //       3, when the reverse flag is set, the polynomial is reversed internally
+    //          i.e. do not swap 0x1021 for 0x8408 etc. if reverse is specified
     //
     template<int32_t size, uint16_t polynomial, bool reverse = false>
     class CcittCrc16
@@ -53,6 +54,9 @@ namespace bpl
 
                     if (reverse)
                     {
+                        // the appropriate bit-reversing required to generate the reversed polynomial lookup table
+                        // i.e. to generate for 0x8408, the reverse of 0x1021
+                        //
                         table[bpl::DataUtils::reverse8(i)] = bpl::DataUtils::reverse16(crc);
                     }
                     else

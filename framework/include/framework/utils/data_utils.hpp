@@ -8,6 +8,11 @@
 #include <array>
 #include <cstdint>
 
+//
+// notes 1, don't split the non templated constexpr methods between .hpp & .cpp files
+//       2, constexpr methods / functions must be fully defined everywhere they are included in order to be available at compile time
+//
+
 namespace bpl
 {
     class DataUtils
