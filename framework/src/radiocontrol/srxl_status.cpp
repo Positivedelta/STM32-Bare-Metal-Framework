@@ -5,40 +5,47 @@
 #include "framework/radiocontrol/srxl_status.hpp"
 
 bpl::SrxlStatus::SrxlStatus():
-    newData(false), staleData(false), headerError(false), crcError(false),
-    newDataCount(0), staleDataCount(0), headerErrorCount(0), crcErrorCount(0) {
+    newData(false), staleData(false), failsafeCondition(false), packetHeaderError(false), packetTypeError(false), crcError(false) {
 }
 
 void bpl::SrxlStatus::clearFlags()
 {
     newData = false;
     staleData = false;
-    headerError = false;
+    failsafeCondition = false;
+    packetHeaderError = false;
+    packetTypeError = false;
     crcError = false;
 }
 
 void bpl::SrxlStatus::indicateNewData()
 {
     newData = true;
-    newDataCount++;
 }
 
 void bpl::SrxlStatus::indicateStaleData()
 {
     staleData = true;
-    staleDataCount++;
 }
 
-void bpl::SrxlStatus::indicateHeaderError()
+void bpl::SrxlStatus::indicateFailsafeCondition()
 {
-    headerError = true;
-    headerErrorCount++;
+    failsafeCondition = true;
+}
+
+void bpl::SrxlStatus::indicatePacketHeaderError()
+{
+    packetHeaderError = true;
+}
+
+void bpl::SrxlStatus::indicatePacketTypeError()
+{
+    packetTypeError = true;
 }
 
 void bpl::SrxlStatus::indicateCrcError()
 {
     crcError = true;
-    crcErrorCount++;
 }
 
 bool bpl::SrxlStatus::hasNewData() const
@@ -51,32 +58,22 @@ bool bpl::SrxlStatus::hasStaleData() const
     return staleData;
 }
 
-bool bpl::SrxlStatus::hasHeaderError() const
+bool bpl::SrxlStatus::hasFailsafeCondition() const
 {
-    return headerError;
+    return failsafeCondition;
+}
+
+bool bpl::SrxlStatus::hasPacketHeaderError() const
+{
+    return packetHeaderError;
+}
+
+bool bpl::SrxlStatus::hasPacketTypeError() const
+{
+    return packetTypeError;
 }
 
 bool bpl::SrxlStatus::hasCrcError() const
 {
     return crcError;
-}
-
-uint32_t bpl::SrxlStatus::getNewDataCount() const
-{
-    return newDataCount;
-}
-
-uint32_t bpl::SrxlStatus::getStaleDataCount() const
-{
-    return staleDataCount;
-}
-
-uint32_t bpl::SrxlStatus::getHeaderErrorCount() const
-{
-    return headerErrorCount;
-}
-
-uint32_t bpl::SrxlStatus::getCrcErrorCount() const
-{
-    return crcErrorCount;
 }

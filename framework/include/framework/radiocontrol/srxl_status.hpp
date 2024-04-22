@@ -12,25 +12,25 @@ namespace bpl
     class SrxlStatus
     {
         private:
-            bool newData, staleData, headerError, crcError;
-            uint32_t newDataCount, staleDataCount, headerErrorCount, crcErrorCount;
+            bool newData, staleData, failsafeCondition, packetHeaderError, packetTypeError, crcError;
 
         public:
             SrxlStatus();
             void clearFlags();
+
             void indicateNewData();
             void indicateStaleData();
-            void indicateHeaderError();
+            void indicateFailsafeCondition();
+            void indicatePacketHeaderError();
+            void indicatePacketTypeError();
             void indicateCrcError();
 
             bool hasNewData() const;
             bool hasStaleData() const;
-            bool hasHeaderError() const;
+            bool hasFailsafeCondition() const;
+            bool hasPacketHeaderError() const;
+            bool hasPacketTypeError() const;
             bool hasCrcError() const;
-            uint32_t getNewDataCount() const;
-            uint32_t getStaleDataCount() const;
-            uint32_t getHeaderErrorCount() const;
-            uint32_t getCrcErrorCount() const;
     };
 }
 
