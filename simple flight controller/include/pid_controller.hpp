@@ -8,17 +8,17 @@
 #include <cstdint>
 
 #include "framework/cli/cli_provider.hpp"
+#include "framework/radiocontrol/rc_input.hpp"
 #include "framework/tasking/task.hpp"
 
 #include "pinpoint_gyro_driver.hpp"
-#include "sbus_driver.hpp"
 #include "pwm_servo_driver.hpp"
 #include "led_driver.hpp"
 
 class PidController : public bpl::Task, public bpl::CliProvider
 {
     public:
-        PidController(const uint32_t period, const char* taskName, const PinPointGyroDriver& gyros, const SBusDriver& sbus, const PWMServoDriver& servos, const LedDriver& led);
+        PidController(const uint32_t period, const char* taskName, const PinPointGyroDriver& gyros, const bpl::RcInput& rcInput, const PWMServoDriver& servos, const LedDriver& led);
 
     private:
         void runTask() override;

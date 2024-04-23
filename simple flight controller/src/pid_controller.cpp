@@ -4,7 +4,7 @@
 
 #include "pid_controller.hpp"
 
-PidController::PidController(const uint32_t period, const char* taskName, const PinPointGyroDriver& gyros, const SBusDriver& sbus, const PWMServoDriver& servos, const LedDriver& led):
+PidController::PidController(const uint32_t period, const char* taskName, const PinPointGyroDriver& gyros, const bpl::RcInput& rcInput, const PWMServoDriver& servos, const LedDriver& led):
     Task(period, taskName), CliProvider("loop", "set P=#gain and/or I=#gain and/or D=#gain") {
 }
 

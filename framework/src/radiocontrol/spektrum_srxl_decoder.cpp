@@ -3,10 +3,11 @@
 //
 
 #include "framework/io/byte_listener.hpp"
+#include "framework/radiocontrol/rc_input.hpp"
 #include "framework/radiocontrol/spektrum_srxl_decoder.hpp"
 
 bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time):
-    uart(uart), time(time), lastTimestamp(time.getMicros64()), crc(bpl::CcittCrc16<BUFFER_SIZE, 0x1021, false>()), index(0), processed(true),
+    uart(uart), time(time), lastTimestamp(time.getMicros64()), crc(bpl::CcittCrc16<BUFFER_SIZE, 0x1021, false>()), bufferIndex(0), processed(true),
     status(bpl::SrxlStatus()), statistics(bpl::SrxlStatistics()) {
         const bpl::ByteListener uartHandler = [&](const uint8_t byte) {
             const auto now = time.getMicros64();
@@ -15,14 +16,14 @@ bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& 
                 if ((now - lastTimestamp) > PACKET_TIMEOUT_US)
                 {
                     buffer[0] = byte;
-                    index = 1;
+                    bufferIndex = 1;
                 }
                 else
                 {
-                    buffer[index++] = byte;
-                    if (index == BUFFER_SIZE)
+                    buffer[bufferIndex++] = byte;
+                    if (bufferIndex == BUFFER_SIZE)
                     {
-                        index = 0;
+                        bufferIndex = 0;
                         processed = false;
                     }
                 }
@@ -70,17 +71,30 @@ bpl::SrxlStatus bpl::SpektrumSrxlDecoder::decode()
                         statistics.incrementFailsafeConditionCount();
                     }
 
-                    // do the decode, just the first 6 channels for the moment...
-                    // FIXME! figure out how CH7 is handled
+                    // do the decode, including possible failsafe values
+                    // FIXME! for the moment, just first 6 channels... i.e. figure out how CH7 is handled
+                    // FIXME! all of the code in the below loop is AR7700 specific
                     //
                     for (auto index = 2; index < 14; index += 2)
                     {
-                        // FIXME! AR7700 specific code
                         // msb/lsb: on the AR77000 msb bits 6:3 are the channel number, bit 7 is not used
                         //          bits 2:0/7:0 represent the 11 bit channel data
                         //
-                        const auto msb = channels[index];
-                        channels[msb & 0b0111'1000] = (uint32_t(msb & 0b0000'0111) << 8) | channels[index + 1];
+                        const auto msb = buffer[index];
+                        const auto channel = (msb & 0b0111'1000) >> 3;
+                        auto value = (int32_t(msb & 0b0000'0111) << 8) | buffer[index + 1];
+
+                        // scale to signed values in the range [-4096, 4096], as defined in bpl::RcInput
+                        // the throttle channel is scaled to the range [0..4096]
+                        //
+                        if (channel == THROTTLE_CHANNEL)
+                        {
+                            channels[channel] = ((MIN_CHANNEL_VALUE + value) / CHANNEL_RANGE) << bpl::RcInput::ABSOLUTE_MAX_CHANNEL_SHIFT;
+                        }
+                        else
+                        {
+                            channels[channel] = ((value - NEUTRAL_CHANNEL_VALUE) / CHANNEL_RANGE) << (bpl::RcInput::ABSOLUTE_MAX_CHANNEL_SHIFT + 1);
+                        }
                     }
 
                     status.indicateNewData();
@@ -122,11 +136,11 @@ bpl::SrxlStatus bpl::SpektrumSrxlDecoder::decode()
     return status;
 }
 
-uint32_t bpl::SpektrumSrxlDecoder::getChannel(const uint32_t channel) const
+int32_t bpl::SpektrumSrxlDecoder::getChannel(const uint32_t channel) const
 {
     // FIXME! report / log this condition? add it to the SrxlStatistics error counts? return an optional? is it worth it?
     //
-    if (channel >= MAX_CHANNELS) return NEUTRAL_CHANNEL_VALUE;
+    if (channel >= MAX_NUMBER_OF_CHANNELS) return 0;
 
     return channels[channel];
 }

@@ -7,8 +7,12 @@
 #include <memory_resource>
 
 #include "framework/cli/cli_handler.hpp"
+#include "framework/drivers/time.hpp"
+#include "framework/drivers/usart1.hpp"
 #include "framework/drivers/usart2.hpp"
 #include "framework/io/baud_rate.hpp"
+#include "framework/radiocontrol/rc_input.hpp"
+#include "framework/radiocontrol/spektrum_srxl_decoder.hpp"
 #include "framework/stm32f4/nvic.hpp"
 #include "framework/tasking/scheduler.hpp"
 
@@ -16,9 +20,17 @@
 //
 #include "led_driver.hpp"
 #include "pinpoint_gyro_driver.hpp"
-#include "sbus_driver.hpp"
 #include "pwm_servo_driver.hpp"
 #include "pid_controller.hpp"
+
+//
+// IRQ priorities (0..15 ==> high..low)
+//
+//   1: RSXL RC receiver input UART
+//   2: console UART
+//   3: time provider
+//  10: task scheduler
+//
 
 int main()
 {
@@ -37,11 +49,19 @@ int main()
     //
     Nvic::setPriorityGrouping(Nvic::PRE4_SUB0);
 
-    auto led = LedDriver(100, "LED Task");                                      // 100ms timebase
-    auto gyros = PinPointGyroDriver(1, "Gyro Task", led);                       // sample every 1ms
-    auto sbus = SBusDriver();
-    auto servos = PWMServoDriver(333);                                          // update the servos or ESCs at 333Hz
-    auto controller = PidController(3, "PID Task", gyros, sbus, servos, led);   // run the control loop every 3ms, i.e. at 333Hz
+    // FIXME! 1, instantiating the time reference here as it might required elsewhere
+    //        2, eventually RcDecoder instances need to be configurable, construct them all and select an instance...
+    //
+    auto& time = driver::Time::getInstance(90'000'000, Nvic::Priority3);            // based on a 90 Mhz timebase (the APB1 bus clock speed)
+    auto& rsxl = driver::Usart1::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
+    auto rcDecoder = bpl::SpektrumSrxlDecoder(rsxl, time);
+    auto rcInput = bpl::RcInput(rcDecoder);
+//  auto rcInput = bpl::RcInput(bpl::SpektrumSrxlDecoder(rsxl, time));
+
+    auto led = LedDriver(100, "LED Task");                                          // 100ms timebase
+    auto gyros = PinPointGyroDriver(1, "Gyro Task", led);                           // sample every 1ms
+    auto servos = PWMServoDriver(333);                                              // update the servos or ESCs at 333Hz
+    auto controller = PidController(3, "PID Task", gyros, rcInput, servos, led);    // run the control loop every 3ms, i.e. at 333Hz
     auto& scheduler = bpl::TaskScheduler::getInstance().initialise(1'000, {gyros, controller, led}, Nvic::Priority10);
     scheduler.start();
 
@@ -50,10 +70,9 @@ int main()
     led.flash(5);
 
     // the CLI runs as the main foreground task
-    // set the uart IRQ priority to 1 (0..15 ==> high..low)
     //
-    auto& console = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
-    auto cli = bpl::CliHandler(console, {scheduler, led, gyros, sbus, servos, controller});
+    const auto& console = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority2);
+    auto cli = bpl::CliHandler(console, {scheduler, led, gyros, rcInput, servos, controller});
     while (true) cli.run();
 
     return 0;
