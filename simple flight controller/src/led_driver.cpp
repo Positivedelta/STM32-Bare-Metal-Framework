@@ -21,8 +21,10 @@ LedDriver::LedDriver(const uint32_t period, const char* taskName):
         // make PA5 an output, it's connected to led2
         // set led2 off as it's default state
         //
-        Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) & ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
-        Stm32f4::gpioA(Gpio::MODER) = Stm32f4::gpioA(Gpio::MODER) | (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+        auto moder = Stm32f4::gpioA(Gpio::MODER);
+        moder &= ~(Gpio::MODER_MASK << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+        moder |= (Gpio::OP << (Gpio::Pin5 << Gpio::MODER_SHIFT));
+        Stm32f4::gpioA(Gpio::MODER) = moder;
         Stm32f4::gpioA(Gpio::BSR) = 1 << (Gpio::Pin5 + 16);
 }
 
