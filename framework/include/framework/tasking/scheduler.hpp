@@ -94,7 +94,7 @@ namespace bpl
         private:
             TaskScheduler();
             bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;
-            void printTaskStatistics(const bpl::PrintWriter& consoleWriter);
+            void printTaskStatistics(const bpl::PrintWriter& consoleWriter, const bool addLine = false);
     };
 }
 

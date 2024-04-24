@@ -32,7 +32,7 @@ namespace bpl
             const std::pmr::string& getCommandHelp() const;
 
             // notes 1, the help commands are dealt with by this method
-            //       2, all other commands are delegated to the inheriting instances and are must be handled appropriately by doExecute()
+            //       2, all other commands are delegated to the inheriting instances and are must be handled appropriately by handleCliCommand()
             //       3, only a single instance is expected to handle a specific non help command
             //
             bool execute(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console);

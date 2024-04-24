@@ -15,6 +15,7 @@ PidController::PidController(const uint32_t period, const char* taskName, const 
 
 void PidController::runTask()
 {
+    rcInput.setCyclicRing();
     rcInput.aquire();
 }
 

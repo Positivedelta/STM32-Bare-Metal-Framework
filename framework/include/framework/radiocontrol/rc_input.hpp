@@ -29,11 +29,13 @@ namespace bpl
 
         private:
             bpl::RcDecoder& rcDecoder;
+            driver::Time& time;
             bool useCyclicRing;
             int32_t aileron, elevator;
+            char rcChannelValueString[20];
 
         public:
-            RcInput(bpl::RcDecoder& rcDecoder);
+            RcInput(bpl::RcDecoder& rcDecoder, driver::Time& time);
 
             void setCyclicRing(const bool enable = true);
             bool hasCyclicRing() const;
@@ -53,6 +55,7 @@ namespace bpl
 
         private:
             bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;
+            void printChannelValues(const bpl::PrintWriter& consoleWriter, const bool addLine = false);
     };
 }
 

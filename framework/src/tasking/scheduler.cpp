@@ -111,7 +111,7 @@ bool bpl::TaskScheduler::handleCliCommand(std::pmr::vector<std::string_view>& co
             auto running = true;
             while (running)
             {
-                printTaskStatistics(consoleWriter);
+                printTaskStatistics(consoleWriter, true);
 
                 for (auto interval = 0; interval < refresh * 4; interval++)
                 {
@@ -141,10 +141,9 @@ bool bpl::TaskScheduler::handleCliCommand(std::pmr::vector<std::string_view>& co
     return false;
 }
 
-void bpl::TaskScheduler::printTaskStatistics(const bpl::PrintWriter& consoleWriter)
+void bpl::TaskScheduler::printTaskStatistics(const bpl::PrintWriter& consoleWriter, const bool addLine)
 {
     std::snprintf(taskStatistics, sizeof(taskStatistics), "Scheduler CPU: %.2f%% [%lu Cycles]", getMaxCpu(), getMaxUsedCycles());
-    consoleWriter.println();
     consoleWriter.println(taskStatistics);
 
     consoleWriter.println("Task CPU:");
@@ -155,4 +154,6 @@ void bpl::TaskScheduler::printTaskStatistics(const bpl::PrintWriter& consoleWrit
         std::snprintf(taskStatistics, sizeof(taskStatistics), "    %5.2f%% [%s]", task.getMaxCpu(availableCycles), task.getTaskName());
         consoleWriter.println(taskStatistics);
     }
+
+    if (addLine) consoleWriter.println();
 }

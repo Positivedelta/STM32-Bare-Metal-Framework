@@ -55,7 +55,7 @@ int main()
     auto& time = driver::Time::getInstance(90'000'000, Nvic::Priority3);            // based on a 90 Mhz timebase (the APB1 bus clock speed)
     auto& rsxl = driver::Usart1::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
     auto rcDecoder = bpl::SpektrumSrxlDecoder(rsxl, time);
-    auto rcInput = bpl::RcInput(rcDecoder);
+    auto rcInput = bpl::RcInput(rcDecoder, time);
 //  auto rcInput = bpl::RcInput(bpl::SpektrumSrxlDecoder(rsxl, time));
 
     auto led = LedDriver(100, "LED Task");                                          // 100ms timebase

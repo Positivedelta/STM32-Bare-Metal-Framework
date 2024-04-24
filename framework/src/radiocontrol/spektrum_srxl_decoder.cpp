@@ -35,7 +35,7 @@ bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& 
         };
 
         uart.setByteListener(uartHandler);
-        channels.fill(NEUTRAL_CHANNEL_VALUE);
+        channels.fill(0);
 }
 
 bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()

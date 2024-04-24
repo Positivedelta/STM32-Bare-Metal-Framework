@@ -2,11 +2,14 @@
 // (c) Bit Parallel Ltd, April 2024
 //
 
+#include <cstdio>
+
+#include "framework/utils/string_utils.hpp"
 #include "framework/radiocontrol/rc_input.hpp"
 
-bpl::RcInput::RcInput(bpl::RcDecoder& rcDecoder):
-    CliProvider("rc", "[repeat] all | #ch | #ch #ch ..#ch | #ch:#ch"),
-    rcDecoder(rcDecoder), useCyclicRing(false), aileron(0), elevator(0) {
+bpl::RcInput::RcInput(bpl::RcDecoder& rcDecoder, driver::Time& time):
+    CliProvider("rc", "all | ch=#n | #ch=#n,#n,... | ch=#n:#n | stats [#repeat]"),
+    rcDecoder(rcDecoder), time(time), useCyclicRing(false), aileron(0), elevator(0) {
 }
 
 void bpl::RcInput::setCyclicRing(const bool enable)
@@ -79,7 +82,7 @@ void bpl::RcInput::aquire()
 
 uint32_t bpl::RcInput::getThrottle() const
 {
-    return rcDecoder.getChannel(0);         // FIXME! this must use the correct mapped channel number;
+    return rcDecoder.getChannel(0);         // FIXME! this must use the correct mapped channel number
 }
 
 int32_t bpl::RcInput::getAileron() const
@@ -94,12 +97,12 @@ int32_t bpl::RcInput::getElevator() const
 
 int32_t bpl::RcInput::getRudder() const
 {
-    return rcDecoder.getChannel(3);         // FIXME! this must use the correct mapped channel number;
+    return rcDecoder.getChannel(3);         // FIXME! this must use the correct mapped channel number
 }
 
 int32_t bpl::RcInput::getPitch() const
 {
-    return rcDecoder.getChannel(5);         // FIXME! this must use the correct mapped channel number;
+    return rcDecoder.getChannel(5);         // FIXME! this must use the correct mapped channel number
 }
 
 bpl::RcInputStatus bpl::RcInput::getStatus() const
@@ -115,9 +118,72 @@ bpl::RcInputStatistics bpl::RcInput::getStatistics() const
 bool bpl::RcInput::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
 {
     const auto& consoleWriter = console.getPrintWriter();
+    const auto& consoleReader = console.getTextReader();
 
-    // FIXME! parse the sbus command and display the results
+    // allowed syntax: rc all | ch=#n | #ch=#n,#n,... | ch=#n:#n | stats [#repeat]
     //
-    consoleWriter.println("The RC command needs implementing...");
-    return true;
+    if (commandTokens[1] == "all")
+    {
+        if (commandTokens.size() == 3)
+        {
+            int32_t refresh = 1;
+            if (bpl::StringUtils::stoi(commandTokens[2], refresh))
+            {
+                // check every 1/4 second for an ESC key press, i.e. to quit
+                //
+                auto running = true;
+                while (running)
+                {
+                    printChannelValues(consoleWriter, true);
+
+                    for (auto interval = 0; interval < refresh * 4; interval++)
+                    {
+                        if (consoleReader.isKey(bpl::Ascii::ESC))
+                        {
+                            running = false;
+                            break;
+                        }
+
+                        // wait for 1/4 second, time specified microseconds
+                        //
+                        time.spinWait(250'000);
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        printChannelValues(consoleWriter);
+        return true;
+    }
+
+    //
+    // FIXME! parse and implement the remaining command options
+    //
+
+    return false;
+}
+
+void bpl::RcInput::printChannelValues(const bpl::PrintWriter& consoleWriter, const bool addLine)
+{
+    // FIXME! these must use the correctly mapped channel numbers
+    // note, cliChannelValueString has space for 19 + '\0' characters
+    //
+    std::snprintf(rcChannelValueString, sizeof(rcChannelValueString), "Throttle: %+05ld", rcDecoder.getChannel(0));
+    consoleWriter.println(rcChannelValueString);
+
+    std::snprintf(rcChannelValueString, sizeof(rcChannelValueString), " Aileron: %+05ld", rcDecoder.getChannel(1));
+    consoleWriter.println(rcChannelValueString);
+
+    std::snprintf(rcChannelValueString, sizeof(rcChannelValueString), "Elevator: %+05ld", rcDecoder.getChannel(2));
+    consoleWriter.println(rcChannelValueString);
+
+    std::snprintf(rcChannelValueString, sizeof(rcChannelValueString), "  Rudder: %+05ld", rcDecoder.getChannel(3));
+    consoleWriter.println(rcChannelValueString);
+
+    std::snprintf(rcChannelValueString, sizeof(rcChannelValueString), "   Pitch: %+05ld", rcDecoder.getChannel(5));
+    consoleWriter.println(rcChannelValueString);
+
+    if (addLine) consoleWriter.println();
 }

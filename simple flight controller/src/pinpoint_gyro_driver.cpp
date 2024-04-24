@@ -5,7 +5,7 @@
 #include "pinpoint_gyro_driver.hpp"
 
 PinPointGyroDriver::PinPointGyroDriver(const uint32_t period, const char* taskName, const LedDriver& led):
-    Task(period, taskName), CliProvider("gyros", "[repeat] display | reset") {
+    Task(period, taskName), CliProvider("gyros", "display [#repeat] | reset") {
 }
 
 void PinPointGyroDriver::sample()
