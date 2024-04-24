@@ -12,11 +12,6 @@
 #include "framework/drivers/Uart.hpp"
 #include "framework/radiocontrol/rc_decoder.hpp"
 
-
-// FIXME! probably does not need to have an IRQ handler
-//
-//#include "framework/irq/timer_irq_consumer.hpp"
-
 //
 // FIXME! must implement...
 //        1, cli interface
@@ -26,7 +21,6 @@
 
 namespace bpl
 {
-    //class RcInputDriver : public bpl::TimerIrqConsumer, public CliProvider
     class RcInput : public bpl::CliProvider
     {
         public:
@@ -36,7 +30,7 @@ namespace bpl
         private:
             bpl::RcDecoder& rcDecoder;
             bool useCyclicRing;
-            int32_t alieron, elevator;
+            int32_t aileron, elevator;
 
         public:
             RcInput(bpl::RcDecoder& rcDecoder);
@@ -54,12 +48,8 @@ namespace bpl
             int32_t getPitch() const;
 //          bpl::FlightMode getFlightMode() const;
 
-            // FIXME! these are not generic!
-            //
-//          bpl::RcStatus getLastStatus();
-//          bpl::RcStatistics getStatistics();
-
-    //      void irq() override;
+            bpl::RcInputStatus getStatus() const;
+            bpl::RcInputStatistics getStatistics() const;
 
         private:
             bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;

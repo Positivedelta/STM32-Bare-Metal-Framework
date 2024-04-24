@@ -2,34 +2,34 @@
 // (c) Bit Parallel Ltd, April 2024
 //
 
-#ifndef BPL_SRXL_STATISTICS_H
-#define BPL_SRXL_STATISTICS_H
+#ifndef BPL_RC_INPUT_STATISTICS_H
+#define BPL_RC_INPUT_STATISTICS_H
 
 #include <cstdint>
 
 namespace bpl
 {
-    class SrxlStatistics
+    class RcInputStatistics
     {
         private:
-            uint32_t newDataCount, staleDataCount, failsafeConditionCount, packetHeaderErrorCount, packetTypeErrorCount, crcErrorCount;
+            uint32_t newDataCount, staleDataCount, failsafeConditionCount, packetErrorCount, crcErrorCount, parityErrorCount;
 
         public:
-            SrxlStatistics();
+            RcInputStatistics();
 
             void incrementNewDataCount();
             void incrementStaleDataCount();
             void incrementFailsafeConditionCount();
-            void incrementPacketHeaderErrorCount();
-            void incrementPacketTypeErrorCount();
+            void incrementPacketErrorCount();
             void incrementCrcErrorCount();
+            void incrementParityErrorCount();
 
             uint32_t getNewDataCount() const;
             uint32_t getStaleDataCount() const;
             uint32_t getFailsafeConditionCount() const;
-            uint32_t getPacketHeaderErrorCount() const;
-            uint32_t getPacketTypeErrorCount() const;
+            uint32_t getPacketErrorCount() const;
             uint32_t getCrcErrorCount() const;
+            uint32_t getParityErrorCount() const;
     };
 }
 

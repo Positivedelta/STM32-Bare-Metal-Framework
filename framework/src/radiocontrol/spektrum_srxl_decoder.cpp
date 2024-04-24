@@ -8,7 +8,7 @@
 
 bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time):
     uart(uart), time(time), lastTimestamp(time.getMicros64()), crc(bpl::CcittCrc16<BUFFER_SIZE, 0x1021, false>()), bufferIndex(0), processed(true),
-    status(bpl::SrxlStatus()), statistics(bpl::SrxlStatistics()) {
+    status(bpl::RcInputStatus()), statistics(bpl::RcInputStatistics()) {
         const bpl::ByteListener uartHandler = [&](const uint8_t byte) {
             const auto now = time.getMicros64();
             if (processed)
@@ -38,7 +38,7 @@ bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& 
         channels.fill(NEUTRAL_CHANNEL_VALUE);
 }
 
-bpl::SrxlStatus bpl::SpektrumSrxlDecoder::decode()
+bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
 {
     status.clearFlags();
 
@@ -102,8 +102,8 @@ bpl::SrxlStatus bpl::SpektrumSrxlDecoder::decode()
                 }
                 else
                 {
-                    status.indicatePacketTypeError();
-                    statistics.incrementPacketTypeErrorCount();
+                    status.indicatePacketError();
+                    statistics.incrementPacketErrorCount();
                 }
             }
             else
@@ -121,8 +121,8 @@ bpl::SrxlStatus bpl::SpektrumSrxlDecoder::decode()
         } */
         else
         {
-            status.indicatePacketHeaderError();
-            statistics.incrementPacketHeaderErrorCount();
+            status.indicatePacketError();
+            statistics.incrementPacketErrorCount();
         }
 
         processed = true;
@@ -145,12 +145,12 @@ int32_t bpl::SpektrumSrxlDecoder::getChannel(const uint32_t channel) const
     return channels[channel];
 }
 
-bpl::SrxlStatus bpl::SpektrumSrxlDecoder::getLastStatus() const
+bpl::RcInputStatus bpl::SpektrumSrxlDecoder::getStatus() const
 {
     return status;
 }
 
-bpl::SrxlStatistics bpl::SpektrumSrxlDecoder::getStatistics() const
+bpl::RcInputStatistics bpl::SpektrumSrxlDecoder::getStatistics() const
 {
     return statistics;
 }

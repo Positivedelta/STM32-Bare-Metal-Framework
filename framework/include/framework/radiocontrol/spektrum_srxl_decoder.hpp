@@ -41,8 +41,8 @@ namespace bpl
             bpl::CcittCrc16<BUFFER_SIZE, 0x1021, false> crc;            // xmodem (not bit reversed)
             uint32_t bufferIndex;
             bool processed;
-            bpl::SrxlStatus status;
-            bpl::SrxlStatistics statistics;
+            bpl::RcInputStatus status;
+            bpl::RcInputStatistics statistics;
             std::array<int32_t, MAX_NUMBER_OF_CHANNELS> channels;
 
         public:
@@ -51,11 +51,11 @@ namespace bpl
             // the main RC channels are signed and returned in the range [-4096, 4096], as defined in bpl::RcInput
             // note, the throttle channel is returned in the range [0..4096]
             //
-            bpl::SrxlStatus decode() override;
+            bpl::RcInputStatus decode() override;
             int32_t getChannel(const uint32_t channel) const override;
 
-            bpl::SrxlStatus getLastStatus() const override;
-            bpl::SrxlStatistics getStatistics() const override;
+            bpl::RcInputStatus getStatus() const override;
+            bpl::RcInputStatistics getStatistics() const override;
     };
 }
 

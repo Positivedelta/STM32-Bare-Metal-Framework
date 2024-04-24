@@ -6,7 +6,7 @@
 
 bpl::RcInput::RcInput(bpl::RcDecoder& rcDecoder):
     CliProvider("rc", "[repeat] all | #ch | #ch #ch ..#ch | #ch:#ch"),
-    rcDecoder(rcDecoder), useCyclicRing(false), alieron(0), elevator(0) {
+    rcDecoder(rcDecoder), useCyclicRing(false), aileron(0), elevator(0) {
 }
 
 void bpl::RcInput::setCyclicRing(const bool enable)
@@ -33,17 +33,15 @@ void bpl::RcInput::aquire()
 
     // apply a cyclic ring if enabled
     //
-    alieron = rcDecoder.getChannel(1);      // FIXME! these must use the correct mapped channel numbers
+    aileron = rcDecoder.getChannel(1);      // FIXME! these must use the correct mapped channel numbers
     elevator = rcDecoder.getChannel(2);
     if (useCyclicRing)
     {
-        // FIXME! this needs testing!
-        //
         // use an iterative square root approximation to find the radius of the cyclic stick position
         // in order to re-scale the desired cyclic stick values and ensure that they lie within the cyclic ring
         // note, the calculated square root may be no more than 1 above or below the actual value
         //
-        const auto magnitude = (alieron * alieron) + (elevator * elevator);
+        const auto magnitude = (aileron * aileron) + (elevator * elevator);
         if (magnitude > ABSOLUTE_MAX_CHANNEL_VALUE * ABSOLUTE_MAX_CHANNEL_VALUE)
         {
             auto extra = ABSOLUTE_MAX_CHANNEL_VALUE >> 2;
@@ -73,7 +71,7 @@ void bpl::RcInput::aquire()
             // scale by (ABSOLUTE_MAX_CHANNEL_VALUE / radius) where the radius is ABSOLUTE_MAX_CHANNEL_VALUE + extra
             //
             const auto radius = ABSOLUTE_MAX_CHANNEL_VALUE + extra;
-            alieron = (alieron << ABSOLUTE_MAX_CHANNEL_SHIFT) / radius;
+            aileron = (aileron << ABSOLUTE_MAX_CHANNEL_SHIFT) / radius;
             elevator = (elevator << ABSOLUTE_MAX_CHANNEL_SHIFT) / radius;
         }
     }
@@ -86,7 +84,7 @@ uint32_t bpl::RcInput::getThrottle() const
 
 int32_t bpl::RcInput::getAileron() const
 {
-    return alieron;
+    return aileron;
 }
 
 int32_t bpl::RcInput::getElevator() const
@@ -104,9 +102,15 @@ int32_t bpl::RcInput::getPitch() const
     return rcDecoder.getChannel(5);         // FIXME! this must use the correct mapped channel number;
 }
 
-//void RcInput::irq()
-//{
-//}
+bpl::RcInputStatus bpl::RcInput::getStatus() const
+{
+    return rcDecoder.getStatus();
+}
+
+bpl::RcInputStatistics bpl::RcInput::getStatistics() const
+{
+    return rcDecoder.getStatistics();
+}
 
 bool bpl::RcInput::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
 {
