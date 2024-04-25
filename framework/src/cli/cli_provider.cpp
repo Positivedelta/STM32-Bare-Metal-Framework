@@ -13,7 +13,7 @@ bpl::CliProvider::CliProvider(std::pmr::string name, std::pmr::string help):
 //       2, all other commands are delegated to the inheriting instances and are then handled if appropriate by the given instances
 //       3, only a single instance is expected to handle a specific non help command
 //
-bool bpl::CliProvider::execute(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
+bool bpl::CliProvider::execute(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time)
 {
     if (commandTokens.front() == "help")
     {
@@ -45,7 +45,7 @@ bool bpl::CliProvider::execute(std::pmr::vector<std::string_view>& commandTokens
         //       2, under these circumstances, it's expected that the other handlers will return false (as they are different commands)
         //          and the CliHandler instance will report an "Invalid command" (see below)
         //
-        return handleCliCommand(commandTokens, console);
+        return handleCliCommand(commandTokens, console, time);
     }
     else
     {

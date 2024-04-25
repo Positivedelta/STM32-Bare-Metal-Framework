@@ -50,12 +50,12 @@ int main()
     Nvic::setPriorityGrouping(Nvic::PRE4_SUB0);
 
     // FIXME! 1, instantiating the time reference here as it might required elsewhere
-    //        2, eventually RcDecoder instances need to be configurable, construct them all and select an instance...
+    //        2, eventually the RcDecoder instances need to be configurable, i.e. construct them all and select an instance...
     //
     auto& time = driver::Time::getInstance(90'000'000, Nvic::Priority3);            // based on a 90 Mhz timebase (the APB1 bus clock speed)
     auto& rsxl = driver::Usart1::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
     auto rcDecoder = bpl::SpektrumSrxlDecoder(rsxl, time);
-    auto rcInput = bpl::RcInput(rcDecoder, time);
+    auto rcInput = bpl::RcInput(rcDecoder);
 //  auto rcInput = bpl::RcInput(bpl::SpektrumSrxlDecoder(rsxl, time));
 
     auto led = LedDriver(100, "LED Task");                                          // 100ms timebase
@@ -72,7 +72,7 @@ int main()
     // the CLI runs as the main foreground task
     //
     const auto& console = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority2);
-    auto cli = bpl::CliHandler(console, {scheduler, led, gyros, rcInput, servos, controller});
+    auto cli = bpl::CliHandler(console, {scheduler, led, gyros, rcInput, servos, controller}, time);
     while (true) cli.run();
 
     return 0;

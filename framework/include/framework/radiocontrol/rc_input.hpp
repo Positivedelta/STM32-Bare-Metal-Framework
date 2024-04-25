@@ -8,7 +8,6 @@
 #include <cstdint>
 
 #include "framework/cli/cli_provider.hpp"
-#include "framework/drivers/time.hpp"
 #include "framework/drivers/Uart.hpp"
 #include "framework/radiocontrol/rc_decoder.hpp"
 
@@ -29,13 +28,12 @@ namespace bpl
 
         private:
             bpl::RcDecoder& rcDecoder;
-            driver::Time& time;
             bool useCyclicRing;
             int32_t aileron, elevator;
             char cliReceiverString[32];
 
         public:
-            RcInput(bpl::RcDecoder& rcDecoder, driver::Time& time);
+            RcInput(bpl::RcDecoder& rcDecoder);
 
             void setCyclicRing(const bool enable = true);
             bool hasCyclicRing() const;
@@ -54,7 +52,7 @@ namespace bpl
             bpl::RcInputStatistics getStatistics() const;
 
         private:
-            bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;
+            bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time) override;
             void printChannelValues(const bpl::PrintWriter& consoleWriter);
             void printChannelStatistics(const bpl::PrintWriter& consoleWriter);
     };

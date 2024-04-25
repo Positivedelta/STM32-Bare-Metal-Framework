@@ -88,7 +88,7 @@ __attribute__((flatten, hot)) void SysTick::handler()
 // the inherited CLI handler
 //
 
-bool bpl::TaskScheduler::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
+bool bpl::TaskScheduler::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time)
 {
     const auto& consoleWriter = console.getPrintWriter();
     const auto& consoleReader = console.getTextReader();
@@ -122,16 +122,9 @@ bool bpl::TaskScheduler::handleCliCommand(std::pmr::vector<std::string_view>& co
                         break;
                     }
 
-                    // wait for 1/4 second
-                    // notes 1, SysTick is configured to count in microseconds
-                    //       2, the timebase value represents the SysTick countdown period and is specified in microseconds
-                    //       3, it takes 1s to for SysTick to cycle "timebase" times 
+                    // wait for 1/4 second, time specified microseconds
                     //
-                    uint32_t sysTickCounts = 0;
-                    while (sysTickCounts < (schedulerTimeBase >> 2))
-                    {
-                        while ((Stm32f4::sysTick(Stk::CTRL) & Stk::CTRL_COUNT) > 0) sysTickCounts++;
-                    }
+                    time.spinWait(250'000);
                 }
             }
 

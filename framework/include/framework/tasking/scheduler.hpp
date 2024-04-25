@@ -93,7 +93,7 @@ namespace bpl
 
         private:
             TaskScheduler();
-            bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;
+            bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time) override;
             void printTaskStatistics(const bpl::PrintWriter& consoleWriter);
     };
 }

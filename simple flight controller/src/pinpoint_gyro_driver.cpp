@@ -29,7 +29,7 @@ void PinPointGyroDriver::runTask()
 // protected CliProvider method
 //
 
-bool PinPointGyroDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
+bool PinPointGyroDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time)
 {
     const auto& consoleWriter = console.getPrintWriter();
 

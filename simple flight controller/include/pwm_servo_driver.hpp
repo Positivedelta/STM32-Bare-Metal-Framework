@@ -29,7 +29,7 @@ class PWMServoDriver : public bpl::CliProvider
 //      void runTask() override;
 
     private:
-        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;
+        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time) override;
 };
 
 #endif

@@ -23,7 +23,7 @@ void PidController::runTask()
 // protected CliProvider method
 //
 
-bool PidController::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
+bool PidController::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time)
 {
     const auto& consoleWriter = console.getPrintWriter();
 

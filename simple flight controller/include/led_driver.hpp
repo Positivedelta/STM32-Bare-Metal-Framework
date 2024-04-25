@@ -28,7 +28,7 @@ class LedDriver : public bpl::Task, public bpl::CliProvider
 
     private:
         void runTask() override;
-        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;
+        bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time) override;
 
         void doLedOn();
         void doLedOff();

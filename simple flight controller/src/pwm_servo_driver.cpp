@@ -16,7 +16,7 @@ void PWMServoDriver::setPWM(const uint32_t servo, const uint32_t pwmValue)
 //{
 //}
 
-bool PWMServoDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
+bool PWMServoDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time)
 {
     const auto& consoleWriter = console.getPrintWriter();
 

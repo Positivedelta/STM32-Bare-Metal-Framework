@@ -9,8 +9,8 @@
 #include "framework/cli/cli_handler.hpp"
 #include "framework/utils/string_utils.hpp"
 
-bpl::CliHandler::CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList):
-    console(console), consoleReader(console.getTextReader()), consoleWriter(console.getPrintWriter()),
+bpl::CliHandler::CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList, driver::Time& time):
+    console(console), time(time), consoleReader(console.getTextReader()), consoleWriter(console.getPrintWriter()),
     prompt(bpl::InputPrompt(PROMPT_TEXT)), history(bpl::StringEditBufferWithHistory(HISTORY_SIZE)) {
 //  prompt(bpl::InputPrompt(PROMPT_TEXT)), history(bpl::CharArrayEditBufferWithHistory<65, 8>()) {      // FIXME! for testing the char* version of bpl::TextReader::readln()
         providers = std::move(cliProviderList);
@@ -45,7 +45,7 @@ void bpl::CliHandler::run()
         auto success = false;
         for (auto& provider : providers)
         {
-            const auto handled = provider.get().execute(tokens, console);
+            const auto handled = provider.get().execute(tokens, console, time);
             if (handled) success = true;
         }
 

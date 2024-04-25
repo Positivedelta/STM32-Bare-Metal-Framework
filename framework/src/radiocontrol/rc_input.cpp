@@ -7,9 +7,9 @@
 #include "framework/utils/string_utils.hpp"
 #include "framework/radiocontrol/rc_input.hpp"
 
-bpl::RcInput::RcInput(bpl::RcDecoder& rcDecoder, driver::Time& time):
+bpl::RcInput::RcInput(bpl::RcDecoder& rcDecoder):
     CliProvider("rc", "all | ch=#n | #ch=#n,#n,... | ch=#n:#n | stats [#repeat]"),
-    rcDecoder(rcDecoder), time(time), useCyclicRing(false), aileron(0), elevator(0) {
+    rcDecoder(rcDecoder), useCyclicRing(false), aileron(0), elevator(0) {
 }
 
 void bpl::RcInput::setCyclicRing(const bool enable)
@@ -115,7 +115,7 @@ bpl::RcInputStatistics bpl::RcInput::getStatistics() const
     return rcDecoder.getStatistics();
 }
 
-bool bpl::RcInput::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console)
+bool bpl::RcInput::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time)
 {
     const auto& consoleWriter = console.getPrintWriter();
     const auto& consoleReader = console.getTextReader();

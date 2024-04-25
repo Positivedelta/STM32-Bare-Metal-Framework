@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "framework/cli/cli_provider.hpp"
+#include "framework/drivers/time.hpp"
 #include "framework/io/text_reader.hpp"
 #include "framework/io/print_writer.hpp"
 #include "framework/io/text_io.hpp"
@@ -42,8 +43,10 @@ namespace bpl
                     }
             };
 
-            CliProviderList providers;
             const bpl::TextIO& console;
+            driver::Time& time;
+            CliProviderList providers;
+
             const bpl::TextReader& consoleReader;
             const bpl::PrintWriter& consoleWriter;
             const bpl::InputPrompt prompt;
@@ -53,10 +56,11 @@ namespace bpl
 //          //
 //          bpl::CharArrayEditBufferWithHistory<65, 8> history;
 
-        // note, bpl::TextIO will accept implementations of bpl::IOStream, e.g. uarts
+        // notes 1, bpl::TextIO will accept implementations of bpl::IOStream, e.g. uarts
+        //       2, time is required to allow commands to repeat / update at user specified rates
         //
         public:
-            CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList);
+            CliHandler(const bpl::TextIO& console, CliProviderList&& cliProviderList, driver::Time& time);
             void run();
     };
 }
