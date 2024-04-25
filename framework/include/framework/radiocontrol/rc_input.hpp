@@ -14,9 +14,8 @@
 
 //
 // FIXME! must implement...
-//        1, cli interface
-//        2, channel mapping
-//        3, flight mode
+//        1, channel mapping
+//        2, flight mode
 //
 
 namespace bpl
@@ -24,15 +23,16 @@ namespace bpl
     class RcInput : public bpl::CliProvider
     {
         public:
-            static constexpr int32_t ABSOLUTE_MAX_CHANNEL_SHIFT = 12;
-            static constexpr int32_t ABSOLUTE_MAX_CHANNEL_VALUE = 1 << 12;
+            constexpr static uint32_t MAX_NUMBER_OF_CHANNELS = 32;
+            constexpr static int32_t ABSOLUTE_MAX_CHANNEL_SHIFT = 12;
+            constexpr static int32_t ABSOLUTE_MAX_CHANNEL_VALUE = 1 << 12;
 
         private:
             bpl::RcDecoder& rcDecoder;
             driver::Time& time;
             bool useCyclicRing;
             int32_t aileron, elevator;
-            char rcChannelValueString[20];
+            char cliReceiverString[32];
 
         public:
             RcInput(bpl::RcDecoder& rcDecoder, driver::Time& time);
@@ -55,7 +55,8 @@ namespace bpl
 
         private:
             bool handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console) override;
-            void printChannelValues(const bpl::PrintWriter& consoleWriter, const bool addLine = false);
+            void printChannelValues(const bpl::PrintWriter& consoleWriter);
+            void printChannelStatistics(const bpl::PrintWriter& consoleWriter);
     };
 }
 

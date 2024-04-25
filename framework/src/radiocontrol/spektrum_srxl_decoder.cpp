@@ -7,7 +7,7 @@
 #include "framework/radiocontrol/spektrum_srxl_decoder.hpp"
 
 bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time):
-    uart(uart), time(time), lastTimestamp(time.getMicros64()), crc(bpl::CcittCrc16<BUFFER_SIZE, 0x1021, false>()), bufferIndex(0), processed(true),
+    uart(uart), time(time), lastTimestamp(time.getMicros64()), crc(bpl::CcittCrc16<SRXL_A5_BUFFER_SIZE, 0x1021, false>()), bufferIndex(0), processed(true),
     status(bpl::RcInputStatus()), statistics(bpl::RcInputStatistics()) {
         const bpl::ByteListener uartHandler = [&](const uint8_t byte) {
             const auto now = time.getMicros64();
@@ -21,7 +21,7 @@ bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& 
                 else
                 {
                     buffer[bufferIndex++] = byte;
-                    if (bufferIndex == BUFFER_SIZE)
+                    if (bufferIndex == SRXL_A5_BUFFER_SIZE)
                     {
                         bufferIndex = 0;
                         processed = false;
@@ -89,11 +89,11 @@ bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
                         //
                         if (channel == THROTTLE_CHANNEL)
                         {
-                            channels[channel] = ((MIN_CHANNEL_VALUE + value) / CHANNEL_RANGE) << bpl::RcInput::ABSOLUTE_MAX_CHANNEL_SHIFT;
+                            channels[channel] = ((SRXL_A5_MIN_CHANNEL_VALUE + value) / SRXL_A5_CHANNEL_RANGE) << bpl::RcInput::ABSOLUTE_MAX_CHANNEL_SHIFT;
                         }
                         else
                         {
-                            channels[channel] = ((value - NEUTRAL_CHANNEL_VALUE) / CHANNEL_RANGE) << (bpl::RcInput::ABSOLUTE_MAX_CHANNEL_SHIFT + 1);
+                            channels[channel] = ((value - SRXL_A5_NEUTRAL_CHANNEL_VALUE) / SRXL_A5_CHANNEL_RANGE) << (bpl::RcInput::ABSOLUTE_MAX_CHANNEL_SHIFT + 1);
                         }
                     }
 
@@ -140,7 +140,7 @@ int32_t bpl::SpektrumSrxlDecoder::getChannel(const uint32_t channel) const
 {
     // FIXME! report / log this condition? add it to the SrxlStatistics error counts? return an optional? is it worth it?
     //
-    if (channel >= MAX_NUMBER_OF_CHANNELS) return 0;
+    if (channel >= bpl::RcInput::MAX_NUMBER_OF_CHANNELS) return 0;
 
     return channels[channel];
 }

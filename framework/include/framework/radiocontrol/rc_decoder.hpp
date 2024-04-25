@@ -15,8 +15,6 @@ namespace bpl
     class RcDecoder
     {
         public:
-            constexpr static uint32_t MAX_NUMBER_OF_CHANNELS = 32;
-
             virtual bpl::RcInputStatus decode() = 0;
             virtual int32_t getChannel(const uint32_t channel) const = 0;
 

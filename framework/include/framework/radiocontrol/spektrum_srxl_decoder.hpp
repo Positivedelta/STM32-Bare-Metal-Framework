@@ -14,7 +14,10 @@
 #include "framework/radiocontrol/rc_decoder.hpp"
 
 //
-// FIXME! currently this class is based around the AR7700 receiver, it needs to be generic...
+// FIXME! currently this class is based around the AR7700 receiver, it needs to be generic
+//
+// the default DX7 G2 channel index numbers
+//   0: throttle, 1: aileron, 2: elevator, 3: rudder, 4: gear, 5: aux1 (pitch), 6: aux2
 //
 
 namespace bpl
@@ -22,28 +25,34 @@ namespace bpl
     class SpektrumSrxlDecoder : public RcDecoder
     {
         private:
-            constexpr static uint8_t BUFFER_SIZE = 18;
+            constexpr static uint16_t CRC_POLYNOMINAL = 0x1021;
+            constexpr static bool CRC_BIT_REVERSE = false;
+
+            // spektrum SRXL receivers may support 5.5, 11 and 22 millisecond packet frame times, this value is chosen to be universal
+            //
             constexpr static uint64_t PACKET_TIMEOUT_US = 4'000;
 
-            // FIXME! 1, AR7700 specific, the newer 0xa6 packets use 16 bit values
-            //        2, check these values, some report these as 0x0002, 0x03fe, 0x7fe
+            // FIXME! AR7700 specific constants
+            //        1, check the channel data values, some report these as 0x0002, 0x03fe, 0x7fe
+            //        2, the newer 0xa6 packets use 16 bit channel values
             //
-            constexpr static int32_t MIN_CHANNEL_VALUE = 0x0000;
-            constexpr static int32_t NEUTRAL_CHANNEL_VALUE = 0x03ff;
-            constexpr static int32_t MAX_CHANNEL_VALUE = 0x07ff;
-            constexpr static int32_t CHANNEL_RANGE = MAX_CHANNEL_VALUE - MIN_CHANNEL_VALUE;
+            constexpr static uint8_t SRXL_A5_BUFFER_SIZE = 18;
+            constexpr static int32_t SRXL_A5_MIN_CHANNEL_VALUE = 0x0000;
+            constexpr static int32_t SRXL_A5_NEUTRAL_CHANNEL_VALUE = 0x03ff;
+            constexpr static int32_t SRXL_A5_MAX_CHANNEL_VALUE = 0x07ff;
+            constexpr static int32_t SRXL_A5_CHANNEL_RANGE = SRXL_A5_MAX_CHANNEL_VALUE - SRXL_A5_MIN_CHANNEL_VALUE;
             constexpr static uint32_t THROTTLE_CHANNEL = 0;
 
             driver::Uart& uart;
             driver::Time& time;
-            std::array<uint8_t, BUFFER_SIZE> buffer;
+            std::array<uint8_t, SRXL_A5_BUFFER_SIZE> buffer;
             uint64_t lastTimestamp;
-            bpl::CcittCrc16<BUFFER_SIZE, 0x1021, false> crc;            // xmodem (not bit reversed)
+            bpl::CcittCrc16<SRXL_A5_BUFFER_SIZE, CRC_POLYNOMINAL, CRC_BIT_REVERSE> crc;
             uint32_t bufferIndex;
             bool processed;
             bpl::RcInputStatus status;
             bpl::RcInputStatistics statistics;
-            std::array<int32_t, MAX_NUMBER_OF_CHANNELS> channels;
+            std::array<int32_t, bpl::RcInput::MAX_NUMBER_OF_CHANNELS> channels;
 
         public:
             SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time);

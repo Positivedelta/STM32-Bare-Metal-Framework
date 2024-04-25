@@ -120,9 +120,12 @@ bool bpl::RcInput::handleCliCommand(std::pmr::vector<std::string_view>& commandT
     const auto& consoleWriter = console.getPrintWriter();
     const auto& consoleReader = console.getTextReader();
 
+    // FIXME! add in the individual / range channel commands
     // allowed syntax: rc all | ch=#n | #ch=#n,#n,... | ch=#n:#n | stats [#repeat]
     //
-    if (commandTokens[1] == "all")
+    const auto all = commandTokens[1] == "all";
+    const auto stats = commandTokens[1] == "stats";
+    if (all | stats)
     {
         if (commandTokens.size() == 3)
         {
@@ -134,7 +137,8 @@ bool bpl::RcInput::handleCliCommand(std::pmr::vector<std::string_view>& commandT
                 auto running = true;
                 while (running)
                 {
-                    printChannelValues(consoleWriter, true);
+                    (all) ? printChannelValues(consoleWriter) : printChannelStatistics(consoleWriter);
+                    consoleWriter.println();
 
                     for (auto interval = 0; interval < refresh * 4; interval++)
                     {
@@ -154,7 +158,7 @@ bool bpl::RcInput::handleCliCommand(std::pmr::vector<std::string_view>& commandT
             }
         }
 
-        printChannelValues(consoleWriter);
+        (all) ? printChannelValues(consoleWriter) : printChannelStatistics(consoleWriter);
         return true;
     }
 
@@ -165,25 +169,45 @@ bool bpl::RcInput::handleCliCommand(std::pmr::vector<std::string_view>& commandT
     return false;
 }
 
-void bpl::RcInput::printChannelValues(const bpl::PrintWriter& consoleWriter, const bool addLine)
+void bpl::RcInput::printChannelValues(const bpl::PrintWriter& consoleWriter)
 {
     // FIXME! these must use the correctly mapped channel numbers
     // note, cliChannelValueString has space for 19 + '\0' characters
     //
-    std::snprintf(rcChannelValueString, sizeof(rcChannelValueString), "Throttle: %+05ld", rcDecoder.getChannel(0));
-    consoleWriter.println(rcChannelValueString);
+    std::snprintf(cliReceiverString, sizeof(cliReceiverString), "Throttle: %+05ld", rcDecoder.getChannel(0));
+    consoleWriter.println(cliReceiverString);
 
-    std::snprintf(rcChannelValueString, sizeof(rcChannelValueString), " Aileron: %+05ld", rcDecoder.getChannel(1));
-    consoleWriter.println(rcChannelValueString);
+    std::snprintf(cliReceiverString, sizeof(cliReceiverString), " Aileron: %+05ld", rcDecoder.getChannel(1));
+    consoleWriter.println(cliReceiverString);
 
-    std::snprintf(rcChannelValueString, sizeof(rcChannelValueString), "Elevator: %+05ld", rcDecoder.getChannel(2));
-    consoleWriter.println(rcChannelValueString);
+    std::snprintf(cliReceiverString, sizeof(cliReceiverString), "Elevator: %+05ld", rcDecoder.getChannel(2));
+    consoleWriter.println(cliReceiverString);
 
-    std::snprintf(rcChannelValueString, sizeof(rcChannelValueString), "  Rudder: %+05ld", rcDecoder.getChannel(3));
-    consoleWriter.println(rcChannelValueString);
+    std::snprintf(cliReceiverString, sizeof(cliReceiverString), "  Rudder: %+05ld", rcDecoder.getChannel(3));
+    consoleWriter.println(cliReceiverString);
 
-    std::snprintf(rcChannelValueString, sizeof(rcChannelValueString), "   Pitch: %+05ld", rcDecoder.getChannel(5));
-    consoleWriter.println(rcChannelValueString);
+    std::snprintf(cliReceiverString, sizeof(cliReceiverString), "   Pitch: %+05ld", rcDecoder.getChannel(5));
+    consoleWriter.println(cliReceiverString);
+}
 
-    if (addLine) consoleWriter.println();
+void bpl::RcInput::printChannelStatistics(const bpl::PrintWriter& consoleWriter)
+{
+    const auto statistics = rcDecoder.getStatistics();
+    std::snprintf(cliReceiverString, sizeof(cliReceiverString), "       New Data: %ld", statistics.getNewDataCount());
+    consoleWriter.println(cliReceiverString);
+
+    std::snprintf(cliReceiverString, sizeof(cliReceiverString), "     Stale Data: %ld", statistics.getStaleDataCount());
+    consoleWriter.println(cliReceiverString);
+
+    std::snprintf(cliReceiverString, sizeof(cliReceiverString), "Failsafe Frames: %ld", statistics.getFailsafeConditionCount());
+    consoleWriter.println(cliReceiverString);
+
+    std::snprintf(cliReceiverString, sizeof(cliReceiverString), " Unknown Frames: %ld", statistics.getPacketErrorCount());
+    consoleWriter.println(cliReceiverString);
+
+    std::snprintf(cliReceiverString, sizeof(cliReceiverString), "   CRC Failures: %ld", statistics.getCrcErrorCount());
+    consoleWriter.println(cliReceiverString);
+
+    std::snprintf(cliReceiverString, sizeof(cliReceiverString), "Parity Failures: %ld", statistics.getParityErrorCount());
+    consoleWriter.println(cliReceiverString);
 }
