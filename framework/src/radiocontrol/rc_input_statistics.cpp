@@ -13,9 +13,11 @@ void bpl::RcInputStatistics::incrementNewDataCount()
     newDataCount++;
 }
 
+// don't start accumulating this statistic until at least one good RC update has been received
+//
 void bpl::RcInputStatistics::incrementStaleDataCount()
 {
-    staleDataCount++;
+    if (newDataCount > 0) staleDataCount++;
 }
 
 void bpl::RcInputStatistics::incrementFailsafeConditionCount()
