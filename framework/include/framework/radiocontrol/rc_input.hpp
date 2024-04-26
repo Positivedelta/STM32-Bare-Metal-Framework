@@ -30,7 +30,7 @@ namespace bpl
             bpl::RcDecoder& rcDecoder;
             bool useCyclicRing;
             int32_t aileron, elevator;
-            char cliReceiverString[32];
+            char cliStringBuffer[32];
 
         public:
             RcInput(bpl::RcDecoder& rcDecoder);

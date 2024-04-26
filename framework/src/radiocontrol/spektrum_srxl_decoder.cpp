@@ -9,7 +9,7 @@
 bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time):
     uart(uart), time(time), lastTimestamp(time.getMicros64()), crc(bpl::CcittCrc16<SRXL_A5_BUFFER_SIZE, 0x1021, false>()), bufferIndex(0), processed(true),
     status(bpl::RcInputStatus()), statistics(bpl::RcInputStatistics()) {
-        const bpl::ByteListener uartHandler = [&](const uint8_t byte) {
+        const bpl::ByteListener srxlHandler = [&](const uint8_t byte) {
             const auto now = time.getMicros64();
             if (processed)
             {
@@ -34,7 +34,7 @@ bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& 
             return true;
         };
 
-        uart.setByteListener(uartHandler);
+        uart.setByteListener(srxlHandler);
         channels.fill(0);
 }
 
