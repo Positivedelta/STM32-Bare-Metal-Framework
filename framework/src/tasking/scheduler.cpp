@@ -137,15 +137,23 @@ bool bpl::TaskScheduler::handleCliCommand(std::pmr::vector<std::string_view>& co
 
 void bpl::TaskScheduler::printTaskStatistics(const bpl::PrintWriter& consoleWriter)
 {
-    std::snprintf(taskStatistics, sizeof(taskStatistics), "Scheduler CPU: %.2f%% [%lu Cycles]", getMaxCpu(), getMaxUsedCycles());
-    consoleWriter.println(taskStatistics);
+    consoleWriter.print("Scheduler CPU: ");
+    bpl::StringUtils::ftoc<sizeof(taskStatistics)>(getMaxCpu(), 2, 0, taskStatistics);
+    consoleWriter.print(taskStatistics);
+    consoleWriter.print("% [");
+    bpl::StringUtils::itoc(getMaxUsedCycles(), 0, taskStatistics);
+    consoleWriter.print(taskStatistics);
+    consoleWriter.println(" Cycles]");
 
     consoleWriter.println("Task CPU:");
     const auto availableCycles = getAvailableCycles();
     for (auto& schedulerTask : *this)
     {
         auto& task = schedulerTask.get();
-        std::snprintf(taskStatistics, sizeof(taskStatistics), "    %5.2f%% [%s]", task.getMaxCpu(availableCycles), task.getTaskName());
-        consoleWriter.println(taskStatistics);
+        bpl::StringUtils::ftoc<sizeof(taskStatistics)>(task.getMaxCpu(availableCycles), 2, 9, taskStatistics);
+        consoleWriter.print(taskStatistics);
+        consoleWriter.print("% [");
+        consoleWriter.print(task.getTaskName());
+        consoleWriter.println("]");
     }
 }
