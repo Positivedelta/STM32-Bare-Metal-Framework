@@ -97,7 +97,7 @@ namespace bpl
                 }
                 else
                 {
-                    auto right = expansion % factor;
+                    const auto right = expansion % factor;
                     if (right == 0)
                     {
                         while (index < decimalPlaces) buffer[index++] = '0';
@@ -110,7 +110,7 @@ namespace bpl
 
                     buffer[index++] = '.';
 
-                    auto left = int32_t(value);
+                    const auto left = int32_t(value);
                     if (left == 0)
                     {
                         buffer[index++] = '0';
