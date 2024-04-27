@@ -141,8 +141,7 @@ void bpl::TaskScheduler::printTaskStatistics(const bpl::PrintWriter& consoleWrit
     bpl::StringUtils::ftoc<sizeof(taskStatistics)>(getMaxCpu(), 2, 0, taskStatistics);
     consoleWriter.print(taskStatistics);
     consoleWriter.print("% [");
-    bpl::StringUtils::itoc(getMaxUsedCycles(), 0, taskStatistics);
-    consoleWriter.print(taskStatistics);
+    consoleWriter.print(bpl::StringUtils::itoc<sizeof(taskStatistics)>(getMaxUsedCycles(), taskStatistics));
     consoleWriter.println(" Cycles]");
 
     consoleWriter.println("Task CPU:");

@@ -42,7 +42,7 @@ namespace bpl
             TaskList tasks;
             uint32_t schedulerTimeBase, reloadValue;
             volatile uint32_t maxUsedCycles;
-            char taskStatistics[64];
+            char taskStatistics[32];
 
         public:
             static TaskScheduler& getInstance();

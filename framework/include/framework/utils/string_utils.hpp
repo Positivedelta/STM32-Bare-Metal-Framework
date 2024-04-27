@@ -51,25 +51,34 @@ namespace bpl
             static bool stoi(const std::string_view& stringView, int32_t& value);
 
             // added as a substitute for std::snprintf() to format integers and avoid the chance of dynamic memory being allocated
-            // FIXME! needs to be used carefully as there is no real bounds checking on the generated character buffer
+            // FIXME! needs to be used carefully as there is no real bounds checking on the internal buffer manipulation
             //
-            template<int32_t size> requires ((size > 0) && (size <= 256))
-            static bool itoc(const int32_t value, int32_t padding, char (&buffer)[size])
+            template<uint32_t size, uint32_t padding = 0> requires ((size > 0) && (size <= 256))
+            static char* itoc(int32_t value, char (&buffer)[size])
             {
-                auto index = 1;
+                auto index = size;
+                buffer[--index] = 0;
+
                 if (value == 0)
                 {
-                    buffer[0] = '0';
+                    buffer[--index] = '0';
                 }
                 else
                 {
-                    index = ftocInsert(value, buffer);
+                    const auto negative = (value < 0);
+                    if (negative) value = -value;
+
+                    while (value > 0)
+                    {
+                        buffer[--index] = '0' + (value % 10);
+                        value /= 10;
+                    }
+
+                    if (negative) buffer[--index] = '-';
                 }
 
-                while (index < padding) buffer[index++] = ' ';
-                ftocReverse(buffer, index);
-                buffer[index] = 0;
-                return true;
+                while (index >= (size - padding)) buffer[--index] = ' ';
+                return &buffer[index];
             }
 
             // added as a substitute for std::snprintf() to format floats and avoid the chance of dynamic memory being allocated
