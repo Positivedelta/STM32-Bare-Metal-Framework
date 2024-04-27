@@ -82,84 +82,75 @@ namespace bpl
             }
 
             // added as a substitute for std::snprintf() to format floats and avoid the chance of dynamic memory being allocated
-            // FIXME! needs to be used carefully as there is no real bounds checking on the generated character buffer
+            // FIXME! needs to be used carefully as there is no real bounds checking on the internal buffer manipulation
             //
-            template<int32_t size> requires ((size > 0) && (size <= 256))
-            static bool ftoc(const float value, int32_t decimalPlaces, int32_t padding, char (&buffer)[size])
+            template<uint32_t size, uint32_t decimalPlaces = 2, uint32_t padding = 0> requires ((size > 0) && (size <= 256))
+            static char* ftoc(float value, char (&buffer)[size])
             {
-                const auto factor = int32_t(std::pow(10, decimalPlaces));
-                const auto expansion = int32_t(value * factor);
+                auto index = size;
+                buffer[--index] = 0;
 
-                auto index = 0;
+                constexpr auto factor = uint32_t(std::pow(10, decimalPlaces));
+                auto expansion = int32_t(value * factor);
                 if (expansion == 0)
                 {
-                    buffer[index] = '0';
+                    if constexpr (decimalPlaces > 0)
+                    {
+                        while (index > (size - 1 - decimalPlaces)) buffer[--index] = '0';
+                        buffer[--index] = '.';
+                    }
 
-                    // check the buffer size, i.e. the leading '0.' the decimal place '0's and the terminating '\0'
-                    // note, that size > 0, as enforced by the template condition
-                    //
-                    if (size < (3 + decimalPlaces)) return false;
-
-                    buffer[++index] = '.';
-                    while (++index < (2 + decimalPlaces)) buffer[index] = '0';
-                    buffer[index] = 0;
+                    buffer[--index] = '0';
                 }
                 else
                 {
-                    const auto right = expansion % factor;
-                    if (right == 0)
+                    const auto negative = (value < 0);
+                    if (negative)
                     {
-                        while (index < decimalPlaces) buffer[index++] = '0';
-                    }
-                    else
-                    {
-                        index = ftocInsert(right, buffer);
-                        while (index < decimalPlaces) buffer[index++] = '0';
+                        expansion = -expansion;
+                        value = -value;
                     }
 
-                    buffer[index++] = '.';
+                    if constexpr (decimalPlaces > 0)
+                    {
+                        auto right = expansion % factor;
+                        if (right == 0)
+                        {
+                            while (index > (size - 1 - decimalPlaces)) buffer[--index] = '0';
+                        }
+                        else
+                        {
+                            while (right > 0)
+                            {
+                                buffer[--index] = '0' + (right % 10);
+                                right /= 10;
+                            }
 
-                    const auto left = int32_t(value);
+                            while (index > (size - 1 - decimalPlaces)) buffer[--index] = '0';
+                        }
+
+                        buffer[--index] = '.';
+                    }
+
+                    auto left = int32_t(value);
                     if (left == 0)
                     {
-                        buffer[index++] = '0';
+                        buffer[--index] = '0';
                     }
                     else
                     {
-                        index += ftocInsert(left, &buffer[index]);
+                        while (left > 0)
+                        {
+                            buffer[--index] = '0' + (left % 10);
+                            left /= 10;
+                        }
                     }
 
-                    while (index < padding) buffer[index++] = ' ';
-                    ftocReverse(buffer, index);
-                    buffer[index] = 0;
+                    if (negative) buffer[--index] = '-';
                 }
 
-                return true;
-            }
-
-        private:
-            static int32_t ftocInsert(int32_t value, char* buffer)
-            {
-                auto index = 0;
-                while(value > 0)
-                {
-                    buffer[index++] = '0' + (value % 10);
-                    value /= 10;
-                }
-
-                return index;
-            }
-
-            static void ftocReverse(char *buffer, const int32_t size)
-            {
-                auto i =0;
-                auto j = size - 1;
-                while (i < j)
-                {
-                    const char swap = buffer[i];
-                    buffer[i++] = buffer[j];
-                    buffer[j--] = swap;
-                }
+                while (index >= (size - padding)) buffer[--index] = ' ';
+                return &buffer[index];
             }
     };
 }
