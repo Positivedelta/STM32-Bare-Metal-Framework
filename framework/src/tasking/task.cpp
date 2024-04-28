@@ -2,15 +2,14 @@
 // (c) Bit Parallel Ltd, December 2023
 //
 
-#include <cstdio>
-
+#include "framework/utils/string_utils.hpp"
 #include "framework/tasking/task.hpp"
 
-// note, std::snprintf() will truncate the name if it's longer than the class property
+// note, bpl::StringUtils::ccpy() will truncate the name if it's longer than the class property
 //
 bpl::Task::Task(const uint32_t period, const char* taskName):
     period(period), counter(period), maxUsedCycles(0) {
-        std::snprintf(name, sizeof(name), taskName);
+        bpl::StringUtils::ccpy<sizeof(name)>(taskName, name);
 }
 
 void bpl::Task::invoke()

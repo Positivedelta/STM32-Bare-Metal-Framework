@@ -21,7 +21,7 @@ namespace bpl
             static void trim(std::pmr::string& string);
 
             template<size_t maxSize>
-            static std::array<char, maxSize> trim(std::array<char, maxSize>& string)
+            constexpr static std::array<char, maxSize> trim(std::array<char, maxSize>& string)
             {
                 auto character = string.front();
                 if (character == '\0') return string;
@@ -54,7 +54,7 @@ namespace bpl
             // FIXME! needs to be used carefully as there is no real bounds checking on the internal buffer manipulation
             //
             template<int32_t size, int32_t padding = 0> requires ((size > 0) && (size <= 256) && (padding >= 0))
-            static char* itoc(int32_t value, char (&buffer)[size])
+            constexpr static char* itoc(int32_t value, char (&buffer)[size])
             {
                 auto index = size;
                 buffer[--index] = 0;
@@ -151,6 +151,22 @@ namespace bpl
 
                 while (index >= (size - padding)) buffer[--index] = ' ';
                 return &buffer[index];
+            }
+
+            // added as a lightweight substitute for std::snprintf() for the copying of char* 'strings'
+            //
+            template<int32_t size> requires ((size > 0) && (size <= 256))
+            constexpr static char* ccpy(const char* value, char (&buffer)[size])
+            {
+                auto index = 0;
+                while ((value[index] != 0) && (index < (size - 1)))
+                {
+                    buffer[index] = value[index];
+                    index++;
+                }
+
+                buffer[index] = 0;
+                return buffer;
             }
     };
 }
