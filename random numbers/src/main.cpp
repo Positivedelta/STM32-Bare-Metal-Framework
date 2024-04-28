@@ -3,8 +3,6 @@
 //
 
 #include <cstdint>
-#include <cstdio>
-#include <string>
 
 #include "framework/stm32f4/stm32f4.hpp"
 #include "framework/stm32f4/gpio.hpp"
@@ -14,6 +12,7 @@
 #include "framework/drivers/entropy.hpp"
 #include "framework/io/baud_rate.hpp"
 #include "framework/io/print_writer.hpp"
+#include "framework/utils/string_utils.hpp"
 
 //
 // note, the Nucleo can be configured to connect Usart2 to the virtual COM port on the ST-LINK module
@@ -55,8 +54,7 @@ int main()
     {
         if (entropy.getUniformBoundedRandom(random, 1000))
         {
-            std::snprintf(buffer, 8, "%lu", random);
-            writer.println(buffer);
+            writer.println(bpl::StringUtils::itoc<sizeof(buffer)>(random, buffer));
         }
         else
         {
