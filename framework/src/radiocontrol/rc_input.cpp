@@ -2,8 +2,6 @@
 // (c) Bit Parallel Ltd, April 2024
 //
 
-#include <cstdio>
-
 #include "framework/utils/string_utils.hpp"
 #include "framework/radiocontrol/rc_input.hpp"
 
@@ -174,40 +172,41 @@ void bpl::RcInput::printChannelValues(const bpl::PrintWriter& consoleWriter)
     // FIXME! these must use the correctly mapped channel numbers
     // note, cliChannelValueString has space for 19 + '\0' characters
     //
-    std::snprintf(cliStringBuffer, sizeof(cliStringBuffer), "Throttle: %+05ld", rcDecoder.getChannel(0));
-    consoleWriter.println(cliStringBuffer);
+    consoleWriter.print("Throttle: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(0), cliStringBuffer));
 
-    std::snprintf(cliStringBuffer, sizeof(cliStringBuffer), " Aileron: %+05ld", rcDecoder.getChannel(1));
-    consoleWriter.println(cliStringBuffer);
+    consoleWriter.print(" Alieron: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(1), cliStringBuffer));
 
-    std::snprintf(cliStringBuffer, sizeof(cliStringBuffer), "Elevator: %+05ld", rcDecoder.getChannel(2));
-    consoleWriter.println(cliStringBuffer);
+    consoleWriter.print("Elevator: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(2), cliStringBuffer));
 
-    std::snprintf(cliStringBuffer, sizeof(cliStringBuffer), "  Rudder: %+05ld", rcDecoder.getChannel(3));
-    consoleWriter.println(cliStringBuffer);
+    consoleWriter.print("  Rudder: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(3), cliStringBuffer));
 
-    std::snprintf(cliStringBuffer, sizeof(cliStringBuffer), "   Pitch: %+05ld", rcDecoder.getChannel(5));
-    consoleWriter.println(cliStringBuffer);
+    consoleWriter.print("   Pitch: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(5), cliStringBuffer));
 }
 
 void bpl::RcInput::printChannelStatistics(const bpl::PrintWriter& consoleWriter)
 {
     const auto statistics = rcDecoder.getStatistics();
-    std::snprintf(cliStringBuffer, sizeof(cliStringBuffer), "       New Data: %ld", statistics.getNewDataCount());
-    consoleWriter.println(cliStringBuffer);
+    consoleWriter.println("RC Frame Stats");
+    consoleWriter.print("     New: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(statistics.getNewDataCount(), cliStringBuffer));
 
-    std::snprintf(cliStringBuffer, sizeof(cliStringBuffer), "     Stale Data: %ld", statistics.getStaleDataCount());
-    consoleWriter.println(cliStringBuffer);
+    consoleWriter.print("   Stale: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(statistics.getStaleDataCount(), cliStringBuffer));
 
-    std::snprintf(cliStringBuffer, sizeof(cliStringBuffer), "Failsafe Frames: %ld", statistics.getFailsafeConditionCount());
-    consoleWriter.println(cliStringBuffer);
+    consoleWriter.print("Failsafe: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(statistics.getFailsafeConditionCount(), cliStringBuffer));
 
-    std::snprintf(cliStringBuffer, sizeof(cliStringBuffer), " Unknown Frames: %ld", statistics.getPacketErrorCount());
-    consoleWriter.println(cliStringBuffer);
+    consoleWriter.print(" Unknown: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(statistics.getPacketErrorCount(), cliStringBuffer));
 
-    std::snprintf(cliStringBuffer, sizeof(cliStringBuffer), "   CRC Failures: %ld", statistics.getCrcErrorCount());
-    consoleWriter.println(cliStringBuffer);
+    consoleWriter.print("     CRC: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(statistics.getCrcErrorCount(), cliStringBuffer));
 
-    std::snprintf(cliStringBuffer, sizeof(cliStringBuffer), "Parity Failures: %ld", statistics.getParityErrorCount());
-    consoleWriter.println(cliStringBuffer);
+    consoleWriter.print("  Parity: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(statistics.getParityErrorCount(), cliStringBuffer));
 }
