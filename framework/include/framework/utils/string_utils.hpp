@@ -53,7 +53,7 @@ namespace bpl
             // added as a substitute for std::snprintf() to format integers and avoid the chance of dynamic memory being allocated
             // FIXME! needs to be used carefully as there is no real bounds checking on the internal buffer manipulation
             //
-            template<uint32_t size, uint32_t padding = 0> requires ((size > 0) && (size <= 256))
+            template<int32_t size, int32_t padding = 0> requires ((size > 0) && (size <= 256) && (padding >= 0))
             static char* itoc(int32_t value, char (&buffer)[size])
             {
                 auto index = size;
@@ -84,7 +84,7 @@ namespace bpl
             // added as a substitute for std::snprintf() to format floats and avoid the chance of dynamic memory being allocated
             // FIXME! needs to be used carefully as there is no real bounds checking on the internal buffer manipulation
             //
-            template<uint32_t size, uint32_t decimalPlaces = 2, uint32_t padding = 0> requires ((size > 0) && (size <= 256))
+            template<int32_t size, int32_t decimalPlaces = 2, int32_t padding = 0> requires ((size > 0) && (size <= 256) && (decimalPlaces >= 0) && (padding >= 0))
             static char* ftoc(float value, char (&buffer)[size])
             {
                 auto index = size;
