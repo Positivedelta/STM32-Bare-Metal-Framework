@@ -156,7 +156,7 @@ namespace bpl
             // added as a lightweight substitute for std::snprintf() for the copying of char* 'strings'
             //
             template<int32_t size> requires ((size > 0) && (size <= 256))
-            constexpr static char* ccpy(const char* value, char (&buffer)[size])
+            constexpr static void ccpy(const char* value, char (&buffer)[size])
             {
                 auto index = 0;
                 while ((value[index] != 0) && (index < (size - 1)))
@@ -166,7 +166,6 @@ namespace bpl
                 }
 
                 buffer[index] = 0;
-                return buffer;
             }
     };
 }
