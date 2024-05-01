@@ -23,8 +23,8 @@ namespace bpl
     {
         public:
             constexpr static uint32_t MAX_NUMBER_OF_CHANNELS = 32;
-            constexpr static int32_t ABSOLUTE_MAX_CHANNEL_SHIFT = 12;
-            constexpr static int32_t ABSOLUTE_MAX_CHANNEL_VALUE = 1 << 12;
+            constexpr static int32_t CHANNEL_RESOLUTION_BITS = 13;                  // to cover the range -4095..4095
+            constexpr static int32_t CHANNEL_MAX_ABSOLUTE_VALUE = (1 << 12) - 1;    // 4095
 
         private:
             bpl::RcDecoder& rcDecoder;
@@ -33,15 +33,15 @@ namespace bpl
             char cliStringBuffer[32];
 
         public:
-            RcInput(bpl::RcDecoder& rcDecoder);
+            RcInput(bpl::RcDecoder& rcDecoder, const bool useCyclicRing = false);
 
             void setCyclicRing(const bool enable = true);
             bool hasCyclicRing() const;
 
-            // note, the RC channels are values in the range [-4096..4096] or [0..4096], as defined in the header file
+            // note, the RC channels are values in the range [-4095..4095] or [0..4095], as defined in the header file
             //
             void aquire();
-            uint32_t getThrottle() const;        // returns values in the range [0..4096]
+            uint32_t getThrottle() const;        // returns values in the range [0..4095]
             int32_t getAileron() const;
             int32_t getElevator() const;
             int32_t getRudder() const;

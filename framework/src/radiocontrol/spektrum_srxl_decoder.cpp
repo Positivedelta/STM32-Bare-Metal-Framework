@@ -3,7 +3,6 @@
 //
 
 #include "framework/io/byte_listener.hpp"
-#include "framework/radiocontrol/rc_input.hpp"
 #include "framework/radiocontrol/spektrum_srxl_decoder.hpp"
 
 bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time):
@@ -84,16 +83,16 @@ bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
                         const auto channel = (msb & 0b0111'1000) >> 3;
                         auto value = (int32_t(msb & 0b0000'0111) << 8) | buffer[index + 1];
 
-                        // scale to signed values in the range [-4096, 4096], as defined in bpl::RcInput
-                        // the throttle channel is scaled to the range [0..4096]
+                        // scale the raw 11 bit values to the signed range [-4095, 4095], as defined in bpl::RcInput
+                        // note, the throttle channel is scaled to the range [0..4095]
                         //
                         if (channel == THROTTLE_CHANNEL)
                         {
-                            channels[channel] = ((SRXL_A5_MIN_CHANNEL_VALUE + value) / SRXL_A5_CHANNEL_RANGE) << bpl::RcInput::ABSOLUTE_MAX_CHANNEL_SHIFT;
+                            channels[channel] = value << (SRXL_A5_CHANNEL_SCALE_BITS - 1);
                         }
                         else
                         {
-                            channels[channel] = ((value - SRXL_A5_NEUTRAL_CHANNEL_VALUE) / SRXL_A5_CHANNEL_RANGE) << (bpl::RcInput::ABSOLUTE_MAX_CHANNEL_SHIFT + 1);
+                            channels[channel] = (value << SRXL_A5_CHANNEL_SCALE_BITS) - (((1 << SRXL_A5_CHANNEL_RESOLUTION_BITS) - 1) << 1);
                         }
                     }
 

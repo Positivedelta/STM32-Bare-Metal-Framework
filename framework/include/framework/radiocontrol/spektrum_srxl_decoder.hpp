@@ -12,6 +12,7 @@
 #include "framework/drivers/time.hpp"
 #include "framework/drivers/uart.hpp"
 #include "framework/radiocontrol/rc_decoder.hpp"
+#include "framework/radiocontrol/rc_input.hpp"
 
 //
 // FIXME! currently this class is based around the AR7700 receiver, it needs to be generic
@@ -33,14 +34,12 @@ namespace bpl
             constexpr static uint64_t PACKET_TIMEOUT_US = 4'000;
 
             // FIXME! AR7700 specific constants
-            //        1, check the channel data values, some report these as 0x0002, 0x03fe, 0x7fe
+            //        1, check the channel data min, neutral and max values, some report these as 0x0002, 0x03fe, 0x7fe
             //        2, the newer 0xa6 packets use 16 bit channel values
             //
             constexpr static uint8_t SRXL_A5_BUFFER_SIZE = 18;
-            constexpr static int32_t SRXL_A5_MIN_CHANNEL_VALUE = 0x0000;
-            constexpr static int32_t SRXL_A5_NEUTRAL_CHANNEL_VALUE = 0x03ff;
-            constexpr static int32_t SRXL_A5_MAX_CHANNEL_VALUE = 0x07ff;
-            constexpr static int32_t SRXL_A5_CHANNEL_RANGE = SRXL_A5_MAX_CHANNEL_VALUE - SRXL_A5_MIN_CHANNEL_VALUE;
+            constexpr static int32_t SRXL_A5_CHANNEL_RESOLUTION_BITS = 11;
+            constexpr static int32_t SRXL_A5_CHANNEL_SCALE_BITS = bpl::RcInput::CHANNEL_RESOLUTION_BITS - SRXL_A5_CHANNEL_RESOLUTION_BITS;
             constexpr static uint32_t THROTTLE_CHANNEL = 0;
 
             driver::Uart& uart;
@@ -57,8 +56,8 @@ namespace bpl
         public:
             SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time);
 
-            // the main RC channels are signed and returned in the range [-4096, 4096], as defined in bpl::RcInput
-            // note, the throttle channel is returned in the range [0..4096]
+            // the main RC channels are signed and returned in the range [-4095, 4095], as defined in bpl::RcInput
+            // note, the throttle channel is returned in the range [0..4095]
             //
             bpl::RcInputStatus decode() override;
             int32_t getChannel(const uint32_t channel) const override;

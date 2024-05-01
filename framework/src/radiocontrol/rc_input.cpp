@@ -5,9 +5,9 @@
 #include "framework/utils/string_utils.hpp"
 #include "framework/radiocontrol/rc_input.hpp"
 
-bpl::RcInput::RcInput(bpl::RcDecoder& rcDecoder):
+bpl::RcInput::RcInput(bpl::RcDecoder& rcDecoder, const bool useCyclicRing):
     CliProvider("rc", "all | ch=#n | #ch=#n,#n,... | ch=#n:#n | stats [#repeat]"),
-    rcDecoder(rcDecoder), useCyclicRing(false), aileron(0), elevator(0) {
+    rcDecoder(rcDecoder), useCyclicRing(useCyclicRing), aileron(0), elevator(0) {
 }
 
 void bpl::RcInput::setCyclicRing(const bool enable)
@@ -22,7 +22,7 @@ bool bpl::RcInput::hasCyclicRing() const
 
 void bpl::RcInput::aquire()
 {
-    // grab the normalised channels, expected to be values in the range [-4096..4096] or [0..4096] for the throttle
+    // grab the normalised channels, expected to be values in the range [-4095..4095] or [0..4095] for the throttle
     // FIXME! 1, check the return value and handle failsafe
     //        2, extract and add methods to return the status and statistics, currently these are not generic
     //
@@ -40,16 +40,17 @@ void bpl::RcInput::aquire()
     {
         // use an iterative square root approximation to find the radius of the cyclic stick position
         // in order to re-scale the desired cyclic stick values and ensure that they lie within the cyclic ring
-        // note, the calculated square root may be no more than 1 above or below the actual value
+        // notes 1, the calculated square root may be no more than 1 above or below the actual value
+        //       2, originally developed with Martin Green for the DigiBar flybarless controller
         //
         const auto magnitude = (aileron * aileron) + (elevator * elevator);
-        if (magnitude > ABSOLUTE_MAX_CHANNEL_VALUE * ABSOLUTE_MAX_CHANNEL_VALUE)
+        if (magnitude > CHANNEL_MAX_ABSOLUTE_VALUE * CHANNEL_MAX_ABSOLUTE_VALUE)
         {
-            auto extra = ABSOLUTE_MAX_CHANNEL_VALUE >> 2;
+            auto extra = CHANNEL_MAX_ABSOLUTE_VALUE >> 2;
             auto searchValue = extra >> 1;
             while (searchValue > 0)
             {
-                auto testRadius = ABSOLUTE_MAX_CHANNEL_VALUE + extra;
+                auto testRadius = CHANNEL_MAX_ABSOLUTE_VALUE + extra;
                 auto testRadiusSquared = testRadius * testRadius;
                 if (testRadiusSquared > magnitude)
                 {
@@ -69,11 +70,11 @@ void bpl::RcInput::aquire()
                 }
             }
 
-            // scale by (ABSOLUTE_MAX_CHANNEL_VALUE / radius) where the radius is ABSOLUTE_MAX_CHANNEL_VALUE + extra
+            // finally scale the cyclic inputs
             //
-            const auto radius = ABSOLUTE_MAX_CHANNEL_VALUE + extra;
-            aileron = (aileron << ABSOLUTE_MAX_CHANNEL_SHIFT) / radius;
-            elevator = (elevator << ABSOLUTE_MAX_CHANNEL_SHIFT) / radius;
+            const auto magnitude = CHANNEL_MAX_ABSOLUTE_VALUE + extra;
+            aileron = (aileron * CHANNEL_MAX_ABSOLUTE_VALUE) / magnitude;
+            elevator = (elevator * CHANNEL_MAX_ABSOLUTE_VALUE) / magnitude;
         }
     }
 }
@@ -169,17 +170,20 @@ bool bpl::RcInput::handleCliCommand(std::pmr::vector<std::string_view>& commandT
 
 void bpl::RcInput::printChannelValues(const bpl::PrintWriter& consoleWriter)
 {
-    // FIXME! these must use the correctly mapped channel numbers
+    // FIXME! 1, these must use the correctly mapped channel numbers
+    //        2, add percentage values
+    //        3, for the alieron and elevator show the raw values in brackets if the cyclic ring is being used
+    //
     // note, cliChannelValueString has space for 19 + '\0' characters
     //
     consoleWriter.print("Throttle: ");
     consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(0), cliStringBuffer));
 
     consoleWriter.print(" Alieron: ");
-    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(1), cliStringBuffer));
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(aileron, cliStringBuffer));
 
     consoleWriter.print("Elevator: ");
-    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(2), cliStringBuffer));
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(elevator, cliStringBuffer));
 
     consoleWriter.print("  Rudder: ");
     consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(3), cliStringBuffer));
