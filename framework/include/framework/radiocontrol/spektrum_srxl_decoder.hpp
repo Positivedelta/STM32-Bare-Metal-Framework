@@ -29,7 +29,7 @@ namespace bpl
             constexpr static uint16_t CRC_POLYNOMINAL = 0x1021;
             constexpr static bool CRC_BIT_REVERSE = false;
 
-            // spektrum SRXL receivers may support 5.5, 11 and 22 millisecond packet frame times, this value is chosen to be universal
+            // spektrum SRXL receivers support 5.5, 11 and 22 millisecond packet frame times, this value is chosen to be universal
             //
             constexpr static uint64_t PACKET_TIMEOUT_US = 4'000;
 
@@ -45,7 +45,7 @@ namespace bpl
             driver::Uart& uart;
             driver::Time& time;
             std::array<uint8_t, SRXL_A5_BUFFER_SIZE> buffer;
-            uint64_t lastTimestamp;
+            uint64_t lastTimestamp, lastCaptureTime;
             bpl::CcittCrc16<SRXL_A5_BUFFER_SIZE, CRC_POLYNOMINAL, CRC_BIT_REVERSE> crc;
             uint32_t bufferIndex;
             bool processed;

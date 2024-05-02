@@ -6,12 +6,12 @@
 #include "framework/radiocontrol/spektrum_srxl_decoder.hpp"
 
 bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time):
-    uart(uart), time(time), lastTimestamp(time.getMicros64()), crc(bpl::CcittCrc16<SRXL_A5_BUFFER_SIZE, 0x1021, false>()), bufferIndex(0), processed(true),
-    status(bpl::RcInputStatus()), statistics(bpl::RcInputStatistics()) {
+    uart(uart), time(time), lastTimestamp(time.getMicros64()), lastCaptureTime(lastTimestamp),
+    crc(bpl::CcittCrc16<SRXL_A5_BUFFER_SIZE, 0x1021, false>()), bufferIndex(0), processed(true), status(bpl::RcInputStatus()), statistics(bpl::RcInputStatistics()) {
         const bpl::ByteListener srxlHandler = [&](const uint8_t byte) {
-            const auto now = time.getMicros64();
             if (processed)
             {
+                const auto now = time.getMicros64();
                 if ((now - lastTimestamp) > PACKET_TIMEOUT_US)
                 {
                     buffer[0] = byte;
@@ -22,6 +22,11 @@ bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& 
                     buffer[bufferIndex++] = byte;
                     if (bufferIndex == SRXL_A5_BUFFER_SIZE)
                     {
+                        // the earlier 'now' timestamp will be close enough...
+                        //
+                        statistics.setPacketRate(static_cast<uint32_t>(now - lastCaptureTime));
+                        lastCaptureTime = now;
+
                         bufferIndex = 0;
                         processed = false;
                     }
@@ -43,8 +48,6 @@ bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
 
     if (!processed)
     {
-        // FIXME! to cope with newer receivers, [0xa6, 0xcd...] packets must be handled, these can be between 5 and 80 bytes long
-        //
         const auto packetHeader = buffer[0];
         if (packetHeader == 0xa5)
         {
@@ -96,6 +99,23 @@ bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
                         }
                     }
 
+                    // FIXME! 1, on a DX7 G2 it the x-plus channel number is not fixed at 12, it varies...
+                    //        2, perhaps it only works on an x-plus capable transmitter
+                    //
+                    // decode the 9 bit x-plus channels stored in bytes [14, 15]
+                    //
+                    // format: [0 bbbb cc d] [dddddddd]
+                    // bbbb: the channel number, this is always at 12
+                    //   cc: channel number, low 2 bits, bit 2 is defined by bit 0 of the packet marker, e.g. 0 for '0x02', 1 for '0x03'
+                    // d..d: channel data, 9 bits, 256 is midpoint
+                    //
+                    const auto xPlusChannel = 12 + (((packetMarker & 0b0000'0001) << 2) | ((buffer[14] & 0b0000'0110) >> 1));
+                    const auto xPlusValue = (int32_t(buffer[14] & 0b0000'0001) << 8) | buffer[15];
+
+                    // scaled to -4095..4095
+                    //
+                    channels[xPlusChannel] = 1 + ((xPlusValue - 256) << 4);
+
                     status.indicateNewData();
                     statistics.incrementNewDataCount();
                 }
@@ -113,6 +133,7 @@ bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
         }
 /*      else if (packetHeader == 0xa6)
         {
+            // FIXME! to cope with newer receivers, [0xa6, 0xcd...] packets must be handled, these can be between 5 and 80 bytes long
             //
             // notes 1, refer to the SRLX2 revision K documentation...
             //       2, buy an up-to-date RX to test with...
@@ -130,6 +151,10 @@ bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
     {
         status.indicateStaleData();
         statistics.incrementStaleDataCount();
+
+        // has the RX stopped sending packets?
+        //
+        if ((time.getMicros64() - lastTimestamp) > bpl::RcInputStatistics::PACKET_RATE_TIMEOUT_US) statistics.setPacketRate(0);
     }
 
     return status;

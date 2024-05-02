@@ -188,14 +188,28 @@ void bpl::RcInput::printChannelValues(const bpl::PrintWriter& consoleWriter)
     consoleWriter.print("  Rudder: ");
     consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(3), cliStringBuffer));
 
+    consoleWriter.print("    Gear: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(4), cliStringBuffer));
+
     consoleWriter.print("   Pitch: ");
     consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(5), cliStringBuffer));
+
+    consoleWriter.print("    Aux2: ");
+    consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rcDecoder.getChannel(6), cliStringBuffer));
 }
 
 void bpl::RcInput::printChannelStatistics(const bpl::PrintWriter& consoleWriter)
 {
     const auto statistics = rcDecoder.getStatistics();
     consoleWriter.println("RC Frame Stats");
+
+    // round the packet rate to the nearest millisecond
+    //
+    const auto rate = (statistics.getPacketRate() + 500) / 1000;
+    consoleWriter.print("    Rate: ");
+    consoleWriter.print(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(rate, cliStringBuffer));
+    consoleWriter.println(" ms");
+
     consoleWriter.print("     New: ");
     consoleWriter.println(bpl::StringUtils::itoc<sizeof(cliStringBuffer)>(statistics.getNewDataCount(), cliStringBuffer));
 

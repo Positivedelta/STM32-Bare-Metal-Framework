@@ -5,7 +5,12 @@
 #include "framework/radiocontrol/rc_input_statistics.hpp"
 
 bpl::RcInputStatistics::RcInputStatistics():
-    newDataCount(0), staleDataCount(0), failsafeConditionCount(0), packetErrorCount(0), crcErrorCount(0), parityErrorCount(0) {
+    packetRate(0), newDataCount(0), staleDataCount(0), failsafeConditionCount(0), packetErrorCount(0), crcErrorCount(0), parityErrorCount(0) {
+}
+
+void bpl::RcInputStatistics::setPacketRate(const uint32_t rate)
+{
+    packetRate = rate;
 }
 
 void bpl::RcInputStatistics::incrementNewDataCount()
@@ -38,6 +43,11 @@ void bpl::RcInputStatistics::incrementCrcErrorCount()
 void bpl::RcInputStatistics::incrementParityErrorCount()
 {
     parityErrorCount++;
+}
+
+uint32_t bpl::RcInputStatistics::getPacketRate() const
+{
+    return packetRate;
 }
 
 uint32_t bpl::RcInputStatistics::getNewDataCount() const
