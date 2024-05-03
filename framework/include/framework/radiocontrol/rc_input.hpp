@@ -45,6 +45,12 @@ namespace bpl
             int32_t getAileron() const;
             int32_t getElevator() const;
             int32_t getRudder() const;
+            int32_t getGear() const;
+            int32_t getAux1() const;
+            int32_t getAux2() const;
+
+            // derived channels
+            //
             int32_t getPitch() const;
 //          bpl::FlightMode getFlightMode() const;
 

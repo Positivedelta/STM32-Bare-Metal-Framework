@@ -40,10 +40,13 @@ namespace bpl
             constexpr static uint8_t SRXL_A5_BUFFER_SIZE = 18;
             constexpr static int32_t SRXL_A5_CHANNEL_RESOLUTION_BITS = 11;
             constexpr static int32_t SRXL_A5_CHANNEL_SCALE_BITS = bpl::RcInput::CHANNEL_RESOLUTION_BITS - SRXL_A5_CHANNEL_RESOLUTION_BITS;
+            constexpr static int32_t SRXL_A5_XPLUS_CHANNEL_RESOLUTION_BITS = 9;
+            constexpr static int32_t SRXL_A5_XPLUS_CHANNEL_SCALE_BITS = bpl::RcInput::CHANNEL_RESOLUTION_BITS - SRXL_A5_XPLUS_CHANNEL_RESOLUTION_BITS;
             constexpr static uint32_t THROTTLE_CHANNEL = 0;
 
             driver::Uart& uart;
             driver::Time& time;
+            bool xPlusSupport;
             std::array<uint8_t, SRXL_A5_BUFFER_SIZE> buffer;
             uint64_t lastTimestamp, lastCaptureTime;
             bpl::CcittCrc16<SRXL_A5_BUFFER_SIZE, CRC_POLYNOMINAL, CRC_BIT_REVERSE> crc;
@@ -54,13 +57,16 @@ namespace bpl
             std::array<int32_t, bpl::RcInput::MAX_NUMBER_OF_CHANNELS> channels;
 
         public:
-            SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time);
+            SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time, const bool xPlusSupport = false);
 
             // the main RC channels are signed and returned in the range [-4095, 4095], as defined in bpl::RcInput
             // note, the throttle channel is returned in the range [0..4095]
             //
             bpl::RcInputStatus decode() override;
             int32_t getChannel(const uint32_t channel) const override;
+
+            void enableXPlus(const bool xPlus = true);
+            bool hasXPlusSupport() const;
 
             bpl::RcInputStatus getStatus() const override;
             bpl::RcInputStatistics getStatistics() const override;

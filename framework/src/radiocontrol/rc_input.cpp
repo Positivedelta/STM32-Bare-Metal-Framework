@@ -99,6 +99,23 @@ int32_t bpl::RcInput::getRudder() const
     return rcDecoder.getChannel(3);         // FIXME! this must use the correct mapped channel number
 }
 
+int32_t bpl::RcInput::getGear() const
+{
+    return rcDecoder.getChannel(4);         // FIXME! this must use the correct mapped channel number
+}
+
+int32_t bpl::RcInput::getAux1() const
+{
+    return rcDecoder.getChannel(5);         // FIXME! this must use the correct mapped channel number
+}
+
+int32_t bpl::RcInput::getAux2() const
+{
+    return rcDecoder.getChannel(6);         // FIXME! this must use the correct mapped channel number
+}
+
+// derived channel
+//
 int32_t bpl::RcInput::getPitch() const
 {
     return rcDecoder.getChannel(5);         // FIXME! this must use the correct mapped channel number

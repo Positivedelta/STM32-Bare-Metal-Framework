@@ -5,8 +5,8 @@
 #include "framework/io/byte_listener.hpp"
 #include "framework/radiocontrol/spektrum_srxl_decoder.hpp"
 
-bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time):
-    uart(uart), time(time), lastTimestamp(time.getMicros64()), lastCaptureTime(lastTimestamp),
+bpl::SpektrumSrxlDecoder::SpektrumSrxlDecoder(driver::Uart& uart, driver::Time& time, const bool xPlusSupport):
+    uart(uart), time(time), xPlusSupport(xPlusSupport), lastTimestamp(time.getMicros64()), lastCaptureTime(lastTimestamp),
     crc(bpl::CcittCrc16<SRXL_A5_BUFFER_SIZE, 0x1021, false>()), bufferIndex(0), processed(true), status(bpl::RcInputStatus()), statistics(bpl::RcInputStatistics()) {
         const bpl::ByteListener srxlHandler = [&](const uint8_t byte) {
             if (processed)
@@ -53,7 +53,7 @@ bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
         {
             if (crc.compute(buffer) == 0)
             {
-                // packet markers for the AR7700 receiver
+                // packet markers for the 0xa2 / 0xa5 packets
                 //
                 // [0x00] valid 1st data packet with fail safe condition
                 // [0x01] valid 2nd data packet with fail safe condition
@@ -61,8 +61,7 @@ bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
                 // [0x03] valid and live 2nd data packet
                 // [other] an invalid packet
                 //
-                // FIXME! the following decode is based on a DX7 G2, the 0xa2 and 0xa3 packet are the same
-                //        although this may not be accurate... will depend on how CH7 is handled, but the first six channels should be the same in both packets
+                // FIXME! the following decode has only been tested using a DX7 G2
                 //
                 const auto packetMarker = buffer[1];
                 if (packetMarker < 0x04)
@@ -74,12 +73,10 @@ bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
                     }
 
                     // do the decode, including possible failsafe values
-                    // FIXME! for the moment, just first 6 channels... i.e. figure out how CH7 is handled
-                    // FIXME! all of the code in the below loop is AR7700 specific
                     //
                     for (auto index = 2; index < 14; index += 2)
                     {
-                        // msb/lsb: on the AR77000 msb bits 6:3 are the channel number, bit 7 is not used
+                        // msb/lsb: on the 0xa2 / 0xa5 msb bits 6:3 are the channel number, bit 7 is not used
                         //          bits 2:0/7:0 represent the 11 bit channel data
                         //
                         const auto msb = buffer[index];
@@ -99,22 +96,29 @@ bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
                         }
                     }
 
-                    // FIXME! 1, on a DX7 G2 it the x-plus channel number is not fixed at 12, it varies...
-                    //        2, perhaps it only works on an x-plus capable transmitter
+                    // FIXME! 1, on a DX7 G2 it the x-plus channel number is not fixed at 12, it varies, undefined data?
+                    //        2, perhaps it only works on an x-plus capable transmitter, investigate...
                     //
-                    // decode the 9 bit x-plus channels stored in bytes [14, 15]
+                    // handle the xplus channels, one per frame, if enabled and available
+                    // the channel number offset and data is always delivered via channel 12
                     //
-                    // format: [0 bbbb cc d] [dddddddd]
-                    // bbbb: the channel number, this is always at 12
-                    //   cc: channel number, low 2 bits, bit 2 is defined by bit 0 of the packet marker, e.g. 0 for '0x02', 1 for '0x03'
-                    // d..d: channel data, 9 bits, 256 is midpoint
-                    //
-                    const auto xPlusChannel = 12 + (((packetMarker & 0b0000'0001) << 2) | ((buffer[14] & 0b0000'0110) >> 1));
-                    const auto xPlusValue = (int32_t(buffer[14] & 0b0000'0001) << 8) | buffer[15];
+                    if (xPlusSupport & ((buffer[14] & 0b0111'1000) == 0b0'1100'000))
+                    {
+                        // decode the 9 bit x-plus channel, for this frame, as stored in bytes [14, 15]
+                        //
+                        // format: [0 bbbb cc d] [dddddddd]
+                        // bbbb: the channel number, this is always at 12
+                        //   cc: channel number, low 2 bits, bit 2 is defined by bit 0 of the packet marker, e.g. 0 for '0x02', 1 for '0x03'
+                        // d..d: channel data, 9 bits, with 256 as its midpoint
+                        //
+                        const auto xPlusChannel = 12 + (((packetMarker & 0b0000'0001) << 2) | ((buffer[14] & 0b0000'0110) >> 1));
+                        const auto xPlusValue = (int32_t(buffer[14] & 0b0000'0001) << 8) | buffer[15];
 
-                    // scaled to -4095..4095
-                    //
-                    channels[xPlusChannel] = 1 + ((xPlusValue - 256) << 4);
+                        // scaled to -4095..4095
+                        //
+                        constexpr auto xPlusOffset = 1 << (SRXL_A5_XPLUS_CHANNEL_RESOLUTION_BITS - 1);
+                        channels[xPlusChannel] = 1 + ((xPlusValue - xPlusOffset) << SRXL_A5_XPLUS_CHANNEL_SCALE_BITS);
+                    }
 
                     status.indicateNewData();
                     statistics.incrementNewDataCount();
@@ -167,6 +171,16 @@ int32_t bpl::SpektrumSrxlDecoder::getChannel(const uint32_t channel) const
     if (channel >= bpl::RcInput::MAX_NUMBER_OF_CHANNELS) return 0;
 
     return channels[channel];
+}
+
+void bpl::SpektrumSrxlDecoder::enableXPlus(const bool enable)
+{
+    xPlusSupport = enable;
+}
+
+bool bpl::SpektrumSrxlDecoder::hasXPlusSupport() const
+{
+    return xPlusSupport;
 }
 
 bpl::RcInputStatus bpl::SpektrumSrxlDecoder::getStatus() const
