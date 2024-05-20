@@ -54,7 +54,7 @@ namespace driver
         // note, buffer sizes must be a power of 2
         //
         protected:
-            inline constexpr static uint32_t IN_BUFFER_SIZE = 256, OUT_BUFFER_SIZE = 256;
+            inline constexpr static uint32_t IN_BUFFER_SIZE = 256, OUT_BUFFER_SIZE = 1024;
 
             volatile uint8_t inBuffer[IN_BUFFER_SIZE], outBuffer[OUT_BUFFER_SIZE];
             volatile uint32_t inBufferHead, inBufferTail;

@@ -108,8 +108,8 @@ bpl::RcInputStatus bpl::SpektrumSrxlDecoder::decode()
                         //
                         // format: [0 bbbb cc d] [dddddddd]
                         // bbbb: the channel number, this is always at 12
-                        //   cc: channel number, low 2 bits, bit 2 is defined by bit 0 of the packet marker, e.g. 0 for '0x02', 1 for '0x03'
-                        // d..d: channel data, 9 bits, with 256 as its midpoint
+                        //   cc: x-plus channel number, low 2 bits, bit 2 is defined by bit 0 of the packet marker, e.g. 0 for '0x02', 1 for '0x03'
+                        // d..d: the associated channel data, 9 bits, with 256 as its midpoint
                         //
                         const auto xPlusChannel = 12 + (((packetMarker & 0b0000'0001) << 2) | ((buffer[14] & 0b0000'0110) >> 1));
                         const auto xPlusValue = (int32_t(buffer[14] & 0b0000'0001) << 8) | buffer[15];

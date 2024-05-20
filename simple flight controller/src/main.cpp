@@ -22,6 +22,7 @@
 #include "pinpoint_gyro_driver.hpp"
 #include "pwm_servo_driver.hpp"
 #include "pid_controller.hpp"
+#include "splash_text.hpp"
 
 //
 // IRQ priorities (0..15 ==> high..low)
@@ -72,6 +73,8 @@ int main()
     // the CLI runs as the main foreground task
     //
     const auto& console = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority2);
+    SplashText::display(console);
+
     auto cli = bpl::CliHandler(console, {scheduler, led, gyros, rcInput, servos, controller}, time);
     while (true) cli.run();
 
