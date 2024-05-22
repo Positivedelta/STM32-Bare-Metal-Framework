@@ -19,9 +19,9 @@
 // project includes
 //
 #include "led_driver.hpp"
-#include "pinpoint_gyro_driver.hpp"
+#include "adis_imu_driver.hpp"
 #include "pwm_servo_driver.hpp"
-#include "pid_controller.hpp"
+#include "stability_controller.hpp"
 #include "splash_text.hpp"
 
 //
@@ -53,17 +53,17 @@ int main()
     // FIXME! 1, instantiating the time reference here as it might required elsewhere
     //        2, eventually the RcDecoder instances need to be configurable, i.e. construct them all and select an instance...
     //
-    auto& time = driver::Time::getInstance(90'000'000, Nvic::Priority3);            // based on a 90 Mhz timebase (the APB1 bus clock speed)
+    auto& time = driver::Time::getInstance(90'000'000, Nvic::Priority3);                    // based on a 90 Mhz timebase (the APB1 bus clock speed)
     auto& rsxl = driver::Usart1::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority1);
     auto rcDecoder = bpl::SpektrumSrxlDecoder(rsxl, time);
     auto rcInput = bpl::RcInput(rcDecoder, true);
 //  auto rcInput = bpl::RcInput(bpl::SpektrumSrxlDecoder(rsxl, time));
 
-    auto led = LedDriver(100, "LED Task");                                          // 100ms timebase
-    auto gyros = PinPointGyroDriver(1, "Gyro Task", led);                           // sample every 1ms
-    auto servos = PWMServoDriver(333);                                              // update the servos or ESCs at 333Hz
-    auto controller = PidController(3, "PID Task", gyros, rcInput, servos, led);    // run the control loop every 3ms, i.e. at 333Hz
-    auto& scheduler = bpl::TaskScheduler::getInstance().initialise(1'000, {gyros, controller, led}, Nvic::Priority10);
+    auto led = LedDriver(100, "LED Task");                                                  // 100ms timebase
+    auto imu = AdisImuDriver(1, "IMU Task", led);                                           // sample every 1ms
+    auto servos = PWMServoDriver(333);                                                      // update the servos or ESCs at 333Hz
+    auto controller = StabilityController(3, "Stability Task", imu, rcInput, servos, led);  // run the stability loop every 3ms, i.e. at 333Hz
+    auto& scheduler = bpl::TaskScheduler::getInstance().initialise(1'000, {imu, controller, led}, Nvic::Priority10);
     scheduler.start();
 
     // FIXME! just for testing...
@@ -75,7 +75,7 @@ int main()
     const auto& console = driver::Usart2::getInstance().initialise(bpl::BaudRate::BPS_115200, Nvic::Priority2);
     SplashText::display(console);
 
-    auto cli = bpl::CliHandler(console, {scheduler, led, gyros, rcInput, servos, controller}, time);
+    auto cli = bpl::CliHandler(console, {scheduler, led, imu, rcInput, servos, controller}, time);
     while (true) cli.run();
 
     return 0;

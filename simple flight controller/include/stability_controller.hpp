@@ -2,8 +2,8 @@
 // (c) Bit Parallel Ltd, October 2023
 //
 
-#ifndef BPL_PID_CONTROLLER_H
-#define BPL_PID_CONTROLLER_H
+#ifndef BPL_STABILITY_CONTROLLER_H
+#define BPL_STABILITY_CONTROLLER_H
 
 #include <cstdint>
 
@@ -11,17 +11,17 @@
 #include "framework/radiocontrol/rc_input.hpp"
 #include "framework/tasking/task.hpp"
 
-#include "pinpoint_gyro_driver.hpp"
+#include "adis_imu_driver.hpp"
 #include "pwm_servo_driver.hpp"
 #include "led_driver.hpp"
 
-class PidController : public bpl::Task, public bpl::CliProvider
+class StabilityController : public bpl::Task, public bpl::CliProvider
 {
     private:
         bpl::RcInput& rcInput;
 
     public:
-        PidController(const uint32_t period, const char* taskName, const PinPointGyroDriver& gyros, bpl::RcInput& rcInput, const PWMServoDriver& servos, const LedDriver& led);
+        StabilityController(const uint32_t period, const char* taskName, const AdisImuDriver& imu, bpl::RcInput& rcInput, const PWMServoDriver& servos, const LedDriver& led);
 
     private:
         void runTask() override;
