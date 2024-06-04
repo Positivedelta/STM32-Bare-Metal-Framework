@@ -4,11 +4,11 @@
 
 #include "pwm_servo_driver.hpp"
 
-PWMServoDriver::PWMServoDriver(const uint32_t frameRate):
+PWMServoDriver::PWMServoDriver([[maybe_unused]] const uint32_t frameRate):
     CliProvider("servos", "manual | set #n=#pwm | auto") {
 }
 
-void PWMServoDriver::setPWM(const uint32_t servo, const uint32_t pwmValue)
+void PWMServoDriver::setPWM([[maybe_unused]] const uint32_t servo, [[maybe_unused]] const uint32_t pwmValue)
 {
 }
 
@@ -16,7 +16,7 @@ void PWMServoDriver::setPWM(const uint32_t servo, const uint32_t pwmValue)
 //{
 //}
 
-bool PWMServoDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time)
+bool PWMServoDriver::handleCliCommand([[maybe_unused]] std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, [[maybe_unused]] driver::Time& time)
 {
     const auto& consoleWriter = console.getPrintWriter();
 

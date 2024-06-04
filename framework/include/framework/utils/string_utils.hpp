@@ -43,7 +43,7 @@ namespace bpl
                 return trimmed;
             }
 
-            static void strip(std::pmr::string& string, const unsigned char c);
+            static void stripWhitespace(std::pmr::string& string);
             static void tokenize(const std::string_view& stringView, const char separator, std::pmr::vector<std::string_view>& tokens);
 
             // added as std::stoi() uses std::string and throws exceptions

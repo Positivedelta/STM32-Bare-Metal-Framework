@@ -118,7 +118,7 @@ void LedDriver::runTask()
 // private CliProvider method
 //
 
-bool LedDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, driver::Time& time)
+bool LedDriver::handleCliCommand(std::pmr::vector<std::string_view>& commandTokens, const bpl::TextIO& console, [[maybe_unused]] driver::Time& time)
 {
     const auto& consoleWriter = console.getPrintWriter();
 

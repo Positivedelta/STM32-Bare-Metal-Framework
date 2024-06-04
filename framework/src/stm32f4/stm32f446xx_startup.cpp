@@ -30,7 +30,7 @@ int main();
 //
 extern "C"
 {
-    void _exit(int status)
+    void _exit([[maybe_unused]] int status)
     {
         // something unexpected / bad has happened, let the user know...
         //
@@ -68,7 +68,7 @@ extern "C"
         return (uint8_t*)prevHeapEnd;
     }
 
-    int32_t _kill(int32_t pid, int32_t sig)
+    int32_t _kill([[maybe_unused]] int32_t pid, [[maybe_unused]] int32_t sig)
     {
         return -1;
     }
@@ -82,22 +82,22 @@ extern "C"
     // added to support the "_printf_float" linker option
     //
 
-    int32_t _isatty(int32_t file)
+    int32_t _isatty([[maybe_unused]] int32_t file)
     {
         return 1;
     }
 
-    int32_t _lseek(int32_t file, int32_t ptr, int32_t dir)
+    int32_t _lseek([[maybe_unused]] int32_t file, [[maybe_unused]] int32_t ptr, [[maybe_unused]] int32_t dir)
     {
         return 0;
     }
 
-    int32_t _fstat(int32_t file, struct stat* st)
+    int32_t _fstat([[maybe_unused]] int32_t file, [[maybe_unused]] struct stat* st)
     {
         return 0;
     }
 
-    int32_t _close(int32_t file)
+    int32_t _close([[maybe_unused]] int32_t file)
     {
         return -1;
     }
@@ -105,7 +105,7 @@ extern "C"
     // notes 1, to support std::scanf() uncomment the code below and add and external reference to uartGetch()
     //       2, in main() implement uartGetch()
     //
-    int32_t _read(int32_t fd, char* data, int32_t length)
+    int32_t _read([[maybe_unused]] int32_t fd, [[maybe_unused]] char* data, [[maybe_unused]] int32_t length)
     {
         return -1;
 
@@ -124,7 +124,7 @@ extern "C"
     // notes 1, to support std::printf() uncomment the code below and add and external reference to uartPutch()
     //       2, in main() implement uartPutch()
     //
-    int32_t _write(int32_t fd, char* text, int32_t length)
+    int32_t _write([[maybe_unused]] int32_t fd, [[maybe_unused]] char* text, [[maybe_unused]] int32_t length)
     {
         return -1;
 

@@ -15,7 +15,7 @@ project("nucleo_f446re_simple_flight_controller" CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wextra -Wno-unused-parameter")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wextra")
 
 include_directories(${BIT_PARALLEL_STM32_ROOT}/framework/include)
 include_directories(${PROJECT_SOURCE_DIR}/include)

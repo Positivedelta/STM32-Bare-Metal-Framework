@@ -47,7 +47,7 @@ namespace driver
             // benign, if needed can be replaced using In::setByteListener()
             // note, returns false to indicate that the byte has not been fully handled and that further action is likely to be required
             //
-            inline const static bpl::ByteListener nullListener = [](const uint8_t byte) {
+            inline const static bpl::ByteListener nullListener = []([[maybe_unused]] const uint8_t byte) {
                 return false;
             };
 

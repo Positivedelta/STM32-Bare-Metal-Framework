@@ -20,7 +20,7 @@ void bpl::StringUtils::trim(std::pmr::string& string)
     string.erase(string.begin(), std::ranges::find_if(string, notSpace));
 }
 
-void bpl::StringUtils::strip(std::pmr::string& string, const unsigned char c)
+void bpl::StringUtils::stripWhitespace(std::pmr::string& string)
 {
     auto isSpace = [](unsigned char const c) {
         return std::isspace(c);
